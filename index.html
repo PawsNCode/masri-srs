@@ -533,6 +533,7 @@ const DEFAULT_STATE = {
   settings: { lessonBatch: 5 },
   daily: { date: todayStr(), reviews: 0, lessons: 0 },
   history: {},
+  script: { progress: {}, best: 0, batch: 5 },
 };
 
 /* ---- On-screen Arabic keyboard ---- */
@@ -1094,10 +1095,257 @@ function App() {
         )}
         {view === "reviews" && <TypedQuiz items={derived.due} mode="srs" onGrade={grade} onExit={() => setView("home")} title="Reviews" />}
         {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onExit={() => setView("items")} title="Practice" />}
-        {view === "script" && <ScriptView />}
+        {view === "script" && <ScriptView scriptState={state.script} setScript={(next) => persist({ ...state, script: next })} />}
         {view === "items" && (
           <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} />
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ===================== SCRIPT TRAIN (learn + quiz the alphabet) ===================== */
+function makeLetterQ(answer) {
+  const pool = shuffle(ALPHABET.filter((x) => x[2] !== answer[2])).slice(0, 3);
+  return { answer, options: shuffle([answer, ...pool]) };
+}
+
+function ScriptTrain({ scriptState, setScript }) {
+  const ss = scriptState || { progress: {}, best: 0, batch: 5 };
+  const prog = ss.progress || {};
+  const batch = ss.batch || 5;
+
+  const [mode, setMode] = useState("menu"); // menu | teach | quiz
+  const [teachQueue, setTeachQueue] = useState([]);
+  const [tIdx, setTIdx] = useState(0);
+  const [quizSet, setQuizSet] = useState([]);
+  const [qIdx, setQIdx] = useState(0);
+  const [q, setQ] = useState(null);
+  const [picked, setPicked] = useState(null);
+  const [sess, setSess] = useState({ right: 0, total: 0, streak: 0, best: ss.best || 0 });
+  const timer = useRef(null);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  const learned = ALPHABET.filter((a) => prog[a[0]] && prog[a[0]].learned);
+  const unlearned = ALPHABET.filter((a) => !(prog[a[0]] && prog[a[0]].learned));
+  const trouble = ALPHABET.filter((a) => (prog[a[0]]?.recentWrong || 0) >= 2);
+  const mastered = ALPHABET.filter((a) => { const p = prog[a[0]]; return p && p.correct >= 4 && (p.recentWrong || 0) === 0; });
+
+  const saveLetter = (key, correct, newStreak) => {
+    const p = prog[key] || { learned: true, correct: 0, wrong: 0, recentWrong: 0 };
+    const np = {
+      learned: true,
+      correct: p.correct + (correct ? 1 : 0),
+      wrong: p.wrong + (correct ? 0 : 1),
+      recentWrong: correct ? 0 : (p.recentWrong || 0) + 1,
+    };
+    setScript({ ...ss, progress: { ...prog, [key]: np }, best: Math.max(ss.best || 0, newStreak || 0) });
+  };
+  const markLearned = (key) => {
+    if (prog[key] && prog[key].learned) return;
+    const p = prog[key] || { correct: 0, wrong: 0, recentWrong: 0 };
+    setScript({ ...ss, progress: { ...prog, [key]: { ...p, learned: true } } });
+  };
+  const setBatch = (n) => setScript({ ...ss, batch: n });
+
+  /* ---- start flows ---- */
+  const startLearn = () => {
+    const next = unlearned.slice(0, batch);
+    if (!next.length) return;
+    setTeachQueue(next);
+    setTIdx(0);
+    setMode("teach");
+  };
+  const startQuiz = (list) => {
+    if (!list.length) return;
+    const set = shuffle(list).slice(0, 12);
+    setQuizSet(set);
+    setQIdx(0);
+    setPicked(null);
+    setQ(makeLetterQ(set[0]));
+    setSess({ right: 0, total: 0, streak: 0, best: ss.best || 0 });
+    setMode("quiz");
+  };
+
+  /* ---- quiz answer ---- */
+  const choose = (opt) => {
+    if (picked) return;
+    const ans = q.answer;
+    const correct = opt[2] === ans[2];
+    speak(ans[0]);
+    setPicked(opt);
+    const newStreak = correct ? sess.streak + 1 : 0;
+    setSess((s) => ({ right: s.right + (correct ? 1 : 0), total: s.total + 1, streak: newStreak, best: Math.max(s.best, newStreak) }));
+    saveLetter(ans[0], correct, newStreak);
+    timer.current = setTimeout(() => {
+      const n = qIdx + 1;
+      if (n >= quizSet.length) {
+        setMode("done");
+      } else {
+        setQIdx(n);
+        setPicked(null);
+        setQ(makeLetterQ(quizSet[n]));
+      }
+    }, 950);
+  };
+
+  /* ===================== MENU ===================== */
+  if (mode === "menu") {
+    return (
+      <div className="fade" style={{ paddingTop: 4 }}>
+        <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "18px 18px 16px", marginBottom: 14, boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
+          <div style={{ fontFamily: displayFont, fontSize: 21, color: T.gold }}>Master the alphabet</div>
+          <div style={{ fontSize: 12.5, color: T.textDim, marginTop: 3, lineHeight: 1.5 }}>
+            Learn {batch} letters, then quiz them — same idea as the word lessons. Lock in the script and reading the words gets much easier.
+          </div>
+          <div style={{ margin: "14px 0 6px" }}>
+            <Bar pct={learned.length / ALPHABET.length} />
+          </div>
+          <div style={{ fontSize: 12, color: T.textDim }}>{learned.length} / {ALPHABET.length} letters learned · {mastered.length} mastered</div>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+          <Stat label="Best streak" value={`${ss.best || 0}🔥`} color={T.terra} />
+          <Stat label="Learned" value={learned.length} color={T.gold} />
+          <Stat label="Trouble" value={trouble.length} color={trouble.length ? T.red : T.textDim} />
+        </div>
+
+        <button className="tap" onClick={startLearn} disabled={!unlearned.length} style={{ width: "100%", padding: 15, borderRadius: 14, border: "none", marginBottom: 10, background: unlearned.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.panel, color: unlearned.length ? "#fff" : T.textDim, fontSize: 15, fontWeight: 700, boxShadow: unlearned.length ? "0 8px 20px rgba(128,29,92,.18)" : "none", border: unlearned.length ? "none" : `1px solid ${T.line}` }}>
+          {unlearned.length ? `Learn next ${Math.min(batch, unlearned.length)} letters →` : "All 28 letters learned 🎉"}
+        </button>
+
+        <button className="tap" onClick={() => startQuiz(learned)} disabled={!learned.length} style={{ width: "100%", padding: 13, borderRadius: 13, marginBottom: 10, border: `1px solid ${learned.length ? T.gold : T.line}`, background: learned.length ? `${T.gold}10` : T.panel, color: learned.length ? T.gold : T.textDim, fontSize: 14, fontWeight: 700 }}>
+          ✨ Quiz learned letters
+        </button>
+
+        <button className="tap" onClick={() => startQuiz(trouble)} disabled={!trouble.length} style={{ width: "100%", padding: 13, borderRadius: 13, border: `1px solid ${trouble.length ? T.red : T.line}`, background: trouble.length ? `${T.red}0f` : T.panel, color: trouble.length ? T.red : T.textDim, fontSize: 14, fontWeight: 700 }}>
+          🔁 Drill trouble letters {trouble.length ? `(${trouble.length})` : ""}
+        </button>
+
+        <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: 16, marginTop: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 14 }}>Letters per quiz</span>
+            <div style={{ display: "flex", gap: 8 }}>
+              {[3, 5, 7, 10].map((n) => (
+                <button key={n} className="tap" onClick={() => setBatch(n)} style={{ border: `1px solid ${batch === n ? T.gold : T.line}`, background: batch === n ? `${T.gold}18` : "transparent", color: batch === n ? T.gold : T.textDim, borderRadius: 9, padding: "6px 11px", fontSize: 13, fontWeight: 600 }}>{n}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {trouble.length > 0 && (
+          <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
+            {trouble.map((a) => (
+              <span key={a[0]} style={{ fontFamily: arFont, fontSize: 26, color: T.red, border: `1px solid ${T.red}44`, borderRadius: 9, padding: "2px 10px", direction: "rtl" }}>{a[0]}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ===================== TEACH ===================== */
+  if (mode === "teach") {
+    const a = teachQueue[tIdx];
+    const f = letterForms(a[0]);
+    const sk = STROKES[a[0]];
+    return (
+      <div className="fade">
+        <div style={{ height: 4, background: T.line, borderRadius: 4, overflow: "hidden", marginBottom: 14 }}>
+          <div style={{ height: "100%", width: `${(tIdx / teachQueue.length) * 100}%`, background: `linear-gradient(90deg, ${T.gold}, ${T.terra})` }} />
+        </div>
+        <div className="pop" key={a[0]} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "26px 22px", textAlign: "center", boxShadow: "0 12px 34px rgba(128,29,92,.10)" }}>
+          <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>New letter</div>
+          <div style={{ fontFamily: arFont, fontSize: 88, color: T.text, direction: "rtl", lineHeight: 1.1, margin: "6px 0 4px" }}>{a[0]}</div>
+          <div style={{ fontSize: 17, color: T.text }}>{a[1]} <span style={{ color: T.goldSoft, fontStyle: "italic" }}>· {a[2]}</span></div>
+          <div style={{ fontSize: 13, color: T.textDim, marginTop: 4, lineHeight: 1.5 }}>{a[3]}</div>
+          {sk && <div style={{ fontSize: 12.5, color: T.gold, marginTop: 6, lineHeight: 1.5 }}>✍️ {sk[1]}</div>}
+          <div style={{ display: "flex", gap: 6, marginTop: 14 }}>
+            {[["iso", f.iso], ["init", f.ini], ["med", f.med], ["fin", f.fin]].map(([k, glyph]) => (
+              <div key={k} style={{ flex: 1, textAlign: "center", background: T.panel, border: `1px solid ${T.line}`, borderRadius: 9, padding: "8px 2px" }}>
+                <div style={{ fontFamily: arFont, fontSize: 26, color: T.text, direction: "rtl", minHeight: 32 }}>{glyph}</div>
+                <div style={{ fontSize: 9, color: T.textDim, marginTop: 3, textTransform: "uppercase", letterSpacing: 0.5 }}>{k}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 14 }}><Speaker text={a[0]} size={20} color={T.gold} /></div>
+        </div>
+        <button
+          className="tap"
+          onClick={() => {
+            markLearned(a[0]);
+            if (tIdx + 1 >= teachQueue.length) startQuiz(teachQueue);
+            else setTIdx(tIdx + 1);
+          }}
+          style={{ width: "100%", marginTop: 14, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}
+        >
+          {tIdx + 1 >= teachQueue.length ? "Got them — quiz me →" : "Learn it ✓"}
+        </button>
+        <div style={{ textAlign: "center", fontSize: 12, color: T.textDim, marginTop: 10 }}>Learning {tIdx + 1} of {teachQueue.length}</div>
+      </div>
+    );
+  }
+
+  /* ===================== DONE ===================== */
+  if (mode === "done") {
+    const acc = sess.total ? Math.round((sess.right / sess.total) * 100) : 0;
+    return (
+      <div className="fade pop" style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
+        <div style={{ fontSize: 38, marginBottom: 8 }}>🎉</div>
+        <div style={{ fontFamily: displayFont, fontSize: 22 }}>Nice work!</div>
+        <div style={{ color: T.textDim, fontSize: 14, marginTop: 8 }}>{sess.right}/{sess.total} correct · {acc}% · best streak {sess.best}🔥</div>
+        <button className="tap" onClick={() => setMode("menu")} style={{ width: "100%", marginTop: 18, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back</button>
+      </div>
+    );
+  }
+
+  /* ===================== QUIZ ===================== */
+  const ans = q.answer;
+  return (
+    <div className="fade">
+      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+        <Stat label="Score" value={`${sess.right}/${sess.total}`} color={T.gold} />
+        <Stat label="Streak" value={`${sess.streak}🔥`} color={T.terra} />
+        <Stat label="Best" value={sess.best} color={T.green} />
+      </div>
+
+      <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "26px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 16 }}>
+        <div style={{ fontSize: 12, color: T.textDim, marginBottom: 10 }}>Which sound is this?</div>
+        <div style={{ fontFamily: arFont, fontSize: 84, color: T.text, direction: "rtl", lineHeight: 1 }}>{ans[0]}</div>
+        <div style={{ marginTop: 12 }}><Speaker text={ans[0]} size={18} color={T.terra} /></div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        {q.options.map((opt, i) => {
+          let bg = T.panel, border = T.line, col = T.text;
+          if (picked) {
+            const isCorrect = opt[2] === ans[2];
+            const isPicked = opt[2] === picked[2];
+            if (isCorrect) { bg = `${T.green}1a`; border = T.green; col = T.gold; }
+            else if (isPicked) { bg = `${T.red}1a`; border = T.red; col = T.red; }
+          }
+          return (
+            <button key={i} className="tap" onClick={() => choose(opt)} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 14, padding: "14px 8px", cursor: "pointer", minHeight: 58, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontFamily: displayFont, fontSize: 22, color: col, fontWeight: 600 }}>{opt[2]}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {picked && (
+        <div className="fade" style={{ textAlign: "center", marginTop: 14, fontSize: 14 }}>
+          <span style={{ fontFamily: arFont, fontSize: 24, color: T.text }}>{ans[0]}</span>
+          <span style={{ color: T.textDim }}> = </span>
+          <span style={{ color: T.gold, fontWeight: 700 }}>{ans[1]}</span>
+          <span style={{ color: T.goldSoft, fontStyle: "italic" }}> · {ans[2]}</span>
+        </div>
+      )}
+
+      <button className="tap" onClick={() => { clearTimeout(timer.current); setMode("menu"); }} style={{ width: "100%", marginTop: 16, padding: 10, borderRadius: 12, border: "none", background: "transparent", color: T.textDim, fontSize: 12 }}>
+        End session
+      </button>
+      <div style={{ fontSize: 11, color: T.textDim, textAlign: "center", marginTop: 6, lineHeight: 1.6 }}>
+        {qIdx + 1} of {quizSet.length} · you'll hear each letter as you answer.
       </div>
     </div>
   );
@@ -1121,8 +1369,8 @@ function Stat({ label, value, color }) {
   );
 }
 
-function ScriptView() {
-  const [mode, setMode] = useState("learn");
+function ScriptView({ scriptState, setScript }) {
+  const [mode, setMode] = useState("train");
   return (
     <div className="fade" style={{ paddingTop: 6 }}>
       <div
@@ -1137,7 +1385,8 @@ function ScriptView() {
         }}
       >
         {[
-          ["learn", "📖 Learn"],
+          ["train", "🎓 Train"],
+          ["learn", "📖 Chart"],
           ["quiz", "✨ Quiz"],
           ["trace", "✍️ Trace"],
         ].map(([k, label]) => (
@@ -1149,8 +1398,8 @@ function ScriptView() {
               flex: 1,
               border: "none",
               borderRadius: 9,
-              padding: "9px 4px",
-              fontSize: 13,
+              padding: "9px 2px",
+              fontSize: 12,
               fontWeight: 600,
               color: mode === k ? "#ffffff" : T.textDim,
               background:
@@ -1161,6 +1410,7 @@ function ScriptView() {
           </button>
         ))}
       </div>
+      {mode === "train" && <ScriptTrain scriptState={scriptState} setScript={setScript} />}
       {mode === "learn" && <ScriptLearn />}
       {mode === "quiz" && <ScriptQuiz />}
       {mode === "trace" && <ScriptTrace />}
