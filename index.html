@@ -408,6 +408,345 @@ const RAW = [
   ["aorab", 15, "sentence", "فين أقرب محطة", "feen aʾrab maHatta", "Where's the nearest station?"],
   ["atallemarabi", 15, "sentence", "أنا عايز أتعلم عربي", "ana ʿaayez atʿallem ʿarabi", "I want to learn Arabic (man)"],
   ["hesabminfadlak", 15, "sentence", "الحساب من فضلك", "el-Hesaab min fadlak", "The bill, please (man)"],
+
+  // ===== L16 — Numbers 11–1000 =====
+  ["n11", 16, "word", "حداشر", "Hedaashar", "Eleven"],
+  ["n12", 16, "word", "اتناشر", "etnaashar", "Twelve"],
+  ["n13", 16, "word", "تلاتاشر", "talataashar", "Thirteen"],
+  ["n15", 16, "word", "خمستاشر", "khamastaashar", "Fifteen"],
+  ["n20", 16, "word", "عشرين", "ʿeshriin", "Twenty"],
+  ["n30", 16, "word", "تلاتين", "talatiin", "Thirty"],
+  ["n40", 16, "word", "أربعين", "arbeʿiin", "Forty"],
+  ["n50", 16, "word", "خمسين", "khamsiin", "Fifty"],
+  ["n60", 16, "word", "ستين", "settiin", "Sixty"],
+  ["n70", 16, "word", "سبعين", "sabʿiin", "Seventy"],
+  ["n80", 16, "word", "تمانين", "tamaniin", "Eighty"],
+  ["n90", 16, "word", "تسعين", "tesʿiin", "Ninety"],
+  ["n100", 16, "word", "مية", "meyya", "One hundred"],
+  ["n1000", 16, "word", "ألف", "alf", "One thousand"],
+
+  // ===== L17 — Days & time expressions =====
+  ["d_goma", 17, "word", "الجمعة", "el-gomʿa", "Friday"],
+  ["d_sabt", 17, "word", "السبت", "es-sabt", "Saturday"],
+  ["d_had", 17, "word", "الحد", "el-Hadd", "Sunday"],
+  ["d_etnein", 17, "word", "الإتنين", "el-etneen", "Monday"],
+  ["d_talat", 17, "word", "التلات", "et-talaat", "Tuesday"],
+  ["d_arba", 17, "word", "الأربع", "el-arbaʿ", "Wednesday"],
+  ["d_khamiis", 17, "word", "الخميس", "el-khamiis", "Thursday"],
+  ["t_deʾiʾa", 17, "word", "دقيقة", "deʾiiʾa", "Minute"],
+  ["t_noss", 17, "phrase", "نص ساعة", "noss saaʿa", "Half an hour"],
+  ["t_reb", 17, "phrase", "ربع ساعة", "rebʿ saaʿa", "Quarter of an hour"],
+  ["t_badri", 17, "word", "بدري", "badri", "Early"],
+  ["t_metaakhar", 17, "word", "متأخر", "metʾakhar", "Late"],
+
+  // ===== L18 — Everyday verbs (I-form) A =====
+  ["v_write", 18, "word", "بكتب", "baktib", "I write"],
+  ["v_read", 18, "word", "باقرا", "baʾra", "I read"],
+  ["v_work", 18, "word", "باشتغل", "bashtaghal", "I work"],
+  ["v_sleep", 18, "word", "بانام", "banaam", "I sleep"],
+  ["v_wake", 18, "word", "باصحى", "baSHa", "I wake up"],
+  ["v_sit", 18, "word", "باقعد", "baʾʿod", "I sit / stay"],
+  ["v_open", 18, "word", "بافتح", "baftaH", "I open"],
+  ["v_close", 18, "word", "باقفل", "baʾfel", "I close"],
+  ["v_pay", 18, "word", "بادفع", "badfaʿ", "I pay"],
+  ["v_help", 18, "word", "باساعد", "basaaʿed", "I help"],
+  ["v_ask", 18, "word", "باسأل", "basʾal", "I ask"],
+  ["v_listen", 18, "word", "باسمع", "basmaʿ", "I listen / hear"],
+
+  // ===== L19 — Everyday verbs (I-form) B + patterns =====
+  ["v_wait", 19, "word", "باستنى", "bastanna", "I wait"],
+  ["v_find", 19, "word", "بالاقي", "balaaʾi", "I find"],
+  ["v_take", 19, "word", "باخد", "baakhod", "I take"],
+  ["v_bring", 19, "word", "باجيب", "bagiib", "I bring"],
+  ["v_understand", 19, "word", "بافهم", "bafham", "I understand"],
+  ["v_forget", 19, "word", "بانسى", "bansa", "I forget"],
+  ["v_think", 19, "word", "بافكر", "bafakkar", "I think"],
+  ["p_doingwhat", 19, "sentence", "بتعمل إيه", "betiʿmel eh", "What are you doing? (m)"],
+  ["p_canhelp", 19, "sentence", "ممكن أساعدك", "mumkin asaʿdak", "Can I help you? (m)"],
+  ["p_whatlike", 19, "sentence", "تحب إيه", "teHebb eh", "What would you like? (m)"],
+
+  // ===== L20 — Prepositions & place words =====
+  ["pr_in", 20, "word", "في", "fi", "In"],
+  ["pr_on", 20, "word", "على", "ʿala", "On"],
+  ["pr_under", 20, "word", "تحت", "taHt", "Under"],
+  ["pr_above", 20, "word", "فوق", "foʾ", "Above / up"],
+  ["pr_next", 20, "word", "جمب", "gamb", "Next to"],
+  ["pr_behind", 20, "word", "ورا", "wara", "Behind"],
+  ["pr_front", 20, "word", "قدام", "oddaam", "In front of"],
+  ["pr_between", 20, "word", "بين", "been", "Between"],
+  ["pr_with", 20, "word", "مع", "maʿa", "With"],
+  ["pr_without", 20, "phrase", "من غير", "men gheer", "Without"],
+  ["pr_to", 20, "word", "لـ", "le", "To / for"],
+  ["pr_inside", 20, "word", "جوه", "gowwa", "Inside"],
+  ["pr_outside", 20, "word", "بره", "barra", "Outside"],
+
+  // ===== L21 — Connectors & question words =====
+  ["c_and", 21, "word", "و", "we", "And"],
+  ["c_but", 21, "word", "بس", "bas", "But / only"],
+  ["c_because", 21, "word", "عشان", "ʿashaan", "Because"],
+  ["c_if", 21, "word", "لو", "law", "If"],
+  ["c_or", 21, "word", "ولا", "walla", "Or"],
+  ["c_also", 21, "word", "كمان", "kamaan", "Also / too"],
+  ["c_sothat", 21, "phrase", "عشان كده", "ʿashaan keda", "That's why / so"],
+  ["c_imean", 21, "word", "يعني", "yaʿni", "I mean / like"],
+  ["c_okthen", 21, "word", "طب", "Tab", "Okay then / so"],
+  ["c_whatsup", 21, "sentence", "فيه إيه", "fiih eh", "What's the matter?"],
+
+  // ===== L22 — Colors =====
+  ["col_white", 22, "word", "أبيض", "abyaD", "White"],
+  ["col_black", 22, "word", "إسود", "eswed", "Black"],
+  ["col_red", 22, "word", "أحمر", "aHmar", "Red"],
+  ["col_blue", 22, "word", "أزرق", "azraʾ", "Blue"],
+  ["col_green", 22, "word", "أخضر", "akhDar", "Green"],
+  ["col_yellow", 22, "word", "أصفر", "aSfar", "Yellow"],
+  ["col_brown", 22, "word", "بني", "bonni", "Brown"],
+  ["col_gray", 22, "word", "رمادي", "romaadi", "Gray"],
+  ["col_orange", 22, "word", "برتقاني", "bortoʾaani", "Orange"],
+  ["col_color", 22, "word", "لون", "loon", "Color"],
+
+  // ===== L23 — Adjectives & opposites =====
+  ["a_hotw", 23, "word", "حر", "Harr", "Hot (weather)"],
+  ["a_cold", 23, "word", "بارد", "baared", "Cold"],
+  ["a_hotobj", 23, "word", "سخن", "sokhn", "Hot (object)"],
+  ["a_fast", 23, "word", "سريع", "sariiʿ", "Fast"],
+  ["a_slow", 23, "word", "بطيء", "baTiiʾ", "Slow"],
+  ["a_easy", 23, "word", "سهل", "sahl", "Easy"],
+  ["a_hard", 23, "word", "صعب", "saʿb", "Hard / difficult"],
+  ["a_clean", 23, "word", "نضيف", "naDiif", "Clean"],
+  ["a_dirty", 23, "word", "وسخ", "wesekh", "Dirty"],
+  ["a_full", 23, "word", "مليان", "malyaan", "Full"],
+  ["a_empty", 23, "word", "فاضي", "faaDi", "Empty / free"],
+  ["a_rich", 23, "word", "غني", "ghani", "Rich"],
+  ["a_poor", 23, "word", "فقير", "faʾiir", "Poor"],
+
+  // ===== L24 — Body & health =====
+  ["b_head", 24, "word", "راس", "raas", "Head"],
+  ["b_eye", 24, "word", "عين", "ʿein", "Eye"],
+  ["b_hand", 24, "word", "إيد", "iid", "Hand"],
+  ["b_leg", 24, "word", "رجل", "regl", "Leg / foot"],
+  ["b_stomach", 24, "word", "بطن", "baTn", "Stomach"],
+  ["b_tooth", 24, "word", "ضرس", "Ders", "Tooth"],
+  ["b_heart", 24, "word", "قلب", "ʾalb", "Heart"],
+  ["b_doctor", 24, "word", "دكتور", "doktoor", "Doctor"],
+  ["b_medicine", 24, "word", "دوا", "dawa", "Medicine"],
+  ["b_pain", 24, "word", "وجع", "wagaʿ", "Pain / ache"],
+  ["b_headache", 24, "word", "صداع", "Sodaaʿ", "Headache"],
+  ["b_haveheadache", 24, "sentence", "عندي صداع", "ʿandi Sodaaʿ", "I have a headache"],
+
+  // ===== L25 — Home & things =====
+  ["h_room", 25, "word", "أوضة", "oDa", "Room"],
+  ["h_kitchen", 25, "word", "مطبخ", "maTbakh", "Kitchen"],
+  ["h_bathroom", 25, "word", "حمام", "Hammaam", "Bathroom"],
+  ["h_bed", 25, "word", "سرير", "sariir", "Bed"],
+  ["h_table", 25, "word", "ترابيزة", "tarabeeza", "Table"],
+  ["h_chair", 25, "word", "كرسي", "korsi", "Chair"],
+  ["h_door", 25, "word", "باب", "baab", "Door"],
+  ["h_window", 25, "word", "شباك", "shebbaak", "Window"],
+  ["h_key", 25, "word", "مفتاح", "moftaaH", "Key"],
+  ["h_light", 25, "word", "نور", "noor", "Light"],
+  ["h_fridge", 25, "word", "تلاجة", "talaaga", "Fridge"],
+
+  // ===== L26 — Clothes & personal items =====
+  ["cl_clothes", 26, "word", "هدوم", "hedoom", "Clothes"],
+  ["cl_shirt", 26, "word", "قميص", "ʾamiiS", "Shirt"],
+  ["cl_trousers", 26, "word", "بنطلون", "banTaloon", "Trousers"],
+  ["cl_shoes", 26, "word", "جزمة", "gazma", "Shoes"],
+  ["cl_dress", 26, "word", "فستان", "fostaan", "Dress"],
+  ["cl_glasses", 26, "word", "نضارة", "naDDaara", "Glasses"],
+  ["cl_wallet", 26, "word", "محفظة", "maHfaZa", "Wallet"],
+  ["cl_phone", 26, "word", "موبايل", "mobaayl", "Mobile phone"],
+
+  // ===== L27 — Work, study & routine =====
+  ["w_office", 27, "word", "مكتب", "maktab", "Office / desk"],
+  ["w_teacher", 27, "word", "مدرس", "modarres", "Teacher (m)"],
+  ["w_student", 27, "word", "طالب", "Taaleb", "Student (m)"],
+  ["w_degree", 27, "word", "شهادة", "shahaada", "Certificate / degree"],
+  ["w_meeting", 27, "word", "اجتماع", "egtemaaʿ", "Meeting"],
+  ["w_appt", 27, "word", "موعد", "mawʿed", "Appointment"],
+  ["w_study", 27, "word", "بادرس", "badris", "I study"],
+  ["w_whatjob", 27, "sentence", "بتشتغل إيه", "beteshtaghal eh", "What do you do for work? (m)"],
+  ["w_iateacher", 27, "sentence", "أنا مدرس", "ana modarres", "I'm a teacher (m)"],
+
+  // ===== L28 — Phone, internet & plans =====
+  ["ph_phone", 28, "word", "تليفون", "telifoon", "Telephone"],
+  ["ph_call", 28, "word", "اتصال", "etesaal", "A call"],
+  ["ph_message", 28, "word", "رسالة", "resaala", "Message"],
+  ["ph_email", 28, "word", "إيميل", "iimeel", "Email"],
+  ["ph_internet", 28, "word", "إنترنت", "internet", "Internet"],
+  ["ph_whatsapp", 28, "word", "واتساب", "watsaab", "WhatsApp"],
+  ["ph_number", 28, "word", "رقم", "raʾam", "Number"],
+  ["ph_available", 28, "word", "موجود", "mawgood", "Available / present (m)"],
+  ["ph_callme", 28, "sentence", "كلمني", "kallemni", "Call me (m)"],
+  ["ph_sendme", 28, "sentence", "ابعتلي", "ebʿatli", "Send me (m)"],
+
+  // ===== L29 — Money & shopping dialogue =====
+  ["m_pound", 29, "word", "جنيه", "gneeh", "Pound (currency)"],
+  ["m_coins", 29, "word", "فكة", "fakka", "Change (coins)"],
+  ["m_card", 29, "word", "كارت", "kart", "Card"],
+  ["m_cash", 29, "word", "كاش", "kaash", "Cash"],
+  ["m_total", 29, "word", "الإجمالي", "el-egmaali", "The total"],
+  ["m_havechange", 29, "sentence", "عندك فكة", "ʿandak fakka", "Do you have change? (m)"],
+  ["m_perkilo", 29, "sentence", "ده بكام الكيلو", "da bekaam el-kilo", "How much per kilo?"],
+
+  // ===== L30 — Weather & nature =====
+  ["we_weather", 30, "word", "جو", "gaww", "Weather"],
+  ["we_sun", 30, "word", "شمس", "shams", "Sun"],
+  ["we_rain", 30, "word", "مطر", "maTar", "Rain"],
+  ["we_wind", 30, "word", "ريح", "riiH", "Wind"],
+  ["we_cold", 30, "word", "برد", "bard", "Cold (the cold)"],
+  ["we_clouds", 30, "word", "سحاب", "saHaab", "Clouds"],
+  ["we_summer", 30, "word", "صيف", "Seif", "Summer"],
+  ["we_winter", 30, "word", "شتا", "sheta", "Winter"],
+
+  // ===== L31 — Travel, hotel & transport =====
+  ["tr_ticket", 31, "word", "تذكرة", "tazkara", "Ticket"],
+  ["tr_hotel", 31, "word", "فندق", "fondoʾ", "Hotel"],
+  ["tr_booking", 31, "word", "حجز", "Hagz", "Reservation"],
+  ["tr_passport", 31, "word", "باسبور", "basboor", "Passport"],
+  ["tr_trip", 31, "word", "رحلة", "reHla", "Trip / flight"],
+  ["tr_wherehotel", 31, "sentence", "فين الفندق", "feen el-fondoʾ", "Where's the hotel?"],
+  ["tr_havebooking", 31, "sentence", "عندي حجز", "ʿandi Hagz", "I have a reservation"],
+
+  // ===== L32 — Restaurant & café =====
+  ["r_order", 32, "sentence", "أنا عايز أطلب", "ana ʿaayez aTlob", "I want to order (m)"],
+  ["r_cup", 32, "word", "كوباية", "kobaaya", "Cup / glass"],
+  ["r_bottle", 32, "word", "أزازة", "azaaza", "Bottle"],
+  ["r_coldserved", 32, "word", "ساقع", "saʾʿa", "Cold (served cold)"],
+  ["r_full", 32, "sentence", "أنا شبعان", "ana shabʿaan", "I'm full (m)"],
+  ["r_billplease", 32, "sentence", "الحساب لو سمحت", "el-Hesaab law samaHt", "The bill, please"],
+
+  // ===== L33 — Opinions, reactions & fillers =====
+  ["o_think", 33, "phrase", "في رأيي", "fi raʾyi", "In my opinion"],
+  ["o_agree", 33, "word", "موافق", "mowaafeʾ", "I agree (m)"],
+  ["o_prefer", 33, "word", "بافضل", "bafaDDal", "I prefer"],
+  ["o_really", 33, "word", "بجد", "begadd", "Really?"],
+  ["o_ofcourse", 33, "word", "طبعاً", "TabʿAn", "Of course"],
+  ["o_maybe", 33, "word", "يمكن", "yemken", "Maybe"],
+  ["o_notsure", 33, "phrase", "مش متأكد", "mesh metʾakked", "Not sure (m)"],
+  ["o_great", 33, "word", "عظيم", "ʿaZiim", "Great"],
+  ["o_sure", 33, "word", "أكيد", "akiid", "Sure / definitely"],
+  ["o_nice", 33, "word", "جميل", "gamiil", "Lovely / nice"],
+
+  // ===== L34 — Conversational sentences I =====
+  ["s_askq", 34, "sentence", "ممكن أسألك سؤال", "mumkin asʾalak suʾaal", "Can I ask you a question? (m)"],
+  ["s_english", 34, "sentence", "إنت بتتكلم إنجليزي", "enta betetkallem engliizi", "Do you speak English? (m)"],
+  ["s_notfromhere", 34, "sentence", "أنا مش من هنا", "ana mesh men hena", "I'm not from here"],
+  ["s_helpplease", 34, "sentence", "ممكن تساعدني لو سمحت", "mumkin tesaaʿedni law samaHt", "Can you help me, please?"],
+  ["s_lost", 34, "sentence", "أنا تايه", "ana taayeh", "I'm lost (m)"],
+  ["s_waitmoment", 34, "sentence", "استنى لحظة", "estanna laHZa", "Wait a moment"],
+  ["s_doesntmatter", 34, "sentence", "مش مهم", "mesh mohem", "It doesn't matter"],
+  ["s_asyoulike", 34, "sentence", "براحتك", "be-raaHtak", "As you like (m)"],
+
+  // ===== L35 — Conversational sentences II =====
+  ["s_nicemeet", 35, "sentence", "سعيد بمعرفتك", "saʿiid be-maʿreftak", "Nice to meet you (m)"],
+  ["s_meetagain", 35, "sentence", "إن شاء الله نتقابل تاني", "in shaaʾ allah netʾaabel taani", "Hopefully we'll meet again"],
+  ["s_callifneed", 35, "sentence", "اتصل بيا لو محتاج حاجة", "etesel biya law meHtaag Haaga", "Call me if you need anything (m)"],
+  ["s_loveegypt", 35, "sentence", "أنا بحب مصر أوي", "ana baHebb maSr awi", "I love Egypt a lot"],
+  ["s_talklater", 35, "sentence", "ممكن نتكلم بعدين", "mumkin netkallem baʿdein", "Can we talk later?"],
+  ["s_letsgo", 35, "sentence", "يلا بينا", "yalla biina", "Let's go (come on)"],
+  ["s_takecare", 35, "sentence", "خد بالك", "khod baalak", "Take care (m)"],
+
+  // ===== L36 — Verbs: present across persons =====
+  ["vc_yougo", 36, "word", "بتروح", "betrooH", "You go (m) / she goes"],
+  ["vc_yougof", 36, "word", "بتروحي", "betrooHi", "You go (f)"],
+  ["vc_hego", 36, "word", "بيروح", "biyrooH", "He goes"],
+  ["vc_wego", 36, "word", "بنروح", "benrooH", "We go"],
+  ["vc_theygo", 36, "word", "بيروحوا", "biyrooHu", "They go"],
+  ["vc_youeat", 36, "word", "بتاكل", "betaakol", "You eat (m) / she eats"],
+  ["vc_heeat", 36, "word", "بياكل", "biyaakol", "He eats"],
+  ["vc_weeat", 36, "word", "بناكل", "benaakol", "We eat"],
+  ["vc_youdo", 36, "word", "بتعمل", "betiʿmel", "You do (m) / she does"],
+  ["vc_hedo", 36, "word", "بيعمل", "biyiʿmel", "He does"],
+  ["vc_wedo", 36, "word", "بنعمل", "benʿmel", "We do"],
+
+  // ===== L37 — Verbs: past, future & negation =====
+  ["pf_iwent", 37, "word", "رحت", "roHt", "I went"],
+  ["pf_hewent", 37, "word", "راح", "raaH", "He went"],
+  ["pf_shewent", 37, "word", "راحت", "raaHet", "She went"],
+  ["pf_wewent", 37, "word", "رحنا", "roHna", "We went"],
+  ["pf_iate", 37, "word", "أكلت", "akalt", "I ate"],
+  ["pf_idid", 37, "word", "عملت", "ʿamalt", "I did"],
+  ["pf_iwillgo", 37, "word", "هروح", "harooH", "I will go"],
+  ["pf_hewillgo", 37, "word", "هيروح", "hayrooH", "He will go"],
+  ["pf_iwilleat", 37, "word", "هاكل", "haakol", "I will eat"],
+  ["pf_didntgo", 37, "word", "ماروحتش", "maroHtesh", "I didn't go"],
+  ["pf_didnteat", 37, "word", "ماكلتش", "makaltesh", "I didn't eat"],
+  ["pf_wontgo", 37, "phrase", "مش هروح", "mesh harooH", "I won't go"],
+
+  // ===== L38 — Taxi & getting a ride =====
+  ["tx_driver", 38, "phrase", "يا أسطى", "ya osTa", "Hey, driver! (calling a cab)"],
+  ["tx_takeme", 38, "phrase", "وديني", "waddiini", "Take me (to)"],
+  ["tx_meter", 38, "sentence", "شغل العداد", "shaghghal el-ʿaddaad", "Turn on the meter"],
+  ["tx_fare", 38, "sentence", "الأجرة بكام", "el-ogra bekaam", "How much is the fare?"],
+  ["tx_stophere", 38, "sentence", "وقف هنا", "waʾʾaf hena", "Stop here"],
+  ["tx_right", 38, "sentence", "على اليمين لو سمحت", "ʿala el-yemiin law samaHt", "To the right, please"],
+  ["tx_hurry", 38, "sentence", "أنا مستعجل", "ana mestaʿgel", "I'm in a hurry (m)"],
+  ["tx_toomuch", 38, "sentence", "ده كتير", "da ketiir", "That's too much"],
+  ["tx_havechange", 38, "sentence", "معايا فكة", "maʿaaya fakka", "I have change"],
+  ["tx_keepchange", 38, "sentence", "الباقي معاك", "el-baaʾi maʿaak", "Keep the change"],
+
+  // ===== L39 — At the pharmacy =====
+  ["rx_pharmacy", 39, "word", "صيدلية", "Saydaleyya", "Pharmacy"],
+  ["rx_cold", 39, "sentence", "عندي برد", "ʿandi bard", "I have a cold"],
+  ["rx_fever", 39, "sentence", "عندي سخونية", "ʿandi sokhneyya", "I have a fever"],
+  ["rx_cough", 39, "sentence", "عندي كحة", "ʿandi koHHa", "I have a cough"],
+  ["rx_stomach", 39, "sentence", "عندي مغص", "ʿandi maghaS", "I have a stomach ache"],
+  ["rx_painkiller", 39, "word", "مسكن", "mosakken", "Painkiller"],
+  ["rx_wantmed", 39, "sentence", "عايز دوا", "ʿaayez dawa", "I want medicine (m)"],
+  ["rx_howmuchmed", 39, "sentence", "الدوا ده بكام", "el-dawa da bekaam", "How much is this medicine?"],
+  ["rx_howoften", 39, "sentence", "مرة كام في اليوم", "marra kaam fil yom", "How many times a day?"],
+  ["rx_nearby", 39, "sentence", "فيه صيدلية قريبة", "fiih Saydaleyya ʾoreyyeba", "Is there a pharmacy nearby?"],
+
+  // ===== L40 — Meeting people & making friends =====
+  ["mt_pleased", 40, "phrase", "اتشرفنا", "etsharrafna", "Pleased to meet you"],
+  ["mt_wherelive", 40, "sentence", "إنت ساكن فين", "enta saaken fein", "Where do you live? (m)"],
+  ["mt_age", 40, "sentence", "عندك كام سنة", "ʿandak kaam sana", "How old are you? (m)"],
+  ["mt_coffee", 40, "sentence", "ممكن ناخد قهوة", "mumkin naakhod ʾahwa", "Shall we grab a coffee?"],
+  ["mt_number", 40, "sentence", "ممكن رقمك", "mumkin raʾamak", "Can I get your number? (m)"],
+  ["mt_gladmet", 40, "sentence", "أنا سعيد إني قابلتك", "ana saʿiid eni ʾabeltak", "I'm glad I met you (m)"],
+  ["mt_nice", 40, "sentence", "إنت لطيف", "enta laTiif", "You're nice (m)"],
+  ["mt_sit", 40, "sentence", "تعالى نقعد", "taʿaala neʾʿod", "Come, let's sit down"],
+  ["mt_talkagain", 40, "sentence", "نتكلم تاني", "netkallem taani", "Let's talk again"],
+
+  // ===== L41 — At the doctor & symptoms =====
+  ["dr_clinic", 41, "word", "عيادة", "ʿeyaada", "Clinic"],
+  ["dr_unwell", 41, "sentence", "أنا تعبان أوي", "ana taʿbaan awi", "I feel really unwell (m)"],
+  ["dr_temp", 41, "sentence", "عندي حرارة", "ʿandi Haraara", "I have a temperature"],
+  ["dr_hurtshere", 41, "sentence", "بيوجعني هنا", "beyewgaʿni hena", "It hurts here"],
+  ["dr_dizzy", 41, "sentence", "حاسس بدوخة", "Haases be-dookha", "I feel dizzy (m)"],
+  ["dr_sincewhen", 41, "phrase", "من إمتى", "men emta", "Since when?"],
+  ["dr_needrest", 41, "sentence", "محتاج راحة", "meHtaag raaHa", "I need rest (m)"],
+  ["dr_allergy", 41, "sentence", "عندي حساسية", "ʿandi Hasaseyya", "I have an allergy"],
+  ["dr_bloodtest", 41, "phrase", "تحليل دم", "taHliil damm", "Blood test"],
+  ["dr_prescription", 41, "word", "روشتة", "roshetta", "Prescription"],
+  ["dr_examine", 41, "sentence", "ممكن تكشف عليا", "mumkin tekshif ʿalayya", "Can you examine me?"],
+
+  // ===== L42 — Renting an apartment =====
+  ["rent_apartment", 42, "word", "شقة", "shaʾʾa", "Apartment"],
+  ["rent_rent", 42, "word", "إيجار", "iigaar", "Rent"],
+  ["rent_howmuch", 42, "sentence", "بكام الإيجار", "bekaam el-iigaar", "How much is the rent?"],
+  ["rent_want", 42, "sentence", "عايز أأجر شقة", "ʿaayez aʾaggar shaʾʾa", "I want to rent an apartment (m)"],
+  ["rent_rooms", 42, "sentence", "كام أوضة", "kaam oDa", "How many rooms?"],
+  ["rent_furnished", 42, "word", "مفروشة", "mafroosha", "Furnished (apartment)"],
+  ["rent_vacant", 42, "word", "فاضية", "faaDya", "Vacant / available (apartment)"],
+  ["rent_deposit", 42, "word", "تأمين", "taʾmiin", "Deposit"],
+  ["rent_contract", 42, "word", "عقد", "ʿaʾd", "Contract"],
+  ["rent_utilities", 42, "phrase", "الكهربا والمية", "el-kahraba wel-mayya", "Electricity and water"],
+  ["rent_seeit", 42, "sentence", "ممكن أشوف الشقة", "mumkin ashoof el-shaʾʾa", "Can I see the apartment?"],
+
+  // ===== L43 — Feelings & relationships =====
+  ["fr_loveyou", 43, "sentence", "بحبك", "baHebbak", "I love you (to a man)"],
+  ["fr_missyou", 43, "sentence", "وحشتني", "weHeshtni", "I miss you"],
+  ["fr_thinkofyou", 43, "sentence", "بفتكرك", "baftekrak", "I think about you (to a man)"],
+  ["fr_upsetwith", 43, "sentence", "أنا زعلان منك", "ana zaʿlaan mennak", "I'm upset with you (m→m)"],
+  ["fr_annoyed", 43, "word", "متضايق", "metDaayeʾ", "Annoyed / upset (m)"],
+  ["fr_happywith", 43, "sentence", "مبسوط معاك", "mabsoot maʿaak", "I'm happy with you (m)"],
+  ["fr_worried", 43, "sentence", "خايف عليك", "khaayef ʿaleek", "I'm worried about you (m)"],
+  ["fr_important", 43, "sentence", "إنت مهم بالنسبة لي", "enta mohem belnesbaali", "You're important to me (m)"],
+  ["fr_relationship", 43, "word", "علاقة", "ʿelaaʾa", "Relationship"],
+  ["fr_friendship", 43, "word", "صداقة", "Sadaaʾa", "Friendship"],
+  ["fr_forgiveme", 43, "sentence", "سامحني", "saamHni", "Forgive me (to a man)"],
+  ["fr_thankseverything", 43, "sentence", "متشكر على كل حاجة", "meteshakker ʿala kollo Haaga", "Thanks for everything (m)"],
 ];
 const ITEMS = RAW.map(([id, level, type, ar, tr, en, alts]) => ({
   id,
@@ -436,6 +775,34 @@ const LEVEL_TITLES = {
   13: "Feelings & States",
   14: "Useful Verbs & Commands",
   15: "Putting It Together",
+  16: "Numbers 11–1000",
+  17: "Days & Time",
+  18: "Everyday Verbs I",
+  19: "Everyday Verbs II",
+  20: "Prepositions & Places",
+  21: "Connectors & Questions",
+  22: "Colors",
+  23: "Adjectives & Opposites",
+  24: "Body & Health",
+  25: "Home & Things",
+  26: "Clothes & Items",
+  27: "Work & Study",
+  28: "Phone & Plans",
+  29: "Money & Shopping",
+  30: "Weather & Nature",
+  31: "Travel & Hotel",
+  32: "Restaurant & Café",
+  33: "Opinions & Reactions",
+  34: "Conversation I",
+  35: "Conversation II",
+  36: "Verbs — Present",
+  37: "Verbs — Past & Future",
+  38: "Taxi & Rides",
+  39: "At the Pharmacy",
+  40: "Meeting People",
+  41: "At the Doctor",
+  42: "Renting a Place",
+  43: "Feelings & Relationships",
 };
 
 /* ---- Time + dates ---- */
@@ -953,6 +1320,149 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice }) 
   );
 }
 
+/* ===================== STATS / PROGRESS REPORT ===================== */
+function MiniBars({ series, color, unit }) {
+  const max = Math.max(1, ...series);
+  return (
+    <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 64 }}>
+      {series.map((v, i) => (
+        <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%" }} title={`${v} ${unit || ""}`}>
+          <div style={{ height: `${(v / max) * 100}%`, minHeight: v ? 4 : 2, background: v ? `linear-gradient(180deg, ${T.gold}, ${T.terra})` : T.line, borderRadius: 3 }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function StatsView({ state, allItems, level, streak }) {
+  const now = Date.now();
+  const prog = state.progress;
+  const totalApp = ITEMS.length;
+  const stageOf = (it) => prog[it.id]?.stage || 0;
+
+  const learned = allItems.filter((it) => prog[it.id]).length;
+  const mastered = allItems.filter((it) => stageOf(it) >= 5).length;
+  const burned = allItems.filter((it) => stageOf(it) >= 9).length;
+  const due = allItems.filter((it) => { const p = prog[it.id]; return p && p.due !== Infinity && p.due <= now; }).length;
+  const next24 = allItems.filter((it) => { const p = prog[it.id]; return p && p.due !== Infinity && p.due > now && p.due <= now + DAY; }).length;
+  const next7 = allItems.filter((it) => { const p = prog[it.id]; return p && p.due !== Infinity && p.due > now && p.due <= now + 7 * DAY; }).length;
+
+  const levelItems = ITEMS.filter((it) => it.level === level);
+  const levelGuru = levelItems.filter((it) => stageOf(it) >= 5).length;
+  const levelPct = levelItems.length ? levelGuru / levelItems.length : 0;
+  const appPct = totalApp ? mastered / totalApp : 0;
+  const startedPct = totalApp ? Math.min(learned, totalApp) / totalApp : 0;
+
+  // last 14 days
+  const days = [];
+  let d = todayStr();
+  for (let k = 0; k < 14; k++) { days.unshift(d); d = shiftDay(d, -1); }
+  const learnedByDay = {};
+  allItems.forEach((it) => { const p = prog[it.id]; if (p && p.learnedAt) { const ds = new Date(p.learnedAt).toISOString().slice(0, 10); learnedByDay[ds] = (learnedByDay[ds] || 0) + 1; } });
+  const learnSeries = days.map((ds) => learnedByDay[ds] || 0);
+  const actSeries = days.map((ds) => state.history[ds] || 0);
+  const newThisWeek = learnSeries.slice(-7).reduce((a, b) => a + b, 0);
+
+  // calendar heatmap — last 8 weeks (most recent week at bottom)
+  const calDays = [];
+  let cd = todayStr();
+  for (let k = 0; k < 56; k++) { calDays.unshift({ day: cd, n: state.history[cd] || 0 }); cd = shiftDay(cd, -1); }
+  const weeks = [];
+  for (let i = 0; i < calDays.length; i += 7) weeks.push(calDays.slice(i, i + 7));
+  const heat = (n) => (n === 0 ? T.line : n < 3 ? `${T.pink}` : n < 7 ? T.terra : T.gold);
+
+  const Ring = ({ pct, label, sub }) => (
+    <div style={{ flex: 1, background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 18, padding: "16px 14px", textAlign: "center" }}>
+      <div style={{ fontFamily: displayFont, fontSize: 30, color: T.gold, lineHeight: 1 }}>{Math.round(pct * 100)}%</div>
+      <div style={{ margin: "10px 0 6px" }}><Bar pct={pct} h={6} /></div>
+      <div style={{ fontSize: 12.5, fontWeight: 700 }}>{label}</div>
+      <div style={{ fontSize: 11, color: T.textDim, marginTop: 1 }}>{sub}</div>
+    </div>
+  );
+
+  return (
+    <div className="fade">
+      {/* completion rings */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+        <Ring pct={appPct} label="Whole app" sub={`${mastered} / ${totalApp} mastered`} />
+        <Ring pct={levelPct} label={`Level ${level}`} sub={`${levelGuru} / ${levelItems.length} mastered`} />
+      </div>
+
+      {/* key numbers */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+        <Stat label="Learned" value={learned} color={T.pink} />
+        <Stat label="Mastered" value={mastered} color={T.terra} />
+        <Stat label="Burned" value={burned} color="#444444" />
+        <Stat label="Streak" value={`${streak}🔥`} color={T.gold} />
+      </div>
+
+      {/* review pipeline */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+        <Stat label="Due now" value={due} color={due ? T.red : T.textDim} />
+        <Stat label="Next 24h" value={next24} color={T.gold} />
+        <Stat label="Next 7 days" value={next7} color={T.goldSoft} />
+      </div>
+
+      {/* new words learned */}
+      <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px 16px 12px", marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+          <span style={{ fontSize: 13, color: T.textDim }}>New words — last 14 days</span>
+          <span style={{ fontSize: 11.5, color: T.goldSoft, fontWeight: 700 }}>{newThisWeek} this week</span>
+        </div>
+        <MiniBars series={learnSeries} unit="new" />
+      </div>
+
+      {/* activity */}
+      <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px 16px 12px", marginBottom: 14 }}>
+        <div style={{ fontSize: 13, color: T.textDim, marginBottom: 12 }}>Reviews &amp; lessons — last 14 days</div>
+        <MiniBars series={actSeries} unit="answers" />
+      </div>
+
+      {/* calendar heatmap */}
+      <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px", marginBottom: 14 }}>
+        <div style={{ fontSize: 13, color: T.textDim, marginBottom: 12 }}>Activity calendar — last 8 weeks</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {weeks.map((wk, wi) => (
+            <div key={wi} style={{ display: "flex", gap: 4 }}>
+              {wk.map((c) => (
+                <div key={c.day} title={`${c.day}: ${c.n}`} style={{ flex: 1, aspectRatio: "1 / 1", borderRadius: 4, background: heat(c.n) }} />
+              ))}
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 5, marginTop: 10, fontSize: 10.5, color: T.textDim }}>
+          less
+          {[T.line, T.pink, T.terra, T.gold].map((c, i) => (<span key={i} style={{ width: 11, height: 11, borderRadius: 3, background: c, display: "inline-block" }} />))}
+          more
+        </div>
+      </div>
+
+      {/* per-level progress */}
+      <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px" }}>
+        <div style={{ fontSize: 13, color: T.textDim, marginBottom: 12 }}>Progress by level</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 320, overflowY: "auto" }}>
+          {Array.from({ length: MAX_LEVEL }, (_, k) => k + 1).map((l) => {
+            const its = ITEMS.filter((it) => it.level === l);
+            const g = its.filter((it) => (prog[it.id]?.stage || 0) >= 5).length;
+            const pct = its.length ? g / its.length : 0;
+            const locked = l > level;
+            const done = pct >= 0.9;
+            return (
+              <div key={l} style={{ opacity: locked ? 0.5 : 1 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, marginBottom: 4 }}>
+                  <span style={{ color: T.text }}>{locked ? "🔒 " : done ? "✓ " : ""}Lv {l} · {LEVEL_TITLES[l] || ""}</span>
+                  <span style={{ color: T.textDim }}>{g}/{its.length}</span>
+                </div>
+                <Bar pct={pct} h={5} />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ===================== APP ===================== */
 function App() {
   const [state, setState] = useState(null);
@@ -1061,6 +1571,7 @@ function App() {
     ["reviews", "Reviews", derived.due.length],
     ["script", "Script"],
     ["items", "Items"],
+    ["stats", "Stats"],
   ];
 
   return (
@@ -1092,11 +1603,11 @@ function App() {
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 5, marginTop: 16, background: T.panel, padding: 5, borderRadius: 13, border: `1px solid ${T.line}` }}>
+        <div style={{ display: "flex", gap: 3, marginTop: 16, background: T.panel, padding: 4, borderRadius: 13, border: `1px solid ${T.line}` }}>
           {tabs.map(([k, label, n]) => (
-            <button key={k} className="tap" onClick={() => setView(k)} style={{ flex: 1, border: "none", borderRadius: 9, padding: "9px 2px", fontSize: 12, fontWeight: 600, position: "relative", color: view === k ? "#fff" : T.textDim, background: view === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>
+            <button key={k} className="tap" onClick={() => setView(k)} style={{ flex: 1, border: "none", borderRadius: 9, padding: "9px 1px", fontSize: 11, fontWeight: 600, position: "relative", color: view === k ? "#fff" : T.textDim, background: view === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>
               {label}
-              {n > 0 && view !== k && (<span style={{ marginLeft: 4, fontSize: 10, background: T.terra, color: "#fff", borderRadius: 8, padding: "1px 5px" }}>{n}</span>)}
+              {n > 0 && view !== k && (<span style={{ position: "absolute", top: 5, right: "50%", marginRight: -16, width: 6, height: 6, borderRadius: 999, background: T.terra }} />)}
             </button>
           ))}
         </div>
@@ -1128,6 +1639,7 @@ function App() {
         {view === "items" && (
           <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} />
         )}
+        {view === "stats" && <StatsView state={state} allItems={allItems} level={state.currentLevel} streak={streak} />}
       </div>
     </div>
   );
