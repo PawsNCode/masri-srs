@@ -833,6 +833,7 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
 /* ===================== ITEMS (browse + select-to-quiz + add) ===================== */
 function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice }) {
   const [filter, setFilter] = useState("all");
+  const [query, setQuery] = useState("");
   const [sel, setSel] = useState({});
   const [showAdd, setShowAdd] = useState(false);
   const [ar, setAr] = useState("");
@@ -840,7 +841,15 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice }) 
   const [en, setEn] = useState("");
   const now = Date.now();
   const levels = ["all", ...Array.from({ length: MAX_LEVEL }, (_, k) => k + 1)];
-  const shown = allItems.filter((it) => filter === "all" || it.level === filter);
+  const raw = query.trim();
+  const ql = raw.toLowerCase();
+  const qar = normAr(raw);
+  const shown = allItems.filter((it) => {
+    if (!raw) return filter === "all" || it.level === filter;
+    const enHit = it.en.toLowerCase().includes(ql) || it.tr.toLowerCase().includes(ql);
+    const arHit = qar.length > 0 && normAr(it.ar).includes(qar);
+    return enHit || arHit;
+  });
   const selIds = Object.keys(sel).filter((k) => sel[k]);
   const learnedSet = (it) => !!state.progress[it.id];
 
@@ -860,11 +869,31 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice }) 
 
   return (
     <div className="fade">
-      <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8, marginBottom: 4 }}>
-        {levels.map((l) => (
-          <button key={l} className="tap" onClick={() => setFilter(l)} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === l ? T.gold : T.line}`, background: filter === l ? `${T.gold}18` : "transparent", color: filter === l ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>{l === "all" ? "All" : "Lv " + l}</button>
-        ))}
+      <div style={{ position: "relative", marginBottom: 10 }}>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search English or Arabic…"
+          style={{ width: "100%", padding: "12px 38px 12px 14px", borderRadius: 12, border: `1px solid ${T.line}`, background: T.panel, color: T.text, fontSize: 14, outline: "none" }}
+        />
+        {raw ? (
+          <button className="tap" onClick={() => setQuery("")} aria-label="clear search" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", border: "none", background: "transparent", color: T.textDim, fontSize: 18, cursor: "pointer", lineHeight: 1 }}>×</button>
+        ) : (
+          <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: T.textDim, fontSize: 14, pointerEvents: "none" }}>🔍</span>
+        )}
       </div>
+
+      {raw ? (
+        <div style={{ fontSize: 11.5, color: T.textDim, margin: "0 2px 8px" }}>
+          {shown.length} match{shown.length === 1 ? "" : "es"} across all levels
+        </div>
+      ) : (
+        <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8, marginBottom: 4 }}>
+          {levels.map((l) => (
+            <button key={l} className="tap" onClick={() => setFilter(l)} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === l ? T.gold : T.line}`, background: filter === l ? `${T.gold}18` : "transparent", color: filter === l ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>{l === "all" ? "All" : "Lv " + l}</button>
+          ))}
+        </div>
+      )}
 
       {leeches > 0 && (
         <button className="tap" onClick={() => onStartPractice("leeches")} style={{ width: "100%", marginBottom: 10, padding: 11, borderRadius: 12, border: `1px solid ${T.red}`, background: `${T.red}0f`, color: T.red, fontSize: 13, fontWeight: 700 }}>
