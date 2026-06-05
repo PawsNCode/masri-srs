@@ -75,4 +75,4 @@ home screen.
 
 ---
 
-*Last updated: rebuilt the handwriting Trace guide with numbered stroke-order markers, directional arrows, and a 2×2 grid for all 28 letters.*
+*Last updated: tap any letter in the Script Chart to jump straight into its Trace guide, with a “Back to chart” button to return. Smaller, tidier stroke-order markers.*
