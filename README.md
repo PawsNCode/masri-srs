@@ -1,31 +1,70 @@
 # Masri SRS 🌙
 
-A small web app for learning **Egyptian Arabic (Masri)** — spaced-repetition
-flashcards, an alphabet quiz, and a handwriting trainer. The whole thing is a
-single self-contained HTML file.
+A web app for learning **Egyptian Arabic (Masri)** — spaced-repetition vocabulary,
+typed-Arabic quizzes, a full alphabet trainer, and a progress dashboard. The whole
+thing is a single self-contained HTML file you can run anywhere or install to your
+home screen.
 
 🔗 **Live app:** https://pawsncode.github.io/masri-srs/
 
 ## Features
 
-- **Spaced-repetition flashcards** (SM-2 scheduling) for high-frequency Egyptian
-  Arabic — each card shows the Arabic script, transliteration, English meaning,
-  and tap-to-hear audio.
-- **Script reference** — the full 28-letter alphabet with a pronunciation key,
-  the four positional letter forms, and stroke-order guides.
-- **Alphabet quiz** — match letters to sounds, with live score, accuracy, and streaks.
-- **Handwriting trainer** — trace letters with your finger over a guide and a
-  "start" dot, plus a Quiz mode that asks you to write a letter from memory.
+### Vocabulary (WaniKani-style)
+- **636 items across 57 levels** — words, phrases, and full sentences, grouped by
+  theme and difficulty (greetings → grammar → daily life → dialogues → slang).
+- **Level gating** — a level unlocks only after you reach **Guru** on 90% of the
+  previous level, so you master each step before moving on.
+- **SRS stages** — every item climbs Apprentice → Guru → Master → Enlightened →
+  Burned, resurfacing right before you'd forget it.
+- **Learning phase** — learn a batch of new words (3/5/7/10, your choice), then a
+  quiz on that batch locks them in.
+- **Typed-Arabic reviews** — read the English, type the Arabic using the built-in
+  on-screen Arabic keyboard or your device keyboard. Grading is forgiving about
+  short vowels and alef/hamza spelling.
+
+### Reviews hub
+- Choose **what** to review: **letters (script), words, phrases, sentences, or all
+  vocabulary** — each with its own due count.
+- **Trouble words** — anything you miss twice in a row is flagged and can be
+  drilled on its own.
+- **Pick your own** — select specific words (Items) or letters (Script) to quiz.
+
+### Script / alphabet
+- **Train** — learn letters in batches with real **SRS scheduling** and due-based
+  letter reviews; two quiz styles: *see letter → pick sound* and *hear sound →
+  type the letter*; streaks and trouble-letter tracking.
+- **Chart** — the full 28-letter reference with a pronunciation key, the four
+  positional forms, and stroke-order guides.
+- **Quiz** — match letters to sounds with live score, accuracy, and streaks.
+- **Trace** — finger-trace letters over a guide with a "start" dot, plus a
+  write-from-memory quiz mode.
+
+### Dictionary, stats & looks
+- **Items** is a searchable dictionary (English / transliteration / Arabic) with a
+  count for every level.
+- **Stats** dashboard: % of the whole app and current level mastered, words
+  learned/mastered/burned, a review pipeline (due now / 24h / 7 days), a 14-day
+  "new words" graph, a 14-day activity graph, an 8-week activity calendar heatmap,
+  and per-level progress bars.
+- **Themes** — six color themes: Rose, Violet, Bubblegum, Mint, Dark, and Midnight.
+- **Audio** — tap-to-hear pronunciation via the browser's Arabic voice.
 - **Progress saves on your device** and the app installs to your home screen.
 
 ## How to use
 
 - Open the live link above, or download `index.html` and open it in any browser.
-- **On iPhone:** open the link in Safari → **Share** → **Add to Home Screen**
-  for a full-screen, app-like icon.
+- **On iPhone:** open the link in Safari → **Share** → **Add to Home Screen** for a
+  full-screen, app-like icon.
+- After updating the site, you can append `?v=2` to the URL in Safari to bypass the
+  cache, or re-add the home-screen icon to refresh it.
 
 ## Built with
 
 - A single HTML file using React + Babel (loaded from a CDN)
 - Pronunciation via the browser's Web Speech API (uses your device's Arabic voice)
-- Progress
+- Progress stored locally in your browser (localStorage)
+
+---
+
+*Last updated: 636 items / 57 levels · added theme picker, reviews hub, letter SRS,
+and dictionary counts.*
