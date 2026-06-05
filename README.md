@@ -38,8 +38,9 @@ home screen.
 - **Chart** — the full 28-letter reference with a pronunciation key, the four
   positional forms, and stroke-order guides.
 - **Quiz** — match letters to sounds with live score, accuracy, and streaks.
-- **Trace** — finger-trace letters over a guide with a "start" dot, plus a
-  write-from-memory quiz mode.
+- **Trace** — finger-trace letters over a soft ghost glyph on a 2×2 grid, with
+  numbered stroke-order markers and directional arrows (like a kanji trace guide),
+  plus a write-from-memory quiz mode.
 
 ### Dictionary, stats & looks
 - **Items** is a searchable dictionary (English / transliteration / Arabic) with a
@@ -74,4 +75,4 @@ home screen.
 
 ---
 
-*Last updated: added Backup & restore (export/import all progress) and a forgiving transliteration search (so “habibi” finds حبيبي). 878 items / 79 levels.*
+*Last updated: rebuilt the handwriting Trace guide with numbered stroke-order markers, directional arrows, and a 2×2 grid for all 28 letters.*
