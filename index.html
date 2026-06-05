@@ -1346,6 +1346,17 @@ const shiftDay = (s, n) => {
 };
 
 /* ---- Arabic answer normalization (forgiving grading) ---- */
+function normTr(s) {
+  if (!s) return "";
+  return s
+    .toLowerCase()
+    .replace(/[ʿʾʼʔʕ'`’ʻ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9 ]/g, "")
+    .replace(/(.)\1+/g, "$1") // collapse doubled letters (habiibi -> habibi)
+    .replace(/\s+/g, " ")
+    .trim();
+}
 function normAr(s) {
   if (!s) return "";
   return s
@@ -1656,8 +1667,47 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit }) {
 }
 
 /* ===================== HOME ===================== */
-function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCounts, streak, onGo, onTrouble, onSetting, onTheme, onReset }) {
+function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCounts, streak, onGo, onTrouble, onSetting, onTheme, onImport, onReset }) {
   const [confirm, setConfirm] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [msg, setMsg] = useState("");
+  const fileRef = useRef(null);
+
+  const downloadBackup = () => {
+    try {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `masri-srs-backup-${todayStr()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+      setMsg("✓ Backup file downloaded.");
+    } catch (e) { setMsg("Couldn't download here — use Copy instead."); }
+  };
+  const copyBackup = async () => {
+    const text = JSON.stringify(state);
+    try { await navigator.clipboard.writeText(text); setMsg("✓ Backup copied to clipboard."); }
+    catch (e) { setImportText(text); setMsg("Select the text below and copy it manually."); }
+  };
+  const showBackupText = () => { setImportText(JSON.stringify(state)); setMsg("Here's your backup text — copy and keep it safe."); };
+  const onFile = (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { setImportText(String(r.result || "")); setMsg("File loaded — tap Restore to apply."); };
+    r.readAsText(f);
+  };
+  const doImport = () => {
+    let obj;
+    try { obj = JSON.parse(importText.trim()); }
+    catch (e) { setMsg("⚠ Invalid backup text — make sure you copied all of it."); return; }
+    if (!obj || typeof obj !== "object" || !("progress" in obj)) { setMsg("⚠ That doesn't look like a Masri backup."); return; }
+    if (onImport(obj)) { setMsg("✓ Progress restored!"); setImportText(""); }
+  };
+
   return (
     <div className="fade">
       <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "18px 18px 16px", marginBottom: 14, boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
@@ -1699,6 +1749,33 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
         <Stat label="Streak" value={`${streak}🔥`} color={T.terra} />
         <Stat label="Reviews today" value={state.daily.reviews} color={T.gold} />
         <Stat label="Lessons today" value={state.daily.lessons} color={T.pink} />
+      </div>
+
+      <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: 16, marginBottom: 14 }}>
+        <button className="tap" onClick={() => { setBackupOpen((o) => !o); setMsg(""); }} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", border: "none", background: "transparent", padding: 0, cursor: "pointer", color: T.text }}>
+          <span style={{ fontSize: 13, color: T.textDim }}>💾 Backup &amp; restore</span>
+          <span style={{ fontSize: 12, color: T.gold, fontWeight: 700 }}>{backupOpen ? "Hide" : "Open"}</span>
+        </button>
+        {backupOpen && (
+          <div className="fade" style={{ marginTop: 12 }}>
+            <div style={{ fontSize: 11.5, color: T.textDim, lineHeight: 1.6, marginBottom: 10 }}>
+              Save a copy of all your progress (levels, SRS, custom quizzes, settings). Keep the file or text somewhere safe, then restore it any time — even on a new phone.
+            </div>
+            <div style={{ fontSize: 12, color: T.gold, fontWeight: 700, marginBottom: 6 }}>Export</div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <button className="tap" onClick={downloadBackup} style={{ flex: 1, padding: 11, borderRadius: 11, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 13, fontWeight: 700 }}>Download file</button>
+              <button className="tap" onClick={copyBackup} style={{ flex: 1, padding: 11, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 13, fontWeight: 600 }}>Copy</button>
+              <button className="tap" onClick={showBackupText} style={{ flex: 1, padding: 11, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 13, fontWeight: 600 }}>Show text</button>
+            </div>
+            <div style={{ fontSize: 12, color: T.gold, fontWeight: 700, margin: "12px 0 6px" }}>Import</div>
+            <input ref={fileRef} type="file" accept=".json,application/json" onChange={onFile} style={{ display: "none" }} />
+            <button className="tap" onClick={() => fileRef.current && fileRef.current.click()} style={{ width: "100%", padding: 11, borderRadius: 11, border: `1px dashed ${T.gold}`, background: `${T.gold}0d`, color: T.gold, fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Choose backup file…</button>
+            <textarea value={importText} onChange={(e) => setImportText(e.target.value)} placeholder="…or paste your backup text here" rows={3} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 11.5, fontFamily: "ui-monospace, monospace", outline: "none", resize: "vertical" }} />
+            <button className="tap" disabled={!importText.trim()} onClick={doImport} style={{ width: "100%", marginTop: 8, padding: 12, borderRadius: 11, border: "none", background: importText.trim() ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: importText.trim() ? "#fff" : T.textDim, fontSize: 14, fontWeight: 700 }}>Restore this backup</button>
+            <div style={{ fontSize: 11, color: T.textDim, marginTop: 8, lineHeight: 1.5 }}>Restoring replaces your current progress with the backup.</div>
+            {msg && <div style={{ fontSize: 12, color: msg[0] === "⚠" ? T.red : T.gold, fontWeight: 600, marginTop: 8 }}>{msg}</div>}
+          </div>
+        )}
       </div>
 
       <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: 16, marginBottom: 14 }}>
@@ -1758,11 +1835,13 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
   const raw = query.trim();
   const ql = raw.toLowerCase();
   const qar = normAr(raw);
+  const qtr = normTr(raw);
   const shown = allItems.filter((it) => {
     if (!raw) return filter === "all" || it.level === filter;
-    const enHit = it.en.toLowerCase().includes(ql) || it.tr.toLowerCase().includes(ql);
-    const arHit = qar.length > 0 && normAr(it.ar).includes(qar);
-    return enHit || arHit;
+    const enHit = it.en.toLowerCase().includes(ql);
+    const trHit = qtr.length > 0 && (normTr(it.tr).includes(qtr) || (it.alts || []).some((a) => normTr(a).includes(qtr)));
+    const arHit = qar.length > 0 && (normAr(it.ar).includes(qar) || (it.alts || []).some((a) => normAr(a).includes(qar)));
+    return enHit || trHit || arHit;
   });
   const countByLevel = {};
   allItems.forEach((it) => { countByLevel[it.level] = (countByLevel[it.level] || 0) + 1; });
@@ -2167,6 +2246,24 @@ function App() {
     persist({ ...s, customItems: [] });
   }, [persist]);
 
+  const onImport = useCallback((obj) => {
+    if (!obj || typeof obj !== "object") return false;
+    const next = {
+      ...DEFAULT_STATE,
+      ...obj,
+      settings: { ...DEFAULT_STATE.settings, ...(obj.settings || {}) },
+      script: { ...DEFAULT_STATE.script, ...(obj.script || {}) },
+      progress: obj.progress || {},
+      custom: obj.custom || [],
+      customItems: obj.customItems || [],
+      customLetters: obj.customLetters || [],
+      history: obj.history || {},
+    };
+    applyTheme(next.settings.theme || "rose");
+    persist(next);
+    return true;
+  }, [persist]);
+
   const onCustomLetters = useCallback((arr) => {
     const s = stateRef.current;
     persist({ ...s, customLetters: arr });
@@ -2257,6 +2354,7 @@ function App() {
             onTrouble={() => startPractice("leeches")}
             onSetting={(patch) => persist({ ...state, settings: { ...state.settings, ...patch } })}
             onTheme={onTheme}
+            onImport={onImport}
             onReset={() => { persist({ ...DEFAULT_STATE, custom: state.custom, customItems: state.customItems, customLetters: state.customLetters, settings: state.settings, daily: { date: todayStr(), reviews: 0, lessons: 0 } }); setView("home"); }}
           />
         )}

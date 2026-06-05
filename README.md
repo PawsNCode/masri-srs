@@ -53,6 +53,9 @@ home screen.
 - **Audio** — tap-to-hear pronunciation via the browser's Arabic voice.
 - **App icon** — a rose-gradient ʿain (ع) with a crescent moon, used as the
   favicon and home-screen icon.
+- **Backup & restore** — from the Home settings you can export all your progress
+  (download a file, copy it, or show it as text) and import it back on any device,
+  so your data is never stuck on one phone.
 - **Progress saves on your device** and the app installs to your home screen.
 
 ## How to use
@@ -71,4 +74,4 @@ home screen.
 
 ---
 
-*Last updated: 878 items / 79 levels — added the everyday conversational layer (terms of endearment like حبيبي/حبيبتي, reactions & slang, filler words, catching-up greetings, love & affection, common phrases, agreeing/declining, exclamations, compliments, and spoken commands).*
+*Last updated: added Backup & restore (export/import all progress) and a forgiving transliteration search (so “habibi” finds حبيبي). 878 items / 79 levels.*
