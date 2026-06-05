@@ -39,8 +39,7 @@ home screen.
   positional forms, and stroke-order guides.
 - **Quiz** — match letters to sounds with live score, accuracy, and streaks.
 - **Trace** — finger-trace letters over a soft ghost glyph on a 2×2 grid, with
-  numbered stroke-order markers and directional arrows (like a kanji trace guide),
-  plus a write-from-memory quiz mode.
+  written stroke-order steps, plus a write-from-memory quiz mode.
 
 ### Dictionary, stats & looks
 - **Items** is a searchable dictionary (English / transliteration / Arabic) with a
@@ -75,4 +74,4 @@ home screen.
 
 ---
 
-*Last updated: tap any letter in the Script Chart to jump straight into its Trace guide, with a “Back to chart” button to return. Smaller, tidier stroke-order markers.*
+*Last updated: simplified the Trace guide — removed the numbered marker overlay; stroke order is now followed via the written steps while tracing the gray letter.*

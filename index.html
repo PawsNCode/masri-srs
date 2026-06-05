@@ -204,38 +204,39 @@ const START_XY = {
 };
 
 /* Per-letter numbered stroke guide for the Trace screen.
-   Each entry: ordered strokes in writing order (right-to-left, body first then dots).
-   {x,y} are 0..1 positions over the square; a = arrow direction in degrees
-   (0=right, 90=down, 180=left, 270=up); a:null means a dot/point (no arrow). */
+   Positions are fractions of the letter's own bounding box (measured at runtime):
+   fx 0=left edge .. 1=right edge, fy 0=top .. 1=bottom of the rendered glyph.
+   a = arrow direction in degrees (0=right, 90=down, 180=left, 270=up);
+   a:null = a dot/point (no arrow). Order = writing order (body first, then dots). */
 const STROKE_GUIDE = {
-  "ا": [{ x: 0.5, y: 0.2, a: 90 }],
-  "ب": [{ x: 0.72, y: 0.48, a: 180 }, { x: 0.5, y: 0.72, a: null }],
-  "ت": [{ x: 0.72, y: 0.5, a: 180 }, { x: 0.44, y: 0.32, a: null }, { x: 0.56, y: 0.32, a: null }],
-  "ث": [{ x: 0.72, y: 0.5, a: 180 }, { x: 0.5, y: 0.26, a: null }, { x: 0.42, y: 0.36, a: null }, { x: 0.58, y: 0.36, a: null }],
-  "ج": [{ x: 0.62, y: 0.32, a: 205 }, { x: 0.5, y: 0.62, a: null }],
-  "ح": [{ x: 0.62, y: 0.32, a: 205 }],
-  "خ": [{ x: 0.62, y: 0.32, a: 205 }, { x: 0.55, y: 0.18, a: null }],
-  "د": [{ x: 0.6, y: 0.3, a: 225 }],
-  "ذ": [{ x: 0.6, y: 0.3, a: 225 }, { x: 0.55, y: 0.18, a: null }],
-  "ر": [{ x: 0.6, y: 0.36, a: 215 }],
-  "ز": [{ x: 0.6, y: 0.36, a: 215 }, { x: 0.55, y: 0.2, a: null }],
-  "س": [{ x: 0.74, y: 0.5, a: 180 }],
-  "ش": [{ x: 0.74, y: 0.5, a: 180 }, { x: 0.5, y: 0.28, a: null }, { x: 0.42, y: 0.38, a: null }, { x: 0.58, y: 0.38, a: null }],
-  "ص": [{ x: 0.74, y: 0.46, a: 180 }],
-  "ض": [{ x: 0.74, y: 0.46, a: 180 }, { x: 0.6, y: 0.26, a: null }],
-  "ط": [{ x: 0.62, y: 0.55, a: 180 }, { x: 0.46, y: 0.24, a: 90 }],
-  "ظ": [{ x: 0.62, y: 0.55, a: 180 }, { x: 0.46, y: 0.24, a: 90 }, { x: 0.64, y: 0.4, a: null }],
-  "ع": [{ x: 0.62, y: 0.34, a: 205 }],
-  "غ": [{ x: 0.62, y: 0.34, a: 205 }, { x: 0.56, y: 0.18, a: null }],
-  "ف": [{ x: 0.66, y: 0.46, a: 180 }, { x: 0.6, y: 0.28, a: null }],
-  "ق": [{ x: 0.62, y: 0.44, a: 205 }, { x: 0.5, y: 0.26, a: null }, { x: 0.6, y: 0.26, a: null }],
-  "ك": [{ x: 0.56, y: 0.24, a: 230 }, { x: 0.42, y: 0.52, a: 20 }],
-  "ل": [{ x: 0.56, y: 0.22, a: 90 }],
-  "م": [{ x: 0.6, y: 0.46, a: 210 }],
-  "ن": [{ x: 0.7, y: 0.46, a: 205 }, { x: 0.5, y: 0.32, a: null }],
-  "ه": [{ x: 0.55, y: 0.46, a: 270 }],
-  "و": [{ x: 0.58, y: 0.4, a: 230 }],
-  "ي": [{ x: 0.72, y: 0.46, a: 180 }, { x: 0.46, y: 0.68, a: null }, { x: 0.56, y: 0.68, a: null }],
+  "ا": [{ fx: 0.5, fy: 0.08, a: 90 }],
+  "ب": [{ fx: 0.9, fy: 0.5, a: 180 }, { fx: 0.5, fy: 0.95, a: null }],
+  "ت": [{ fx: 0.9, fy: 0.5, a: 180 }, { fx: 0.42, fy: 0.12, a: null }, { fx: 0.6, fy: 0.12, a: null }],
+  "ث": [{ fx: 0.9, fy: 0.55, a: 180 }, { fx: 0.5, fy: 0.08, a: null }, { fx: 0.4, fy: 0.22, a: null }, { fx: 0.6, fy: 0.22, a: null }],
+  "ج": [{ fx: 0.62, fy: 0.18, a: 210 }, { fx: 0.5, fy: 0.72, a: null }],
+  "ح": [{ fx: 0.62, fy: 0.18, a: 210 }],
+  "خ": [{ fx: 0.62, fy: 0.28, a: 210 }, { fx: 0.55, fy: 0.05, a: null }],
+  "د": [{ fx: 0.72, fy: 0.18, a: 225 }],
+  "ذ": [{ fx: 0.72, fy: 0.32, a: 225 }, { fx: 0.55, fy: 0.05, a: null }],
+  "ر": [{ fx: 0.66, fy: 0.22, a: 215 }],
+  "ز": [{ fx: 0.66, fy: 0.36, a: 215 }, { fx: 0.55, fy: 0.05, a: null }],
+  "س": [{ fx: 0.92, fy: 0.45, a: 180 }],
+  "ش": [{ fx: 0.92, fy: 0.5, a: 180 }, { fx: 0.5, fy: 0.1, a: null }, { fx: 0.4, fy: 0.24, a: null }, { fx: 0.6, fy: 0.24, a: null }],
+  "ص": [{ fx: 0.92, fy: 0.42, a: 180 }],
+  "ض": [{ fx: 0.92, fy: 0.52, a: 180 }, { fx: 0.6, fy: 0.08, a: null }],
+  "ط": [{ fx: 0.7, fy: 0.6, a: 180 }, { fx: 0.42, fy: 0.12, a: 90 }],
+  "ظ": [{ fx: 0.7, fy: 0.62, a: 180 }, { fx: 0.42, fy: 0.12, a: 90 }, { fx: 0.66, fy: 0.32, a: null }],
+  "ع": [{ fx: 0.6, fy: 0.18, a: 205 }],
+  "غ": [{ fx: 0.6, fy: 0.3, a: 205 }, { fx: 0.55, fy: 0.05, a: null }],
+  "ف": [{ fx: 0.82, fy: 0.45, a: 180 }, { fx: 0.6, fy: 0.1, a: null }],
+  "ق": [{ fx: 0.66, fy: 0.42, a: 205 }, { fx: 0.45, fy: 0.08, a: null }, { fx: 0.62, fy: 0.08, a: null }],
+  "ك": [{ fx: 0.55, fy: 0.12, a: 225 }, { fx: 0.4, fy: 0.55, a: 20 }],
+  "ل": [{ fx: 0.6, fy: 0.1, a: 90 }],
+  "م": [{ fx: 0.6, fy: 0.4, a: 210 }],
+  "ن": [{ fx: 0.85, fy: 0.45, a: 205 }, { fx: 0.5, fy: 0.12, a: null }],
+  "ه": [{ fx: 0.5, fy: 0.42, a: 270 }],
+  "و": [{ fx: 0.6, fy: 0.3, a: 230 }],
+  "ي": [{ fx: 0.9, fy: 0.45, a: 180 }, { fx: 0.45, fy: 0.95, a: null }, { fx: 0.6, fy: 0.95, a: null }],
 };
 
 /* ---- Content: leveled words, phrases & sentences ---- */
@@ -3047,28 +3048,11 @@ function ScriptQuiz() {
 
 function GuideOverlay({ glyph, show }) {
   if (!show) return null;
-  const strokes = STROKE_GUIDE[glyph] || [];
-  const els = [];
-  els.push(<line key="gx" x1="50" y1="4" x2="50" y2="96" stroke={T.line} strokeWidth="0.5" strokeDasharray="2 2.5" />);
-  els.push(<line key="gy" x1="4" y1="50" x2="96" y2="50" stroke={T.line} strokeWidth="0.5" strokeDasharray="2 2.5" />);
-  strokes.forEach((s, i) => {
-    const cx = s.x * 100, cy = s.y * 100;
-    if (s.a != null) {
-      const rad = (s.a * Math.PI) / 180, dx = Math.cos(rad), dy = Math.sin(rad);
-      const sx = cx + dx * 3.6, sy = cy + dy * 3.6;
-      const ex = cx + dx * 9.5, ey = cy + dy * 9.5;
-      const ah = 2.0, ox = -dy, oy = dx;
-      const lpx = ex - dx * ah + ox * ah * 0.8, lpy = ey - dy * ah + oy * ah * 0.8;
-      const rpx = ex - dx * ah - ox * ah * 0.8, rpy = ey - dy * ah - oy * ah * 0.8;
-      els.push(<line key={"l" + i} x1={sx} y1={sy} x2={ex - dx * 1.2} y2={ey - dy * 1.2} stroke={T.terra} strokeWidth="1.3" strokeLinecap="round" opacity="0.8" />);
-      els.push(<polygon key={"a" + i} points={`${ex},${ey} ${lpx},${lpy} ${rpx},${rpy}`} fill={T.terra} opacity="0.85" />);
-    }
-    els.push(<circle key={"c" + i} cx={cx} cy={cy} r="2.6" fill={T.gold} stroke="#fff" strokeWidth="0.55" />);
-    els.push(<text key={"t" + i} x={cx} y={cy} fill="#fff" fontSize="3" fontWeight="700" textAnchor="middle" dominantBaseline="central" style={{ fontFamily: uiFont }}>{i + 1}</text>);
-  });
   return (
     <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
-      {els}
+      <line x1="50" y1="4" x2="50" y2="96" stroke={T.line} strokeWidth="0.5" strokeDasharray="2 2.5" />
+      <line x1="4" y1="50" x2="96" y2="50" stroke={T.line} strokeWidth="0.5" strokeDasharray="2 2.5" />
+      <text x="50" y="50" fontSize="56" textAnchor="middle" dominantBaseline="central" fill={T.textDim} opacity="0.4" direction="rtl" style={{ fontFamily: arFont }}>{glyph}</text>
     </svg>
   );
 }
@@ -3322,32 +3306,7 @@ function ScriptTrace({ initialIdx, onBack }) {
           boxShadow: "0 14px 36px rgba(128,29,92,.10)",
         }}
       >
-        {/* soft gray ghost of the letter */}
-        {guideOn && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: arFont,
-              fontSize: "min(58vw, 320px)",
-              color: T.textDim,
-              opacity: 0.42,
-              direction: "rtl",
-              pointerEvents: "none",
-              userSelect: "none",
-              lineHeight: 1,
-            }}
-          >
-            {letter[0]}
-          </div>
-        )}
-        {/* 2×2 grid */}
-        <div style={{ position: "absolute", top: "50%", left: 0, right: 0, borderTop: `1.5px dashed ${T.line}`, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, borderLeft: `1.5px dashed ${T.line}`, pointerEvents: "none" }} />
-        {/* numbered stroke-order guide */}
+        {/* letter ghost + 2×2 grid + numbered stroke-order guide (anchored to the glyph) */}
         <GuideOverlay glyph={letter[0]} show={guideOn} />
         <canvas
           ref={canvasRef}
@@ -3440,8 +3399,7 @@ function ScriptTrace({ initialIdx, onBack }) {
       <div style={{ fontSize: 11.5, color: T.textDim, textAlign: "center", marginTop: 16, lineHeight: 1.6 }}>
         {!isQuiz ? (
           <>
-            Follow the numbered <b style={{ color: T.gold }}>①②③</b> markers in order — each circle is where a stroke starts and the
-            pink arrow shows its direction. Dots are added last. Arabic flows <b style={{ color: T.text }}>right → left</b>. Tap “Hide guide” to test yourself from memory.
+            Read the ✍️ stroke steps above and trace over the gray letter. Arabic flows <b style={{ color: T.text }}>right → left</b>, and dots are added last. Tap “Hide guide” to test yourself from memory.
           </>
         ) : !revealed ? (
           <>
