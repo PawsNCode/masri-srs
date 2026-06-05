@@ -10,7 +10,7 @@ home screen.
 ## Features
 
 ### Vocabulary (WaniKani-style)
-- **766 items across 69 levels** — words, phrases, and full sentences, grouped by
+- **878 items across 79 levels** — words, phrases, and full sentences, grouped by
   theme and difficulty (greetings → grammar → daily life → dialogues → slang).
 - **Level gating** — a level unlocks only after you reach **Guru** on 90% of the
   previous level, so you master each step before moving on.
@@ -71,4 +71,4 @@ home screen.
 
 ---
 
-*Last updated: 766 items / 69 levels · added a persistent ★ custom quiz on words and letters, six themes (picker at the bottom of Home), and a new app logo/favicon (rose-gradient ʿain + crescent). Fixed an empty Script tab.*
+*Last updated: 878 items / 79 levels — added the everyday conversational layer (terms of endearment like حبيبي/حبيبتي, reactions & slang, filler words, catching-up greetings, love & affection, common phrases, agreeing/declining, exclamations, compliments, and spoken commands).*
