@@ -10,7 +10,7 @@ home screen.
 ## Features
 
 ### Vocabulary (WaniKani-style)
-- **636 items across 57 levels** — words, phrases, and full sentences, grouped by
+- **766 items across 69 levels** — words, phrases, and full sentences, grouped by
   theme and difficulty (greetings → grammar → daily life → dialogues → slang).
 - **Level gating** — a level unlocks only after you reach **Guru** on 90% of the
   previous level, so you master each step before moving on.
@@ -28,6 +28,8 @@ home screen.
 - **Trouble words** — anything you miss twice in a row is flagged and can be
   drilled on its own.
 - **Pick your own** — select specific words (Items) or letters (Script) to quiz.
+- **Custom quiz** — tap the ★ on any word or letter to save it to a personal quiz
+  you can run anytime; your picks persist across sessions.
 
 ### Script / alphabet
 - **Train** — learn letters in batches with real **SRS scheduling** and due-based
@@ -46,7 +48,8 @@ home screen.
   learned/mastered/burned, a review pipeline (due now / 24h / 7 days), a 14-day
   "new words" graph, a 14-day activity graph, an 8-week activity calendar heatmap,
   and per-level progress bars.
-- **Themes** — six color themes: Rose, Violet, Bubblegum, Mint, Dark, and Midnight.
+- **Themes** — six color themes (Rose, Violet, Bubblegum, Mint, Dark, Midnight),
+  chosen at the bottom of the Home screen.
 - **Audio** — tap-to-hear pronunciation via the browser's Arabic voice.
 - **Progress saves on your device** and the app installs to your home screen.
 
@@ -66,5 +69,4 @@ home screen.
 
 ---
 
-*Last updated: 636 items / 57 levels · added theme picker, reviews hub, letter SRS,
-and dictionary counts.*
+*Last updated: 766 items / 69 levels (themes 1–69 from toddler basics to adult daily life) · added a persistent ★ custom quiz on words and letters, moved the theme picker to the bottom of Home.*
