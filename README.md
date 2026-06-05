@@ -51,6 +51,8 @@ home screen.
 - **Themes** — six color themes (Rose, Violet, Bubblegum, Mint, Dark, Midnight),
   chosen at the bottom of the Home screen.
 - **Audio** — tap-to-hear pronunciation via the browser's Arabic voice.
+- **App icon** — a rose-gradient ʿain (ع) with a crescent moon, used as the
+  favicon and home-screen icon.
 - **Progress saves on your device** and the app installs to your home screen.
 
 ## How to use
@@ -69,4 +71,4 @@ home screen.
 
 ---
 
-*Last updated: 766 items / 69 levels (themes 1–69 from toddler basics to adult daily life) · added a persistent ★ custom quiz on words and letters, moved the theme picker to the bottom of Home.*
+*Last updated: 766 items / 69 levels · added a persistent ★ custom quiz on words and letters, six themes (picker at the bottom of Home), and a new app logo/favicon (rose-gradient ʿain + crescent). Fixed an empty Script tab.*
