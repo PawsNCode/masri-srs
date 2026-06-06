@@ -83,7 +83,6 @@ home screen.
 
 ---
 
-*Last updated: added a "How to type & write it" detail screen — tap any word or
-phrase in the dictionary or in a lesson to see its phone-typing keystroke order and
-a letter-by-letter handwriting guide (positional forms + stroke order), with a Back
-button to return where you came from.*
+*Last updated: the "How to type & write it" detail screen now opens as a true
+full-screen view (rendered above the header/nav) that uses the whole display, with
+the Back button anchored at the bottom — no more wasted space below the content.*

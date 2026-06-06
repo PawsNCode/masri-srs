@@ -370,11 +370,11 @@ function ItemDetail({ item, onClose, picked, onToggleCustom }) {
     <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, fontWeight: 700, margin: "22px 2px 10px" }}>{txt}</div>
   );
 
-  return (
-    <div className="fade" style={{ position: "fixed", inset: 0, zIndex: 50, background: T.bg, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-      <div style={{ maxWidth: 560, margin: "0 auto", padding: "12px 18px calc(28px + env(safe-area-inset-bottom))" }}>
+  return ReactDOM.createPortal(
+    <div className="fade" style={{ position: "fixed", inset: 0, zIndex: 1000, background: T.bg, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ maxWidth: 640, margin: "0 auto", minHeight: "100%", display: "flex", flexDirection: "column", padding: "0 18px calc(24px + env(safe-area-inset-bottom))" }}>
         {/* top bar */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, position: "sticky", top: 0, background: T.bg, paddingTop: "calc(6px + env(safe-area-inset-top))", paddingBottom: 8, zIndex: 2 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, position: "sticky", top: 0, background: T.bg, paddingTop: "calc(10px + env(safe-area-inset-top))", paddingBottom: 10, zIndex: 2 }}>
           <button className="tap" onClick={onClose} aria-label="Back" style={{ border: `1px solid ${T.line}`, background: T.panel, color: T.text, borderRadius: 11, padding: "7px 13px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>‹ Back</button>
           <div style={{ flex: 1 }} />
           {onToggleCustom && (
@@ -478,13 +478,16 @@ function ItemDetail({ item, onClose, picked, onToggleCustom }) {
           })()}
         </div>
 
-        <div style={{ fontSize: 11.5, color: T.textDim, textAlign: "center", marginTop: 18, lineHeight: 1.5 }}>
-          {letterTokens.length} letter{letterTokens.length === 1 ? "" : "s"}
-          {wordCount > 1 ? ` · ${wordCount} words` : ""} · read right → left
+        <div style={{ marginTop: "auto", paddingTop: 18 }}>
+          <div style={{ fontSize: 11.5, color: T.textDim, textAlign: "center", lineHeight: 1.5 }}>
+            {letterTokens.length} letter{letterTokens.length === 1 ? "" : "s"}
+            {wordCount > 1 ? ` · ${wordCount} words` : ""} · read right → left
+          </div>
+          <button className="tap" onClick={onClose} style={{ width: "100%", marginTop: 14, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>‹ Back</button>
         </div>
-        <button className="tap" onClick={onClose} style={{ width: "100%", marginTop: 16, padding: 14, borderRadius: 14, border: `1px solid ${T.line}`, background: T.panel, color: T.text, fontSize: 14, fontWeight: 600 }}>Close</button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
