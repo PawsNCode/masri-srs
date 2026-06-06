@@ -44,6 +44,15 @@ home screen.
 ### Dictionary, stats & looks
 - **Items** is a searchable dictionary (English / transliteration / Arabic) with a
   count for every level.
+- **How to type & write it** — tap any word or phrase (in the **Items** dictionary
+  or while learning it in a **Lessons** session) to open a detail screen that shows:
+  the exact **keystroke order** for typing it on a phone or keyboard (left→right,
+  with optional short-vowel marks flagged), and a **letter-by-letter** writing guide
+  giving each letter's name and sound, the **shape it takes inside that word**
+  (isolated / initial / medial / final, with the real joined glyph), and stroke-order
+  steps for drawing it on paper. Multi-word phrases show word breaks, and diacritics
+  (tanwin, fatḥa, etc.) are explained on the letter they sit on. A **Back** button
+  returns you to wherever you opened it from.
 - **Stats** dashboard: % of the whole app and current level mastered, words
   learned/mastered/burned, a review pipeline (due now / 24h / 7 days), a 14-day
   "new words" graph, a 14-day activity graph, an 8-week activity calendar heatmap,
@@ -74,4 +83,7 @@ home screen.
 
 ---
 
-*Last updated: simplified the Trace guide — removed the numbered marker overlay; stroke order is now followed via the written steps while tracing the gray letter.*
+*Last updated: added a "How to type & write it" detail screen — tap any word or
+phrase in the dictionary or in a lesson to see its phone-typing keystroke order and
+a letter-by-letter handwriting guide (positional forms + stroke order), with a Back
+button to return where you came from.*

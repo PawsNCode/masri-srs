@@ -239,6 +239,255 @@ const STROKE_GUIDE = {
   "ي": [{ fx: 0.9, fy: 0.45, a: 180 }, { fx: 0.45, fy: 0.95, a: null }, { fx: 0.6, fy: 0.95, a: null }],
 };
 
+/* ===================== LETTER-BY-LETTER ANALYSIS =====================
+   Powers the item detail view: breaks a word/phrase into its letters,
+   works out the shape each letter takes *inside this word*, and tells the
+   user how to type it (phone) and how to write it (paper).            */
+
+/* Letters that join only to the PRECEDING letter (never to the next one). */
+const RIGHT_JOINERS = new Set(["ا", "أ", "إ", "آ", "د", "ذ", "ر", "ز", "و", "ؤ", "ة", "ى"]);
+/* Letters that join to neither side. */
+const NON_JOINERS = new Set(["ء"]);
+
+/* Build a lookup of every letter we might meet, with its joining behaviour. */
+const LETTER_INFO = {};
+ALPHABET.forEach(([ch, name, sound, note]) => {
+  LETTER_INFO[ch] = {
+    ch, name, sound, note, base: ch,
+    joinFwd: !RIGHT_JOINERS.has(ch) && !NON_JOINERS.has(ch),
+    joinBack: !NON_JOINERS.has(ch),
+  };
+});
+/* Hamza carriers, the madda alif, taa marbuta, alif maqsura — and their
+   stroke "base" (which of the 28 their handwriting is built on). */
+const EXTRA_LETTERS = [
+  ["أ", "alif + hamza", "a / ʾ", "An alif carrying a hamza on top — a glottal stop, often an “a”.", "ا"],
+  ["إ", "alif + hamza", "i / ʾ", "An alif with a hamza beneath — a glottal stop, often an “i”.", "ا"],
+  ["آ", "alif madda", "aa", "An alif with a wavy mark on top = a long “aa”.", "ا"],
+  ["ء", "hamza", "ʾ", "The glottal stop on its own — the little catch in “uh-oh”.", "ء"],
+  ["ؤ", "waaw + hamza", "ʾ / u", "A waaw carrying a hamza.", "و"],
+  ["ئ", "yaa + hamza", "ʾ / i", "A dotless yaa carrying a hamza.", "ي"],
+  ["ة", "taa marbuta", "a / -et", "“Tied taa” — ends many feminine words; usually a soft “a”.", "ت"],
+  ["ى", "alif maqsura", "aa", "“Broken alif” — a dotless yaa said like a long “a”.", "ي"],
+];
+EXTRA_LETTERS.forEach(([ch, name, sound, note, base]) => {
+  LETTER_INFO[ch] = {
+    ch, name, sound, note, base,
+    joinFwd: !RIGHT_JOINERS.has(ch) && !NON_JOINERS.has(ch),
+    joinBack: !NON_JOINERS.has(ch),
+  };
+});
+
+/* Extra handwriting hints for letters that aren't plain members of STROKES. */
+const STROKE_EXTRA = {
+  "ء": "A small hook on the line — draw the little head, then the short tail.",
+  "أ": "Write the alif straight down, then add the hamza hook above it.",
+  "إ": "Write the alif straight down, then add the hamza hook below it.",
+  "آ": "Write the alif straight down, then add the wavy madda mark on top.",
+  "ؤ": "Write the waaw loop and tail, then add the hamza hook on top.",
+  "ئ": "Write the dotless yaa bowl, then add the hamza hook on top.",
+  "ة": "Draw the round haa loop, then add the two dots above.",
+  "ى": "Draw the bowl that hooks back under the line — no dots.",
+};
+const strokeText = (info) =>
+  STROKE_EXTRA[info.ch] || (STROKES[info.base] && STROKES[info.base][1]) || "";
+
+/* Vowel signs & other combining marks. */
+const DIAC = {
+  "\u064B": ["ً", "tanwin fatḥ", "-an", "a final “-an” sound"],
+  "\u064C": ["ٌ", "tanwin ḍamm", "-un", "a final “-un” sound"],
+  "\u064D": ["ٍ", "tanwin kasr", "-in", "a final “-in” sound"],
+  "\u064E": ["َ", "fatḥa", "a", "a short “a” over the letter"],
+  "\u064F": ["ُ", "ḍamma", "u", "a short “u” over the letter"],
+  "\u0650": ["ِ", "kasra", "i", "a short “i” under the letter"],
+  "\u0651": ["ّ", "shadda", "(double)", "doubles the letter"],
+  "\u0652": ["ْ", "sukuun", "(no vowel)", "marks no vowel on the letter"],
+  "\u0670": ["ٰ", "dagger alif", "aa", "a tiny standing alif = long “aa”"],
+};
+
+/* Glyph showing a letter in a given position (uses zero-width joiners). */
+const formGlyph = (ch, form) =>
+  form === "initial" ? ch + ZWJ :
+  form === "medial" ? ZWJ + ch + ZWJ :
+  form === "final" ? ZWJ + ch : ch;
+
+const FORM_LABEL = {
+  isolated: "on its own",
+  initial: "start — joined to the next letter",
+  medial: "middle — joined on both sides",
+  final: "end — joined to the previous letter",
+};
+
+/* Break an Arabic string into ordered tokens (letters, spaces, marks)
+   and work out the positional form of every letter in context. */
+function analyzeArabic(str) {
+  const tokens = [];
+  for (const ch of (str || "")) {
+    if (ch === " " || ch === "\u00A0") { tokens.push({ type: "space" }); continue; }
+    if (DIAC[ch]) {
+      for (let k = tokens.length - 1; k >= 0; k--) {
+        if (tokens[k].type === "letter") { tokens[k].marks.push(DIAC[ch]); break; }
+        if (tokens[k].type === "space") break;
+      }
+      continue;
+    }
+    const info = LETTER_INFO[ch];
+    if (info) tokens.push({ type: "letter", info, marks: [] });
+    else tokens.push({ type: "other", ch });
+  }
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (t.type !== "letter") continue;
+    let prev = null, next = null;
+    if (i > 0 && tokens[i - 1].type === "letter") prev = tokens[i - 1];
+    if (i < tokens.length - 1 && tokens[i + 1].type === "letter") next = tokens[i + 1];
+    const cPrev = !!(prev && prev.info.joinFwd && t.info.joinBack);
+    const cNext = !!(next && t.info.joinFwd && next.info.joinBack);
+    t.cPrev = cPrev; t.cNext = cNext;
+    t.form = cPrev && cNext ? "medial" : cNext ? "initial" : cPrev ? "final" : "isolated";
+  }
+  return tokens;
+}
+
+/* ===================== ITEM DETAIL (type & write a word) ===================== */
+function ItemDetail({ item, onClose, picked, onToggleCustom }) {
+  if (!item) return null;
+  const tokens = analyzeArabic(item.ar);
+  const letterTokens = tokens.filter((t) => t.type === "letter");
+  const wordCount = item.ar.trim().split(/\s+/).filter(Boolean).length;
+
+  /* Literal keypress order: each letter, then any marks typed after it. */
+  const typeSeq = [];
+  tokens.forEach((t) => {
+    if (t.type === "space") typeSeq.push({ kind: "space" });
+    else if (t.type === "letter") {
+      typeSeq.push({ kind: "letter", info: t.info });
+      t.marks.forEach((m) => typeSeq.push({ kind: "mark", mark: m }));
+    }
+  });
+
+  const sectionTitle = (txt) => (
+    <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, fontWeight: 700, margin: "22px 2px 10px" }}>{txt}</div>
+  );
+
+  return (
+    <div className="fade" style={{ position: "fixed", inset: 0, zIndex: 50, background: T.bg, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ maxWidth: 560, margin: "0 auto", padding: "12px 18px calc(28px + env(safe-area-inset-bottom))" }}>
+        {/* top bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, position: "sticky", top: 0, background: T.bg, paddingTop: "calc(6px + env(safe-area-inset-top))", paddingBottom: 8, zIndex: 2 }}>
+          <button className="tap" onClick={onClose} aria-label="Back" style={{ border: `1px solid ${T.line}`, background: T.panel, color: T.text, borderRadius: 11, padding: "7px 13px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>‹ Back</button>
+          <div style={{ flex: 1 }} />
+          {onToggleCustom && (
+            <button className="tap" onClick={() => onToggleCustom(item.id)} aria-label="add to custom quiz" title="Add to custom quiz" style={{ width: 34, height: 34, borderRadius: 999, cursor: "pointer", border: `2px solid ${picked ? T.gold : T.line}`, background: picked ? T.gold : "transparent", color: picked ? "#fff" : T.textDim, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center" }}>★</button>
+          )}
+        </div>
+
+        {/* hero */}
+        <div className="pop" style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "22px 20px", textAlign: "center", boxShadow: "0 12px 34px rgba(128,29,92,.10)" }}>
+          <div style={{ fontFamily: arFont, fontSize: item.type === "sentence" ? 34 : 52, color: T.text, direction: "rtl", lineHeight: 1.35 }}>{item.ar}</div>
+          <div style={{ fontSize: 15, color: T.goldSoft, fontStyle: "italic", marginTop: 6 }}>{item.tr}</div>
+          <div style={{ fontSize: 15, color: T.text, marginTop: 2 }}>{item.en}</div>
+          <div style={{ marginTop: 12 }}><Speaker text={item.ar} size={20} color={T.gold} /></div>
+        </div>
+
+        {/* TYPE IT */}
+        {sectionTitle("⌨️ How to type it")}
+        <div style={{ fontSize: 12.5, color: T.textDim, margin: "0 2px 10px", lineHeight: 1.5 }}>
+          Tap these keys in order, left → right. Arabic builds from the <b>right</b>, so the word grows backwards on screen as you type. Short vowel marks (tinted) are optional — most people skip them.
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {typeSeq.map((s, i) => {
+            if (s.kind === "space") return (
+              <div key={i} style={{ alignSelf: "center", fontSize: 11, color: T.textDim, border: `1px dashed ${T.line}`, borderRadius: 8, padding: "6px 10px" }}>space</div>
+            );
+            if (s.kind === "mark") return (
+              <div key={i} style={{ minWidth: 52, textAlign: "center", background: `${T.gold}10`, border: `1px solid ${T.gold}44`, borderRadius: 10, padding: "6px 4px" }}>
+                <div style={{ fontFamily: arFont, fontSize: 22, color: T.gold, direction: "rtl", lineHeight: 1 }}>{"\u25CC" + s.mark[0]}</div>
+                <div style={{ fontSize: 8.5, color: T.goldSoft, marginTop: 3 }}>{s.mark[1]}</div>
+              </div>
+            );
+            const n = typeSeq.slice(0, i + 1).filter((x) => x.kind === "letter").length;
+            return (
+              <div key={i} style={{ minWidth: 56, textAlign: "center", background: T.panel, border: `1px solid ${T.line}`, borderRadius: 10, padding: "6px 4px" }}>
+                <div style={{ fontSize: 8.5, color: T.textDim }}>{n}</div>
+                <div style={{ fontFamily: arFont, fontSize: 26, color: T.text, direction: "rtl", lineHeight: 1.1 }}>{s.info.ch}</div>
+                <div style={{ fontSize: 8.5, color: T.goldSoft, marginTop: 2 }}>{s.info.name}</div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* WRITE IT */}
+        {sectionTitle("✍️ Write it letter by letter")}
+        <div style={{ fontSize: 12.5, color: T.textDim, margin: "0 2px 10px", lineHeight: 1.5 }}>
+          On paper you also go <b>right → left</b>. Letter 1 is the right-most. Each card shows the shape that letter takes in <i>this</i> word, and how to draw it.
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {(() => {
+            const cards = [];
+            let n = 0;
+            let pendingBreak = false;
+            tokens.forEach((t, ti) => {
+              if (t.type === "space") { if (n > 0) pendingBreak = true; return; }
+              if (t.type !== "letter") return;
+              if (pendingBreak) {
+                cards.push(
+                  <div key={"brk" + ti} style={{ display: "flex", alignItems: "center", gap: 8, margin: "2px 0" }}>
+                    <div style={{ flex: 1, height: 1, background: T.line }} />
+                    <div style={{ fontSize: 10.5, color: T.textDim }}>new word</div>
+                    <div style={{ flex: 1, height: 1, background: T.line }} />
+                  </div>
+                );
+                pendingBreak = false;
+              }
+              n += 1;
+              const info = t.info;
+              cards.push(
+                <div key={ti} style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 14, padding: "12px 13px", display: "flex", gap: 13, alignItems: "flex-start" }}>
+                  <div style={{ textAlign: "center", flexShrink: 0, width: 58 }}>
+                    <div style={{ fontSize: 9, color: T.textDim }}>letter {n}</div>
+                    <div style={{ fontFamily: arFont, fontSize: 46, color: T.text, direction: "rtl", lineHeight: 1.1 }}>{info.ch}</div>
+                    <div style={{ marginTop: 2 }}><Speaker text={info.ch} size={13} color={T.goldSoft} /></div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, color: T.text, fontWeight: 600 }}>
+                      {info.name} <span style={{ color: T.goldSoft, fontStyle: "italic", fontWeight: 400 }}>· {info.sound}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: T.textDim, marginTop: 2, lineHeight: 1.45 }}>{info.note}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+                      <span style={{ fontFamily: arFont, fontSize: 28, color: T.gold, direction: "rtl", lineHeight: 1, background: `${T.gold}10`, border: `1px solid ${T.gold}33`, borderRadius: 8, padding: "2px 12px", minWidth: 40, textAlign: "center" }}>{formGlyph(info.ch, t.form)}</span>
+                      <span style={{ fontSize: 11, color: T.goldSoft, fontWeight: 600 }}>{FORM_LABEL[t.form]}</span>
+                    </div>
+                    {strokeText(info) && (
+                      <div style={{ fontSize: 12, color: T.gold, marginTop: 8, lineHeight: 1.45 }}>✍️ {strokeText(info)}</div>
+                    )}
+                    {t.marks.length > 0 && (
+                      <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 8, lineHeight: 1.5, borderTop: `1px dashed ${T.line}`, paddingTop: 6 }}>
+                        with {t.marks.map((m, mi) => (
+                          <span key={mi}>
+                            <span style={{ fontFamily: arFont, fontSize: 18, color: T.text }}>{"\u25CC" + m[0]}</span> <b>{m[1]}</b> ({m[2]}){mi < t.marks.length - 1 ? ", " : ""}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            });
+            return cards;
+          })()}
+        </div>
+
+        <div style={{ fontSize: 11.5, color: T.textDim, textAlign: "center", marginTop: 18, lineHeight: 1.5 }}>
+          {letterTokens.length} letter{letterTokens.length === 1 ? "" : "s"}
+          {wordCount > 1 ? ` · ${wordCount} words` : ""} · read right → left
+        </div>
+        <button className="tap" onClick={onClose} style={{ width: "100%", marginTop: 16, padding: 14, borderRadius: 14, border: `1px solid ${T.line}`, background: T.panel, color: T.text, fontSize: 14, fontWeight: 600 }}>Close</button>
+      </div>
+    </div>
+  );
+}
+
 /* ---- Content: leveled words, phrases & sentences ---- */
 /* [id, level, type, arabic, translit, english, alts?] */
 const RAW = [
@@ -1647,6 +1896,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit }) {
   const [queue] = useState(() => pool.slice(0, batch));
   const [phase, setPhase] = useState(queue.length ? "teach" : "empty");
   const [i, setI] = useState(0);
+  const [detail, setDetail] = useState(null);
 
   if (phase === "empty") {
     return (
@@ -1681,10 +1931,11 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit }) {
       </div>
       <div className="pop" key={item.id} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "30px 22px", textAlign: "center", boxShadow: "0 12px 34px rgba(128,29,92,.10)" }}>
         <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>New {item.type} · Level {item.level}</div>
-        <div style={{ fontFamily: arFont, fontSize: item.type === "sentence" ? 32 : 48, color: T.text, direction: "rtl", margin: "14px 0", lineHeight: 1.4 }}>{item.ar}</div>
+        <button className="tap" onClick={() => setDetail(item)} aria-label="See how to type and write it" title="Tap to see how to type & write it" style={{ display: "block", width: "100%", background: "transparent", border: "none", cursor: "pointer", padding: 0, fontFamily: arFont, fontSize: item.type === "sentence" ? 32 : 48, color: T.text, direction: "rtl", margin: "14px 0", lineHeight: 1.4 }}>{item.ar}</button>
         <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 16 }}>{item.tr}</div>
         <div style={{ fontFamily: displayFont, fontSize: 20, marginTop: 6 }}>{item.en}</div>
         <div style={{ marginTop: 14 }}><Speaker text={item.ar} size={20} color={T.gold} /></div>
+        <button className="tap" onClick={() => setDetail(item)} style={{ marginTop: 12, background: `${T.gold}0d`, border: `1px solid ${T.gold}33`, color: T.gold, borderRadius: 999, padding: "6px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>✍️ How to type & write it</button>
       </div>
       <button
         className="tap"
@@ -1698,6 +1949,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit }) {
         {i + 1 >= queue.length ? "Got them — start quiz →" : "Learn it ✓"}
       </button>
       <div style={{ textAlign: "center", fontSize: 12, color: T.textDim, marginTop: 10 }}>Learning {i + 1} of {queue.length}</div>
+      {detail && <ItemDetail item={detail} onClose={() => setDetail(null)} />}
     </div>
   );
 }
@@ -1866,6 +2118,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
   const [ar, setAr] = useState("");
   const [tr, setTr] = useState("");
   const [en, setEn] = useState("");
+  const [detail, setDetail] = useState(null);
   const now = Date.now();
   const levels = ["all", ...Array.from({ length: MAX_LEVEL }, (_, k) => k + 1)];
   const raw = query.trim();
@@ -1942,7 +2195,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
       )}
 
       <div style={{ fontSize: 11.5, color: T.textDim, margin: "2px 2px 8px" }}>
-        Tap the ★ to add a word to your custom quiz — your picks are saved.
+        Tap a card to see how to type & write it. Tap the ★ to add it to your custom quiz — your picks are saved.
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: customItems.length ? 70 : 0 }}>
@@ -1956,11 +2209,12 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
                 <span style={{ fontFamily: arFont, fontSize: 22, direction: "rtl", color: T.text }}>{it.ar}</span>
                 <span style={{ fontSize: 10, color: T.goldSoft }}>🔊</span>
               </button>
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <button className="tap" onClick={() => setDetail(it)} style={{ flex: 1, minWidth: 0, textAlign: "left", background: "transparent", border: "none", padding: 0, cursor: "pointer" }}>
                 <div style={{ fontSize: 14, color: T.text }}>{it.en}</div>
                 <div style={{ fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}</div>
-              </div>
+              </button>
               <div style={{ fontSize: 10, color: b.c, border: `1px solid ${b.c}55`, borderRadius: 7, padding: "2px 7px", fontWeight: 700, whiteSpace: "nowrap" }}>{b.t}</div>
+              <button className="tap" onClick={() => setDetail(it)} aria-label="see details" title="See how to type & write it" style={{ background: "transparent", border: "none", color: T.textDim, fontSize: 20, lineHeight: 1, cursor: "pointer", padding: "0 2px", flexShrink: 0 }}>›</button>
             </div>
           );
         })}
@@ -1974,6 +2228,8 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
           </div>
         </div>
       )}
+
+      {detail && <ItemDetail item={detail} picked={inCustom(detail.id)} onToggleCustom={onToggleCustom} onClose={() => setDetail(null)} />}
     </div>
   );
 }
