@@ -21,6 +21,10 @@ home screen.
 - **Typed-Arabic reviews** — read the English, type the Arabic using the built-in
   on-screen Arabic keyboard or your device keyboard. Grading is forgiving about
   short vowels and alef/hamza spelling.
+- **Misses come back** — any item you get wrong is re-quizzed (at least twice more)
+  before the session ends, so a mistake gets reinforced on the spot. At the end, if
+  you missed anything, a **🔁 Retake the ones I missed** button starts a focused
+  re-review of just those items.
 
 ### Reviews hub
 - Choose **what** to review: **letters (script), words, phrases, sentences, or all
@@ -34,16 +38,24 @@ home screen.
 ### Script / alphabet
 - **Train** — learn letters in batches with real **SRS scheduling** and due-based
   letter reviews; two quiz styles: *see letter → pick sound* and *hear sound →
-  type the letter*; streaks and trouble-letter tracking.
+  type the letter*; streaks and trouble-letter tracking. Recognition questions now
+  show the letter in **all four positional shapes** (isolated, initial, medial,
+  final), labelled, so you learn to spot each letter wherever it appears in a word.
 - **Chart** — the full 28-letter reference with a pronunciation key, the four
   positional forms, and stroke-order guides.
-- **Quiz** — match letters to sounds with live score, accuracy, and streaks.
+- **Quiz** — match letters to sounds with live score, accuracy, and streaks; the
+  shown letter rotates through its isolated / initial / medial / final shapes.
 - **Trace** — finger-trace letters over a soft ghost glyph on a 2×2 grid, with
   written stroke-order steps, plus a write-from-memory quiz mode.
 
 ### Dictionary, stats & looks
 - **Items** is a searchable dictionary (English / transliteration / Arabic) with a
   count for every level.
+- **Mastery at a glance** — every word/phrase in the dictionary and every letter in
+  the **Script chart** gets a coloured border based on your answer history: **green**
+  = always correct, **amber** = mixed (right and wrong), **red** = missed more than
+  once. One look tells you what to focus on. (Stats shows the same colours on a
+  28-letter alphabet grid.)
 - **How to type & write it** — tap any word or phrase (in the **Items** dictionary
   or while learning it in a **Lessons** session) to open a detail screen that shows:
   the exact **keystroke order** for typing it on a phone or keyboard (left→right,
@@ -54,9 +66,10 @@ home screen.
   (tanwin, fatḥa, etc.) are explained on the letter they sit on. A **Back** button
   returns you to wherever you opened it from.
 - **Stats** dashboard: % of the whole app and current level mastered, words
-  learned/mastered/burned, a review pipeline (due now / 24h / 7 days), a 14-day
-  "new words" graph, a 14-day activity graph, an 8-week activity calendar heatmap,
-  and per-level progress bars.
+  learned/mastered/burned, a review pipeline (due now / 24h / 7 days), an
+  **alphabet / script** panel (letters learned, mastered, due, plus a colour-coded
+  28-letter grid), a 14-day "new words" graph, a 14-day activity graph, an 8-week
+  activity calendar heatmap, and per-level progress bars.
 - **Themes** — six color themes (Rose, Violet, Bubblegum, Mint, Dark, Midnight),
   chosen at the bottom of the Home screen.
 - **Audio** — tap-to-hear pronunciation via the browser's Arabic voice.
@@ -83,6 +96,8 @@ home screen.
 
 ---
 
-*Last updated: the "How to type & write it" detail screen now opens as a true
-full-screen view (rendered above the header/nav) that uses the whole display, with
-the Back button anchored at the bottom — no more wasted space below the content.*
+*Last updated: script quizzes now test all four letter shapes (isolated / initial /
+medial / final); missed items in any quiz are re-asked at least twice with a "retake
+the ones I missed" option at the end; words, phrases and letters now show green /
+amber / red mastery borders in the dictionary, the script chart and Stats; and Stats
+gained a dedicated alphabet / script panel.*

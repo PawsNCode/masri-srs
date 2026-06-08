@@ -318,6 +318,32 @@ const FORM_LABEL = {
   final: "end — joined to the previous letter",
 };
 
+/* ---- Mastery indicator: colour an item/letter by its accuracy history ---- */
+const MASTERY = { perfect: "#27ae60", mixed: "#e6962e", weak: "#e0556e" };
+const MASTERY_LABEL = { perfect: "always right", mixed: "some misses", weak: "needs review" };
+function masteryLevel(p) {
+  if (!p) return null;
+  const c = p.correct || 0, w = p.wrong || 0;
+  if (c + w === 0) return null;
+  if (w >= 2) return "weak";   // missed more than once
+  if (w >= 1) return "mixed";  // right and wrong
+  return "perfect";            // only ever correct
+}
+const masteryColor = (p) => { const m = masteryLevel(p); return m ? MASTERY[m] : null; };
+
+/* ---- Random positional form for script quizzes (so all 4 shapes get tested) ---- */
+function formsFor(glyph) {
+  const info = LETTER_INFO[glyph];
+  const f = letterForms(glyph);
+  if (!info || (!info.joinFwd && !info.joinBack)) return [["isolated", f.iso]]; // e.g. hamza
+  if (!info.joinFwd) return [["isolated", f.iso], ["final", f.fin]];            // right-joiners
+  return [["isolated", f.iso], ["initial", f.ini], ["medial", f.med], ["final", f.fin]];
+}
+function randomForm(glyph) {
+  const opts = formsFor(glyph);
+  return opts[Math.floor(Math.random() * opts.length)];
+}
+
 /* Break an Arabic string into ordered tokens (letters, spaces, marks)
    and work out the positional form of every letter in context. */
 function analyzeArabic(str) {
@@ -1779,15 +1805,44 @@ function Bar({ pct, h = 8 }) {
 
 /* ===================== TYPED QUIZ (reused everywhere) ===================== */
 function TypedQuiz({ items, mode, onGrade, onExit, title }) {
-  const [queue] = useState(() => items);
+  const [queue, setQueue] = useState(() => items);
   const [i, setI] = useState(0);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [score, setScore] = useState({ right: 0, total: 0 });
   const [leveled, setLeveled] = useState(null);
   const [done, setDone] = useState(items.length === 0);
+  const [missedIds, setMissedIds] = useState([]);
+  const graded = useRef(new Set());
+  const need = useRef({});
+  const reps = useRef({});
+  const initialTotal = useRef(items.length || 1);
+  const REQUIRE = 2, MAXREPS = 6;
 
   const item = queue[i];
+
+  const requeue = (it) => {
+    reps.current[it.id] = (reps.current[it.id] || 0) + 1;
+    if (reps.current[it.id] <= MAXREPS) setQueue((q) => [...q, it]);
+  };
+  // record an answer: grade SRS only on first encounter, then handle re-quizzing
+  const register = (it, ok) => {
+    const id = it.id;
+    if (!graded.current.has(id)) {
+      graded.current.add(id);
+      const lvl = onGrade(id, ok, mode);
+      if (lvl) setLeveled(lvl);
+      setScore((s) => ({ right: s.right + (ok ? 1 : 0), total: s.total + 1 }));
+    }
+    if (!ok) {
+      need.current[id] = REQUIRE;
+      setMissedIds((m) => (m.includes(id) ? m : [...m, id]));
+      requeue(it);
+    } else if ((need.current[id] || 0) > 0) {
+      need.current[id] -= 1;
+      if (need.current[id] > 0) requeue(it);
+    }
+  };
 
   const submit = () => {
     if (feedback) {
@@ -1798,17 +1853,28 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
       return;
     }
     const ok = answerMatches(answer, item);
-    const lvl = onGrade(item.id, ok, mode);
-    if (lvl) setLeveled(lvl);
+    register(item, ok);
     setFeedback(ok ? "correct" : "wrong");
-    setScore((s) => ({ right: s.right + (ok ? 1 : 0), total: s.total + 1 }));
   };
   const giveUp = () => {
     if (feedback) return;
-    const lvl = onGrade(item.id, false, mode);
-    if (lvl) setLeveled(lvl);
+    register(item, false);
     setFeedback("wrong");
-    setScore((s) => ({ right: s.right, total: s.total + 1 }));
+  };
+  const retake = () => {
+    const miss = missedIds.map((id) => items.find((x) => x.id === id)).filter(Boolean);
+    graded.current = new Set();
+    need.current = {};
+    reps.current = {};
+    initialTotal.current = miss.length || 1;
+    setMissedIds([]);
+    setQueue(miss);
+    setI(0);
+    setAnswer("");
+    setFeedback(null);
+    setScore({ right: 0, total: 0 });
+    setLeveled(null);
+    setDone(miss.length === 0);
   };
 
   if (done) {
@@ -1825,7 +1891,10 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
             🎊 Level up! You reached Level {leveled} — new words unlocked.
           </div>
         )}
-        <button className="tap" onClick={onExit} style={{ width: "100%", marginTop: 18, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back to home</button>
+        {missedIds.length > 0 && (
+          <button className="tap" onClick={retake} style={{ width: "100%", marginTop: 18, padding: 14, borderRadius: 13, border: `2px solid ${MASTERY.weak}`, background: `${MASTERY.weak}12`, color: MASTERY.weak, fontWeight: 700, fontSize: 14 }}>🔁 Retake the {missedIds.length} I missed</button>
+        )}
+        <button className="tap" onClick={onExit} style={{ width: "100%", marginTop: missedIds.length > 0 ? 8 : 18, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back to home</button>
       </div>
     );
   }
@@ -1838,13 +1907,13 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: T.goldSoft, whiteSpace: "nowrap" }}>{title}</div>
         <div style={{ flex: 1, height: 4, background: T.line, borderRadius: 4, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${(i / queue.length) * 100}%`, background: `linear-gradient(90deg, ${T.gold}, ${T.terra})`, transition: "width .3s ease" }} />
+          <div style={{ height: "100%", width: `${Math.min(100, (score.total / initialTotal.current) * 100)}%`, background: `linear-gradient(90deg, ${T.gold}, ${T.terra})`, transition: "width .3s ease" }} />
         </div>
         <div style={{ fontSize: 12, color: T.textDim }}>{score.right}/{score.total}</div>
       </div>
 
       <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "22px 18px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
-        <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>Type in Arabic · {item.type}</div>
+        <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>Type in Arabic · {item.type}{(need.current[item.id] || 0) > 0 ? " · 🔁 retry" : ""}</div>
         <div style={{ fontFamily: displayFont, fontSize: 24, color: T.text, marginTop: 8 }}>{item.en}</div>
       </div>
 
@@ -2200,13 +2269,21 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
       <div style={{ fontSize: 11.5, color: T.textDim, margin: "2px 2px 8px" }}>
         Tap a card to see how to type & write it. Tap the ★ to add it to your custom quiz — your picks are saved.
       </div>
+      <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", fontSize: 10.5, color: T.textDim, margin: "0 0 10px" }}>
+        {["perfect", "mixed", "weak"].map((k) => (
+          <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <span style={{ width: 11, height: 11, borderRadius: 3, border: `2px solid ${MASTERY[k]}`, display: "inline-block" }} />{MASTERY_LABEL[k]}
+          </span>
+        ))}
+      </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: customItems.length ? 70 : 0 }}>
         {shown.map((it) => {
           const b = badge(it);
           const picked = inCustom(it.id);
+          const mc = masteryColor(state.progress[it.id]);
           return (
-            <div key={it.id} style={{ background: picked ? `${T.gold}0d` : T.panel, border: `1px solid ${picked ? T.gold : T.line}`, borderRadius: 13, padding: "11px 13px", display: "flex", alignItems: "center", gap: 10 }}>
+            <div key={it.id} style={{ background: picked ? `${T.gold}0d` : T.panel, border: `${mc ? 2 : 1}px solid ${mc || (picked ? T.gold : T.line)}`, borderRadius: 13, padding: "11px 13px", display: "flex", alignItems: "center", gap: 10 }}>
               <button className="tap" onClick={() => onToggleCustom(it.id)} aria-label="add to custom quiz" title="Add to custom quiz" style={{ width: 24, height: 24, borderRadius: 999, flexShrink: 0, cursor: "pointer", border: `2px solid ${picked ? T.gold : T.line}`, background: picked ? T.gold : "transparent", color: picked ? "#fff" : T.textDim, fontSize: 13, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>★</button>
               <button className="tap" onClick={() => speak(it.ar)} aria-label="play" style={{ background: "transparent", border: "none", padding: 0, cursor: "pointer", minWidth: 74, display: "flex", alignItems: "center", gap: 5 }}>
                 <span style={{ fontFamily: arFont, fontSize: 22, direction: "rtl", color: T.text }}>{it.ar}</span>
@@ -2270,6 +2347,14 @@ function StatsView({ state, allItems, level, streak }) {
   const appPct = totalApp ? mastered / totalApp : 0;
   const startedPct = totalApp ? Math.min(learned, totalApp) / totalApp : 0;
 
+  // alphabet / script progress
+  const sp = (state.script && state.script.progress) || {};
+  const slp = (g) => normLP(sp[g]);
+  const sLearned = ALPHABET.filter((a) => slp(a[0])).length;
+  const sMastered = ALPHABET.filter((a) => (slp(a[0])?.stage || 0) >= 5).length;
+  const sDue = ALPHABET.filter((a) => { const p = slp(a[0]); return p && (p.due || 0) <= now; }).length;
+  const sPct = ALPHABET.length ? sLearned / ALPHABET.length : 0;
+
   // last 14 days
   const days = [];
   let d = todayStr();
@@ -2318,6 +2403,38 @@ function StatsView({ state, allItems, level, streak }) {
         <Stat label="Due now" value={due} color={due ? T.red : T.textDim} />
         <Stat label="Next 24h" value={next24} color={T.gold} />
         <Stat label="Next 7 days" value={next7} color={T.goldSoft} />
+      </div>
+
+      {/* alphabet / script */}
+      <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px", marginBottom: 18 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+          <span style={{ fontSize: 13, color: T.text, fontWeight: 700 }}>Alphabet — script</span>
+          <span style={{ fontSize: 11.5, color: T.goldSoft, fontWeight: 700 }}>{Math.round(sPct * 100)}% learned</span>
+        </div>
+        <Bar pct={sPct} h={6} />
+        <div style={{ display: "flex", gap: 8, margin: "12px 0" }}>
+          <Stat label="Learned" value={`${sLearned}/${ALPHABET.length}`} color={T.pink} />
+          <Stat label="Mastered" value={sMastered} color={T.terra} />
+          <Stat label="Due" value={sDue} color={sDue ? T.red : T.textDim} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 5 }}>
+          {ALPHABET.map((a) => {
+            const mc = masteryColor(slp(a[0]));
+            const seen = !!slp(a[0]);
+            return (
+              <div key={a[0]} title={`${a[1]} · ${a[2]}`} style={{ textAlign: "center", border: `2px solid ${mc || T.line}`, background: seen ? T.panelHi : "transparent", borderRadius: 8, padding: "5px 0", opacity: seen ? 1 : 0.45 }}>
+                <span style={{ fontFamily: arFont, fontSize: 19, color: T.text, direction: "rtl" }}>{a[0]}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", fontSize: 10, color: T.textDim, marginTop: 10 }}>
+          {["perfect", "mixed", "weak"].map((k) => (
+            <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <span style={{ width: 10, height: 10, borderRadius: 3, border: `2px solid ${MASTERY[k]}`, display: "inline-block" }} />{MASTERY_LABEL[k]}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* new words learned */}
@@ -2683,7 +2800,7 @@ function App() {
 /* ===================== SCRIPT TRAIN (learn + SRS quiz the alphabet) ===================== */
 function makeLetterQ(answer) {
   const pool = shuffle(ALPHABET.filter((x) => x[2] !== answer[2])).slice(0, 3);
-  return { answer, options: shuffle([answer, ...pool]) };
+  return { answer, options: shuffle([answer, ...pool]), form: randomForm(answer[0]) };
 }
 function letterMatch(typed, glyph) {
   const strip = (s) => (s || "").replace(/[\u064B-\u0652\u0640\u0670]/g, "").trim();
@@ -2721,6 +2838,11 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   const [feedback, setFeedback] = useState(null);
   const [sess, setSess] = useState({ right: 0, total: 0, streak: 0, best: ss.best || 0 });
   const timer = useRef(null);
+  const quizSetRef = useRef([]);
+  const gradedRef = useRef(new Set());
+  const needRef = useRef({});
+  const repsRef = useRef({});
+  const [missedSet, setMissedSet] = useState([]);
   useEffect(() => () => clearTimeout(timer.current), []);
   const didAuto = useRef(false);
   useEffect(() => {
@@ -2759,6 +2881,26 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     saveProg(glyph, np, newStreak);
   };
 
+  const requeueLetter = (glyph) => {
+    repsRef.current[glyph] = (repsRef.current[glyph] || 0) + 1;
+    if (repsRef.current[glyph] <= 5) {
+      const a = ALPHABET.find((x) => x[0] === glyph);
+      if (a) { quizSetRef.current = [...quizSetRef.current, a]; setQuizSet(quizSetRef.current); }
+    }
+  };
+  // grade SRS once per letter, then re-quiz missed letters before the session ends
+  const handleAnswer = (glyph, correct) => {
+    if (!gradedRef.current.has(glyph)) { gradedRef.current.add(glyph); applyResult(glyph, correct); }
+    if (!correct) {
+      needRef.current[glyph] = 2;
+      setMissedSet((m) => (m.includes(glyph) ? m : [...m, glyph]));
+      requeueLetter(glyph);
+    } else if ((needRef.current[glyph] || 0) > 0) {
+      needRef.current[glyph] -= 1;
+      if (needRef.current[glyph] > 0) requeueLetter(glyph);
+    }
+  };
+
   const startLearn = () => {
     const next = unlearned.slice(0, batch);
     if (!next.length) return;
@@ -2769,6 +2911,11 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   const startQuiz = (list, srs) => {
     if (!list.length) return;
     const set = shuffle(list).slice(0, 15);
+    quizSetRef.current = set;
+    gradedRef.current = new Set();
+    needRef.current = {};
+    repsRef.current = {};
+    setMissedSet([]);
     setQuizSet(set);
     setQuizSrs(!!srs);
     setQIdx(0);
@@ -2779,15 +2926,20 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     setSess({ right: 0, total: 0, streak: 0, best: ss.best || 0 });
     setMode("quiz");
   };
+  const retakeMissed = () => {
+    const miss = missedSet.map((g) => ALPHABET.find((x) => x[0] === g)).filter(Boolean);
+    startQuiz(miss, quizSrs);
+  };
 
   const advance = () => {
+    const qs = quizSetRef.current;
     const n = qIdx + 1;
-    if (n >= quizSet.length) { setMode("done"); return; }
+    if (n >= qs.length) { setMode("done"); return; }
     setQIdx(n);
     setPicked(null);
     setTyped("");
     setFeedback(null);
-    setQ(makeLetterQ(quizSet[n]));
+    setQ(makeLetterQ(qs[n]));
   };
   const choose = (opt) => {
     if (picked) return;
@@ -2795,7 +2947,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     const correct = opt[2] === ans[2];
     speak(ans[0]);
     setPicked(opt);
-    applyResult(ans[0], correct);
+    handleAnswer(ans[0], correct);
     timer.current = setTimeout(advance, 950);
   };
   const checkType = () => {
@@ -2804,13 +2956,13 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     const correct = letterMatch(typed, ans[0]);
     speak(ans[0]);
     setFeedback(correct ? "correct" : "wrong");
-    applyResult(ans[0], correct);
+    handleAnswer(ans[0], correct);
   };
   const giveUpType = () => {
     if (feedback) return;
     speak(q.answer[0]);
     setFeedback("wrong");
-    applyResult(q.answer[0], false);
+    handleAnswer(q.answer[0], false);
   };
   const flipDir = () => { clearTimeout(timer.current); setDir(quizDir === "recognize" ? "type" : "recognize"); setPicked(null); setTyped(""); setFeedback(null); };
 
@@ -2960,7 +3112,10 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
         <div style={{ fontFamily: displayFont, fontSize: 22 }}>Nice work!</div>
         <div style={{ color: T.textDim, fontSize: 14, marginTop: 8 }}>{sess.right}/{sess.total} correct · {acc}% · best streak {sess.best}🔥</div>
         {quizSrs && <div style={{ fontSize: 12, color: T.goldSoft, marginTop: 6 }}>Scheduled for their next review.</div>}
-        <button className="tap" onClick={() => setMode("menu")} style={{ width: "100%", marginTop: 18, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back</button>
+        {missedSet.length > 0 && (
+          <button className="tap" onClick={retakeMissed} style={{ width: "100%", marginTop: 18, padding: 14, borderRadius: 13, border: `2px solid ${MASTERY.weak}`, background: `${MASTERY.weak}12`, color: MASTERY.weak, fontWeight: 700 }}>🔁 Retake the {missedSet.length} I missed</button>
+        )}
+        <button className="tap" onClick={() => setMode("menu")} style={{ width: "100%", marginTop: missedSet.length > 0 ? 8 : 18, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back</button>
       </div>
     );
   }
@@ -2988,8 +3143,8 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
       {!isType ? (
         <>
           <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "26px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 16 }}>
-            <div style={{ fontSize: 12, color: T.textDim, marginBottom: 10 }}>Which sound is this?</div>
-            <div style={{ fontFamily: arFont, fontSize: 84, color: T.text, direction: "rtl", lineHeight: 1 }}>{ans[0]}</div>
+            <div style={{ fontSize: 12, color: T.textDim, marginBottom: 10 }}>Which sound is this? <span style={{ color: T.goldSoft, fontWeight: 600 }}>· {q.form[0]} form</span></div>
+            <div style={{ fontFamily: arFont, fontSize: 84, color: T.text, direction: "rtl", lineHeight: 1 }}>{q.form[1]}</div>
             <div style={{ marginTop: 12 }}><Speaker text={ans[0]} size={18} color={T.terra} /></div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -3116,7 +3271,7 @@ function ScriptView({ scriptState, setScript, autoReview, onAutoConsumed, custom
         ))}
       </div>
       {mode === "train" && <ScriptTrain scriptState={scriptState} setScript={setScript} autoReview={autoReview} onAutoConsumed={onAutoConsumed} customLetters={customLetters || []} onCustomLetters={onCustomLetters} />}
-      {mode === "learn" && <ScriptLearn onTrace={openTrace} />}
+      {mode === "learn" && <ScriptLearn onTrace={openTrace} scriptState={scriptState} />}
       {mode === "quiz" && <ScriptQuiz />}
       {mode === "trace" && <ScriptTrace initialIdx={traceIdx} onBack={traceReturn ? () => { setMode(traceReturn); setTraceReturn(null); } : null} />}
     </div>
@@ -3137,7 +3292,7 @@ function makeQuestion(qmode) {
   const answer = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
   const pool = shuffle(ALPHABET.filter((x) => x[2] !== answer[2])).slice(0, 3);
   const options = shuffle([answer, ...pool]);
-  return { answer, options, qmode };
+  return { answer, options, qmode, form: randomForm(answer[0]) };
 }
 
 function ScriptQuiz() {
@@ -3223,11 +3378,11 @@ function ScriptQuiz() {
         }}
       >
         <div style={{ fontSize: 12, color: T.textDim, marginBottom: 10 }}>
-          {showLetter ? "Which sound is this?" : "Which letter makes this sound?"}
+          {showLetter ? <>Which sound is this? <span style={{ color: T.goldSoft, fontWeight: 600 }}>· {q.form[0]} form</span></> : "Which letter makes this sound?"}
         </div>
         {showLetter ? (
           <div style={{ fontFamily: arFont, fontSize: 84, color: T.text, direction: "rtl", lineHeight: 1 }}>
-            {q.answer[0]}
+            {q.form[1]}
           </div>
         ) : (
           <div style={{ fontFamily: displayFont, fontSize: 40, color: T.gold }}>
@@ -3690,7 +3845,7 @@ function ctrlBtn(active) {
   };
 }
 
-function ScriptLearn({ onTrace }) {
+function ScriptLearn({ onTrace, scriptState }) {
   return (
     <div className="fade" style={{ paddingTop: 6 }}>
       <div style={{ fontFamily: displayFont, fontSize: 20, marginBottom: 6 }}>
@@ -3738,16 +3893,24 @@ function ScriptLearn({ onTrace }) {
         <b style={{ color: T.text }}>isolated · initial · medial · final</b>. Tap the big
         letter to <b style={{ color: T.gold }}>trace</b> it, or 🔊 to hear it.
       </div>
+      <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", fontSize: 10.5, color: T.textDim, marginBottom: 12 }}>
+        {["perfect", "mixed", "weak"].map((k) => (
+          <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <span style={{ width: 11, height: 11, borderRadius: 3, border: `2px solid ${MASTERY[k]}`, display: "inline-block" }} />{MASTERY_LABEL[k]}
+          </span>
+        ))}
+      </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
         {ALPHABET.map(([l, name, tr, note], idx) => {
           const f = letterForms(l);
+          const mc = masteryColor(normLP(((scriptState && scriptState.progress) || {})[l]));
           return (
             <div
               key={name}
               style={{
                 background: T.panel,
-                border: `1px solid ${T.line}`,
+                border: `${mc ? 2 : 1}px solid ${mc || T.line}`,
                 borderRadius: 14,
                 padding: "12px 14px",
               }}
