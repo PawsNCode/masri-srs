@@ -1441,7 +1441,8 @@ function learnItem(now) {
 }
 function reviewSchedule(prog, correct, now) {
   let stage = prog ? prog.stage : 1;
-  stage = correct ? Math.min(9, stage + 1) : Math.max(1, stage - (stage >= 5 ? 2 : 1));
+  // Correct → climb one rung. Miss → lose half your progress (50% setback), rounded.
+  stage = correct ? Math.min(9, stage + 1) : Math.max(1, Math.round(stage / 2));
   const ms = STAGE_MS[stage];
   return {
     stage,
@@ -1455,6 +1456,24 @@ function reviewSchedule(prog, correct, now) {
 }
 function isLeech(prog) {
   return !!prog && (prog.recentWrong || 0) >= 2;
+}
+// How far up the SRS ladder (0–100%). Burned = 100%.
+function masteryPct(prog) {
+  const st = prog && prog.stage ? prog.stage : 0;
+  return Math.round((st / 9) * 100);
+}
+// Traffic-light mastery: red = struggling, green = never missed, amber = recovering.
+function masteryColor(prog) {
+  if (!prog) return null;
+  if ((prog.recentWrong || 0) >= 2) return T.red;
+  if ((prog.wrong || 0) === 0) return T.green;
+  return T.amber;
+}
+function masteryLabel(prog) {
+  if (!prog) return "";
+  if ((prog.recentWrong || 0) >= 2) return "needs work";
+  if ((prog.wrong || 0) === 0) return "solid";
+  return "improving";
 }
 function fmtUntil(due, now) {
   if (due === Infinity) return "burned";
@@ -1941,16 +1960,26 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
         </div>
       )}
 
-      <div style={{ fontSize: 11.5, color: T.textDim, margin: "2px 2px 8px" }}>
-        Tap the ★ to add a word to your custom quiz — your picks are saved.
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 12px", margin: "2px 2px 8px", fontSize: 11 }}>
+        <span style={{ color: T.textDim }}>Mastery:</span>
+        {[[T.green, "solid"], [T.amber, "improving"], [T.red, "needs work"]].map(([c, label]) => (
+          <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: T.textDim }}>
+            <span style={{ width: 9, height: 9, borderRadius: 3, background: c }} />{label}
+          </span>
+        ))}
+        <span style={{ color: T.textDim, marginLeft: "auto" }}>★ adds to custom quiz</span>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: customItems.length ? 70 : 0 }}>
         {shown.map((it) => {
           const b = badge(it);
           const picked = inCustom(it.id);
+          const p = state.progress[it.id];
+          const locked = it.level > level && !it.custom;
+          const mc = !locked && p ? masteryColor(p) : null;
+          const pct = !locked && p ? masteryPct(p) : null;
           return (
-            <div key={it.id} style={{ background: picked ? `${T.gold}0d` : T.panel, border: `1px solid ${picked ? T.gold : T.line}`, borderRadius: 13, padding: "11px 13px", display: "flex", alignItems: "center", gap: 10 }}>
+            <div key={it.id} style={{ background: picked ? `${T.gold}0d` : T.panel, border: `1px solid ${picked ? T.gold : T.line}`, borderLeft: mc ? `5px solid ${mc}` : `1px solid ${picked ? T.gold : T.line}`, borderRadius: 13, padding: "11px 13px", display: "flex", alignItems: "center", gap: 10 }}>
               <button className="tap" onClick={() => onToggleCustom(it.id)} aria-label="add to custom quiz" title="Add to custom quiz" style={{ width: 24, height: 24, borderRadius: 999, flexShrink: 0, cursor: "pointer", border: `2px solid ${picked ? T.gold : T.line}`, background: picked ? T.gold : "transparent", color: picked ? "#fff" : T.textDim, fontSize: 13, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>★</button>
               <button className="tap" onClick={() => speak(it.ar)} aria-label="play" style={{ background: "transparent", border: "none", padding: 0, cursor: "pointer", minWidth: 74, display: "flex", alignItems: "center", gap: 5 }}>
                 <span style={{ fontFamily: arFont, fontSize: 22, direction: "rtl", color: T.text }}>{it.ar}</span>
@@ -1960,7 +1989,15 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
                 <div style={{ fontSize: 14, color: T.text }}>{it.en}</div>
                 <div style={{ fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}</div>
               </div>
-              <div style={{ fontSize: 10, color: b.c, border: `1px solid ${b.c}55`, borderRadius: 7, padding: "2px 7px", fontWeight: 700, whiteSpace: "nowrap" }}>{b.t}</div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
+                <div style={{ fontSize: 10, color: b.c, border: `1px solid ${b.c}55`, borderRadius: 7, padding: "2px 7px", fontWeight: 700, whiteSpace: "nowrap" }}>{b.t}</div>
+                {pct != null && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: 999, background: mc }} />
+                    <span style={{ fontSize: 9.5, color: T.textDim, fontWeight: 600 }}>{pct}%</span>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
@@ -2460,6 +2497,8 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   const [picked, setPicked] = useState(null);
   const [typed, setTyped] = useState("");
   const [feedback, setFeedback] = useState(null);
+  const [traceShown, setTraceShown] = useState(false);
+  const [traceKey, setTraceKey] = useState(0);
   const [sess, setSess] = useState({ right: 0, total: 0, streak: 0, best: ss.best || 0 });
   const timer = useRef(null);
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -2516,6 +2555,8 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     setPicked(null);
     setTyped("");
     setFeedback(null);
+    setTraceShown(false);
+    setTraceKey((k) => k + 1);
     setQ(makeLetterQ(set[0]));
     setSess({ right: 0, total: 0, streak: 0, best: ss.best || 0 });
     setMode("quiz");
@@ -2553,7 +2594,24 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     setFeedback("wrong");
     applyResult(q.answer[0], false);
   };
-  const flipDir = () => { clearTimeout(timer.current); setDir(quizDir === "recognize" ? "type" : "recognize"); setPicked(null); setTyped(""); setFeedback(null); };
+  const flipDir = () => { clearTimeout(timer.current); const order = ["recognize", "type", "trace"]; setDir(order[(order.indexOf(quizDir) + 1) % 3]); setPicked(null); setTyped(""); setFeedback(null); setTraceShown(false); setTraceKey((k) => k + 1); };
+
+  // Tracing quiz: write from memory, reveal, then self-grade. A miss feeds the
+  // SRS (halving progress) and re-queues the letter so it must be retaken.
+  const gradeTrace = (ok) => {
+    const glyph = q.answer[0];
+    applyResult(glyph, ok);
+    let qs = quizSet;
+    if (!ok && quizSet.length < 40) qs = [...quizSet, q.answer]; // retake the miss
+    if (qs !== quizSet) setQuizSet(qs);
+    setTraceShown(false);
+    const n = qIdx + 1;
+    if (n >= qs.length) { setMode("done"); return; }
+    setQIdx(n);
+    setPicked(null); setTyped(""); setFeedback(null);
+    setTraceKey((k) => k + 1);
+    setQ(makeLetterQ(qs[n]));
+  };
 
   /* ===================== MENU ===================== */
   if (mode === "menu") {
@@ -2598,9 +2656,9 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
         {/* settings */}
         <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: 16, marginTop: 16 }}>
           <div style={{ fontSize: 12.5, color: T.textDim, marginBottom: 10 }}>Quiz style</div>
-          <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-            {[["recognize", "👀 Letter → sound"], ["type", "⌨️ Sound → type letter"]].map(([k, label]) => (
-              <button key={k} className="tap" onClick={() => setDir(k)} style={{ flex: 1, border: "none", borderRadius: 10, padding: "10px 6px", fontSize: 11.5, fontWeight: 600, color: quizDir === k ? "#fff" : T.textDim, background: quizDir === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.panelHi }}>{label}</button>
+          <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+            {[["recognize", "👀 Letter → sound"], ["type", "⌨️ Sound → type"], ["trace", "✍️ Sound → write"]].map(([k, label]) => (
+              <button key={k} className="tap" onClick={() => setDir(k)} style={{ flex: "1 1 30%", border: "none", borderRadius: 10, padding: "10px 6px", fontSize: 11, fontWeight: 600, color: quizDir === k ? "#fff" : T.textDim, background: quizDir === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.panelHi }}>{label}</button>
             ))}
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -2683,6 +2741,11 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
             ))}
           </div>
           <div style={{ marginTop: 14 }}><Speaker text={a[0]} size={20} color={T.gold} /></div>
+          <div style={{ marginTop: 16, borderTop: `1px dashed ${T.line}`, paddingTop: 14 }}>
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, marginBottom: 8 }}>✍️ Now write it</div>
+            <MiniTrace glyph={a[0]} guide={true} resetKey={tIdx} />
+            <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 8, lineHeight: 1.5 }}>Trace over the gray letter, right → left. Dots and hamzas go on last.</div>
+          </div>
         </div>
         <button className="tap" onClick={() => { markLearned(a[0]); if (tIdx + 1 >= teachQueue.length) startQuiz(teachQueue, true); else setTIdx(tIdx + 1); }} style={{ width: "100%", marginTop: 14, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
           {tIdx + 1 >= teachQueue.length ? "Got them — quiz me →" : "Learn it ✓"}
@@ -2709,8 +2772,10 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   /* ===================== QUIZ ===================== */
   const ans = q.answer;
   const isType = quizDir === "type";
+  const isTrace = quizDir === "trace";
   const correct = feedback === "correct";
   const wrong = feedback === "wrong";
+  const dirLabel = isTrace ? "Sound → write letter" : isType ? "Sound → type letter" : "Letter → pick sound";
 
   return (
     <div className="fade">
@@ -2722,11 +2787,42 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
 
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
         <button className="tap" onClick={flipDir} style={{ border: `1px solid ${T.line}`, background: T.panelHi, color: T.gold, borderRadius: 20, padding: "7px 14px", fontSize: 12, fontWeight: 600 }}>
-          {isType ? "Sound → type letter" : "Letter → pick sound"} ⇄
+          {dirLabel} ⇄
         </button>
       </div>
 
-      {!isType ? (
+      {isTrace ? (
+        <>
+          <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "18px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 14 }}>
+            {!traceShown && <div style={{ fontSize: 11, color: T.terra, fontWeight: 700, letterSpacing: 0.4, marginBottom: 4 }}>WRITE THIS LETTER FROM MEMORY</div>}
+            <div style={{ fontFamily: displayFont, fontSize: 34, color: T.gold }}>{ans[2]}</div>
+            <div style={{ fontSize: 13, color: T.textDim, marginTop: 2 }}>{ans[1]}</div>
+            <div style={{ marginTop: 8 }}><Speaker text={ans[0]} size={18} color={T.terra} /></div>
+          </div>
+
+          <MiniTrace glyph={ans[0]} guide={traceShown} resetKey={traceKey} />
+
+          {traceShown && (
+            <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${T.line}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
+              <div style={{ fontSize: 12, color: T.textDim, marginBottom: 2 }}>The letter is</div>
+              <div style={{ fontFamily: arFont, fontSize: 44, color: T.text, direction: "rtl", lineHeight: 1.1 }}>{ans[0]}</div>
+              {STROKES[ans[0]] && <div style={{ fontSize: 12.5, color: T.gold, marginTop: 4, lineHeight: 1.5 }}>✍️ {STROKES[ans[0]][1]}</div>}
+            </div>
+          )}
+
+          {!traceShown ? (
+            <button className="tap" onClick={() => setTraceShown(true)} style={{ width: "100%", marginTop: 12, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
+              Reveal answer
+            </button>
+          ) : (
+            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+              <button className="tap" onClick={() => gradeTrace(false)} style={{ flex: 1, padding: 14, borderRadius: 13, border: `1.5px solid ${T.red}`, background: `${T.red}14`, color: T.text, fontSize: 14, fontWeight: 700 }}>Missed ✗</button>
+              <button className="tap" onClick={() => gradeTrace(true)} style={{ flex: 1, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 14, fontWeight: 700 }}>Got it ✓</button>
+            </div>
+          )}
+          {traceShown && <div style={{ fontSize: 11, color: T.textDim, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>Be honest — a miss halves your progress and brings the letter back.</div>}
+        </>
+      ) : !isType ? (
         <>
           <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "26px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 16 }}>
             <div style={{ fontSize: 12, color: T.textDim, marginBottom: 10 }}>Which sound is this?</div>
@@ -3054,6 +3150,80 @@ function GuideOverlay({ glyph, show }) {
       <line x1="4" y1="50" x2="96" y2="50" stroke={T.line} strokeWidth="0.5" strokeDasharray="2 2.5" />
       <text x="50" y="50" fontSize="56" textAnchor="middle" dominantBaseline="central" fill={T.textDim} opacity="0.4" direction="rtl" style={{ fontFamily: arFont }}>{glyph}</text>
     </svg>
+  );
+}
+
+/* Compact, reusable trace pad — ghost glyph + grid + a drawable canvas.
+   Used in the learning step (guide on) and the tracing quiz (guide off until reveal).
+   Pass a changing `resetKey` to wipe the canvas (e.g. on the next quiz letter). */
+function MiniTrace({ glyph, guide = true, resetKey = 0 }) {
+  const canvasRef = useRef(null);
+  const drawing = useRef(false);
+  const last = useRef(null);
+
+  const setup = useCallback(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const rect = c.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    c.width = rect.width * dpr;
+    c.height = rect.height * dpr;
+    const ctx = c.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = T.gold;
+  }, []);
+
+  const clear = useCallback(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
+    ctx.clearRect(0, 0, c.width, c.height);
+  }, []);
+
+  useEffect(() => {
+    setup();
+    const onR = () => setup();
+    window.addEventListener("resize", onR);
+    return () => window.removeEventListener("resize", onR);
+  }, [setup]);
+
+  // wipe when the letter or the reset signal changes
+  useEffect(() => { setup(); clear(); }, [glyph, resetKey, setup, clear]);
+
+  const pos = (e) => {
+    const c = canvasRef.current;
+    const rect = c.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return { x: p.clientX - rect.left, y: p.clientY - rect.top };
+  };
+  const start = (e) => { e.preventDefault(); drawing.current = true; last.current = pos(e); };
+  const move = (e) => {
+    if (!drawing.current) return;
+    e.preventDefault();
+    const ctx = canvasRef.current.getContext("2d");
+    const p = pos(e);
+    ctx.beginPath();
+    ctx.moveTo(last.current.x, last.current.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    last.current = p;
+  };
+  const end = () => { drawing.current = false; };
+
+  return (
+    <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1", background: T.panel, border: `1px solid ${T.line}`, borderRadius: 18, overflow: "hidden", boxShadow: "0 10px 28px rgba(128,29,92,.08)" }}>
+      <GuideOverlay glyph={glyph} show={guide} />
+      <canvas
+        ref={canvasRef}
+        onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
+        onTouchStart={start} onTouchMove={move} onTouchEnd={end}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", touchAction: "none", cursor: "crosshair" }}
+      />
+      <button className="tap" onClick={clear} style={{ position: "absolute", bottom: 8, right: 8, border: `1px solid ${T.line}`, background: T.panelHi, color: T.textDim, borderRadius: 9, padding: "5px 11px", fontSize: 11.5, fontWeight: 600 }}>Clear</button>
+    </div>
   );
 }
 

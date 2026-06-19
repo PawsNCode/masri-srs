@@ -16,15 +16,18 @@ home screen.
   previous level, so you master each step before moving on.
 - **SRS stages** — every item climbs Apprentice → Guru → Master → Enlightened →
   Burned, resurfacing right before you'd forget it.
+- **Half-back on a miss** — get a review wrong and the item loses **half its
+  progress** (e.g. correct three times then wrong once drops it from ~44% back to
+  ~22% mastery), then comes due again soon. Honest mistakes cost you, so you really
+  learn it.
+- **Mastery colors** — every word in the Items list shows its state at a glance:
+  **green = solid** (never missed), **amber = improving** (missed before, recovering),
+  **red = needs work** (missed twice), plus a live mastery % per item.
 - **Learning phase** — learn a batch of new words (3/5/7/10, your choice), then a
   quiz on that batch locks them in.
 - **Typed-Arabic reviews** — read the English, type the Arabic using the built-in
   on-screen Arabic keyboard or your device keyboard. Grading is forgiving about
   short vowels and alef/hamza spelling.
-- **Misses come back** — any item you get wrong is re-quizzed (at least twice more)
-  before the session ends, so a mistake gets reinforced on the spot. At the end, if
-  you missed anything, a **🔁 Retake the ones I missed** button starts a focused
-  re-review of just those items.
 
 ### Reviews hub
 - Choose **what** to review: **letters (script), words, phrases, sentences, or all
@@ -37,39 +40,25 @@ home screen.
 
 ### Script / alphabet
 - **Train** — learn letters in batches with real **SRS scheduling** and due-based
-  letter reviews; two quiz styles: *see letter → pick sound* and *hear sound →
-  type the letter*; streaks and trouble-letter tracking. Recognition questions now
-  show the letter in **all four positional shapes** (isolated, initial, medial,
-  final), labelled, so you learn to spot each letter wherever it appears in a word.
+  letter reviews. Every new letter now comes with a **trace pad** in the learning
+  step, so you write each one as you learn it. Three quiz styles: *see letter → pick
+  sound*, *hear sound → type the letter*, and *hear sound → **write** the letter*.
+- **Tracing quiz in the SRS** — the write-the-letter quiz is fully part of lessons
+  and spaced review: write from memory, reveal, self-grade. A miss halves that
+  letter's progress (same half-back rule as words) and re-queues it so you retake it.
 - **Chart** — the full 28-letter reference with a pronunciation key, the four
   positional forms, and stroke-order guides.
-- **Quiz** — match letters to sounds with live score, accuracy, and streaks; the
-  shown letter rotates through its isolated / initial / medial / final shapes.
+- **Quiz** — match letters to sounds with live score, accuracy, and streaks.
 - **Trace** — finger-trace letters over a soft ghost glyph on a 2×2 grid, with
   written stroke-order steps, plus a write-from-memory quiz mode.
 
 ### Dictionary, stats & looks
 - **Items** is a searchable dictionary (English / transliteration / Arabic) with a
   count for every level.
-- **Mastery at a glance** — every word/phrase in the dictionary and every letter in
-  the **Script chart** gets a coloured border based on your answer history: **green**
-  = always correct, **amber** = mixed (right and wrong), **red** = missed more than
-  once. One look tells you what to focus on. (Stats shows the same colours on a
-  28-letter alphabet grid.)
-- **How to type & write it** — tap any word or phrase (in the **Items** dictionary
-  or while learning it in a **Lessons** session) to open a detail screen that shows:
-  the exact **keystroke order** for typing it on a phone or keyboard (left→right,
-  with optional short-vowel marks flagged), and a **letter-by-letter** writing guide
-  giving each letter's name and sound, the **shape it takes inside that word**
-  (isolated / initial / medial / final, with the real joined glyph), and stroke-order
-  steps for drawing it on paper. Multi-word phrases show word breaks, and diacritics
-  (tanwin, fatḥa, etc.) are explained on the letter they sit on. A **Back** button
-  returns you to wherever you opened it from.
 - **Stats** dashboard: % of the whole app and current level mastered, words
-  learned/mastered/burned, a review pipeline (due now / 24h / 7 days), an
-  **alphabet / script** panel (letters learned, mastered, due, plus a colour-coded
-  28-letter grid), a 14-day "new words" graph, a 14-day activity graph, an 8-week
-  activity calendar heatmap, and per-level progress bars.
+  learned/mastered/burned, a review pipeline (due now / 24h / 7 days), a 14-day
+  "new words" graph, a 14-day activity graph, an 8-week activity calendar heatmap,
+  and per-level progress bars.
 - **Themes** — six color themes (Rose, Violet, Bubblegum, Mint, Dark, Midnight),
   chosen at the bottom of the Home screen.
 - **Audio** — tap-to-hear pronunciation via the browser's Arabic voice.
@@ -90,14 +79,10 @@ home screen.
 
 ## Built with
 
-- A single HTML file using React + Babel (loaded from a CDN)
+- A single HTML file using React 18.3.1 + Babel Standalone 7.26.4, pinned and loaded from the jsDelivr CDN
 - Pronunciation via the browser's Web Speech API (uses your device's Arabic voice)
 - Progress stored locally in your browser (localStorage)
 
 ---
 
-*Last updated: script quizzes now test all four letter shapes (isolated / initial /
-medial / final); missed items in any quiz are re-asked at least twice with a "retake
-the ones I missed" option at the end; words, phrases and letters now show green /
-amber / red mastery borders in the dictionary, the script chart and Stats; and Stats
-gained a dedicated alphabet / script panel.*
+*Last updated: added a trace pad to the script learning step and a tracing quiz wired into the SRS; rebuilt the review rule so a missed word or letter loses half its progress and comes back; added green/amber/red mastery colors (with a live %) to every word in the Items list; and pinned the React/Babel scripts to the jsDelivr CDN so the app loads reliably.*
