@@ -1706,20 +1706,41 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
 }
 
 /* ===================== LEARN SESSION (teach N, then quiz them) ===================== */
-function LearnSession({ pool, batch, onLearn, onGrade, onExit }) {
+function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems }) {
   const [queue] = useState(() => pool.slice(0, batch));
-  const [phase, setPhase] = useState(queue.length ? "teach" : "empty");
+  const [phase, setPhase] = useState("menu");
   const [i, setI] = useState(0);
 
-  if (phase === "empty") {
+  if (phase === "menu") {
+    const canLearn = queue.length > 0;
     return (
-      <div className="fade pop" style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 20, padding: "44px 24px", textAlign: "center" }}>
-        <div style={{ fontSize: 38, marginBottom: 8 }}>🌱</div>
-        <div style={{ fontFamily: displayFont, fontSize: 22 }}>No new words right now</div>
-        <div style={{ color: T.textDim, fontSize: 13.5, marginTop: 8, lineHeight: 1.6 }}>
-          You've learned everything unlocked so far. Master your current level in Reviews (reach Guru on 90%) to unlock the next set.
+      <div className="fade" style={{ paddingTop: 4 }}>
+        <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "18px 18px 16px", marginBottom: 14, boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
+          <div style={{ fontFamily: displayFont, fontSize: 21, color: T.gold }}>Lessons</div>
+          <div style={{ fontSize: 12.5, color: T.textDim, marginTop: 3, lineHeight: 1.5 }}>
+            Learn new words, drill everything you've learned, or run your own custom set.
+          </div>
         </div>
-        <button className="tap" onClick={onExit} style={{ width: "100%", marginTop: 18, padding: 13, borderRadius: 12, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Home</button>
+
+        {/* Learn new words — primary */}
+        <button className="tap" onClick={() => canLearn && setPhase("teach")} disabled={!canLearn} style={{ width: "100%", padding: 16, borderRadius: 14, marginBottom: 10, textAlign: "left", background: canLearn ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.panel, color: canLearn ? "#fff" : T.textDim, border: canLearn ? "none" : `1px solid ${T.line}`, boxShadow: canLearn ? "0 8px 20px rgba(128,29,92,.18)" : "none" }}>
+          <div style={{ fontSize: 15, fontWeight: 700 }}>{canLearn ? `Learn ${queue.length} new word${queue.length === 1 ? "" : "s"} →` : "No new words right now"}</div>
+          <div style={{ fontSize: 11.5, marginTop: 2, opacity: canLearn ? 0.9 : 1, color: canLearn ? "#fff" : T.textDim }}>{canLearn ? "Teach, then quiz them to lock them in" : "You've learned all that's unlocked — master your level in Reviews to unlock more"}</div>
+        </button>
+
+        {/* Quiz / review everything learned */}
+        <button className="tap" onClick={() => learnedCount && onQuizLearned && onQuizLearned()} disabled={!learnedCount} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 10, textAlign: "left", border: `1px solid ${learnedCount ? T.gold : T.line}`, background: learnedCount ? `${T.gold}10` : T.panel, color: learnedCount ? T.gold : T.textDim }}>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>✨ Quiz all learned words {learnedCount ? `(${learnedCount})` : ""}</div>
+          <div style={{ fontSize: 11.5, marginTop: 2, color: T.textDim }}>{learnedCount ? "A shuffled drill over everything you've learned so far" : "Learn some words first"}</div>
+        </button>
+
+        {/* Custom quiz */}
+        <button className="tap" onClick={() => (customCount ? onCustom && onCustom() : onGotoItems && onGotoItems())} style={{ width: "100%", padding: 14, borderRadius: 13, textAlign: "left", border: `1px solid ${T.line}`, background: T.panel, color: T.text }}>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>{customCount ? `★ Start custom quiz (${customCount})` : "★ Create a custom quiz →"}</div>
+          <div style={{ fontSize: 11.5, marginTop: 2, color: T.textDim }}>{customCount ? "Your hand-picked set — tap to begin" : "Pick the words you want with the ★ in Items"}</div>
+        </button>
+
+        <button className="tap" onClick={onExit} style={{ width: "100%", marginTop: 16, padding: 11, borderRadius: 12, border: "none", background: "transparent", color: T.textDim, fontSize: 12.5 }}>Back to home</button>
       </div>
     );
   }
@@ -1730,7 +1751,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit }) {
         <div style={{ textAlign: "center", fontSize: 12.5, color: T.textDim, margin: "0 0 12px", lineHeight: 1.5 }}>
           Now type each one in Arabic to lock it in 👇
         </div>
-        <TypedQuiz items={queue} mode="srs" onGrade={onGrade} onExit={onExit} title="Lesson quiz" />
+        <TypedQuiz items={queue} mode="srs" onGrade={onGrade} onExit={() => setPhase("menu")} title="Lesson quiz" />
       </div>
     );
   }
@@ -2394,6 +2415,13 @@ function App() {
     if (items.length) { setPracticeItems(items); setView("practice"); }
   }, []);
 
+  const startLearnedQuiz = useCallback(() => {
+    const s = stateRef.current;
+    const all = [...ITEMS, ...(s.custom || [])];
+    const items = shuffle(all.filter((it) => s.progress[it.id]));
+    if (items.length) { setPracticeItems(items); setView("practice"); }
+  }, []);
+
   const dueLetters = useMemo(() => {
     if (!state) return 0;
     const sp = (state.script && state.script.progress) || {};
@@ -2476,7 +2504,7 @@ function App() {
           />
         )}
         {view === "lessons" && (
-          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onExit={() => setView("home")} />
+          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} />
         )}
         {view === "reviews" && (
           <ReviewsHub

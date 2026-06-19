@@ -23,8 +23,10 @@ home screen.
 - **Mastery colors** — every word in the Items list shows its state at a glance:
   **green = solid** (never missed), **amber = improving** (missed before, recovering),
   **red = needs work** (missed twice), plus a live mastery % per item.
-- **Learning phase** — learn a batch of new words (3/5/7/10, your choice), then a
-  quiz on that batch locks them in.
+- **Lessons hub** — the Lessons tab opens to a small menu: **learn a batch of new
+  words** (3/5/7/10, your choice) and then quiz them to lock them in, **quiz all the
+  words you've learned** in one shuffled drill, or **start a custom quiz** of words you
+  hand-picked with the ★ in Items.
 - **Typed-Arabic reviews** — read the English, type the Arabic using the built-in
   on-screen Arabic keyboard or your device keyboard. Grading is forgiving about
   short vowels and alef/hamza spelling.
@@ -98,4 +100,4 @@ home screen.
 
 ---
 
-*Last updated: quizzes and reviews are now drill-to-mastery — a session won't end (and won't congratulate you) until every word or script shape is answered correctly twice in a row; a miss resets that item's streak and re-queues it, while the SRS is still graded once per item (as a miss if you ever slipped). Added a Retake button on the finish screen.*
+*Last updated: the Lessons tab now opens to a hub with three choices — learn new words, quiz everything you've learned (a shuffled drill), or start a custom quiz — instead of jumping straight into teaching. The "no new words" dead-end is gone, since the other two options are always available.*
