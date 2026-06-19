@@ -27,9 +27,11 @@ home screen.
   words** (3/5/7/10, your choice) and then quiz them to lock them in, **quiz all the
   words you've learned** in one shuffled drill, or **start a custom quiz** of words you
   hand-picked with the ★ in Items.
-- **Typed-Arabic reviews** — read the English, type the Arabic using the built-in
-  on-screen Arabic keyboard or your device keyboard. Grading is forgiving about
-  short vowels and alef/hamza spelling.
+- **Three quiz types** — every quiz and review lets you answer the way you like, with
+  a toggle at the top that's remembered: **in-app Arabic keys** (the built-in on-screen
+  keyboard, no OS keyboard needed), **your phone keyboard** (switch it to Arabic and
+  type natively), or **multiple choice** (pick the right Arabic from four options).
+  Typed answers are graded leniently about short vowels and alef/hamza spelling.
 - **Drill to mastery** — every quiz and review (words *and* script shapes) keeps going
   until you answer **each item correctly twice in a row**. Miss one and its streak
   resets, and it comes back later in the same session — the quiz never ends, and never
@@ -100,4 +102,4 @@ home screen.
 
 ---
 
-*Last updated: the Lessons tab now opens to a hub with three choices — learn new words, quiz everything you've learned (a shuffled drill), or start a custom quiz — instead of jumping straight into teaching. The "no new words" dead-end is gone, since the other two options are always available.*
+*Last updated: reviews and quizzes now have three answer modes you can switch between (and the choice is remembered): type with the in-app Arabic keys, type with your phone's own Arabic keyboard, or answer by multiple choice. Applies to reviews, lessons, practice, and custom quizzes.*

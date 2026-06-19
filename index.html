@@ -1525,7 +1525,7 @@ const DEFAULT_STATE = {
   custom: [],
   customItems: [],
   customLetters: [],
-  settings: { lessonBatch: 5, theme: "rose" },
+  settings: { lessonBatch: 5, theme: "rose", quizType: "inapp" },
   daily: { date: todayStr(), reviews: 0, lessons: 0 },
   history: {},
   script: { progress: {}, best: 0, batch: 5, quizDir: "recognize" },
@@ -1575,7 +1575,7 @@ function Bar({ pct, h = 8 }) {
 }
 
 /* ===================== TYPED QUIZ (reused everywhere) ===================== */
-function TypedQuiz({ items, mode, onGrade, onExit, title }) {
+function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", onQuizType }) {
   const [queue, setQueue] = useState(() => items);
   const [streak, setStreak] = useState({}); // id -> consecutive correct this session
   const [missed, setMissed] = useState({}); // id -> ever missed this session
@@ -1583,11 +1583,36 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
   const [feedback, setFeedback] = useState(null);
   const [leveled, setLeveled] = useState(null);
   const [done, setDone] = useState(items.length === 0);
+  const [qtype, setQtype] = useState(quizType || "inapp");
+  const [mcPick, setMcPick] = useState(null);
+  const inputRef = useRef(null);
 
   const item = queue[0];
   const total = items.length;
   const masteredCount = items.filter((it) => (streak[it.id] || 0) >= 2).length;
   const curStreak = item ? streak[item.id] || 0 : 0;
+  const isMc = qtype === "mc";
+
+  // multiple-choice options: the answer + 3 distractors (prefer same type), deduped by spelling
+  const mcOptions = useMemo(() => {
+    if (!item || !isMc) return [];
+    const seen = new Set([normAr(item.ar)]);
+    const distract = [];
+    for (const pool of [ITEMS.filter((x) => x.type === item.type), ITEMS]) {
+      for (const x of shuffle(pool)) {
+        const k = normAr(x.ar);
+        if (!seen.has(k)) { seen.add(k); distract.push(x); }
+        if (distract.length >= 3) break;
+      }
+      if (distract.length >= 3) break;
+    }
+    return shuffle([item, ...distract]);
+  }, [item && item.id, isMc]);
+
+  useEffect(() => {
+    if (qtype === "phone" && !feedback && inputRef.current) inputRef.current.focus();
+    // eslint-disable-next-line
+  }, [item && item.id, qtype]);
 
   const grade = (ok) => {
     if (feedback) return;
@@ -1608,6 +1633,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
     }
     setFeedback(null);
     setAnswer("");
+    setMcPick(null);
     if (q.length === 0) setDone(true);
     else setQueue(q);
   };
@@ -1615,8 +1641,14 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
     if (feedback) { next(); return; }
     grade(answerMatches(answer, item));
   };
+  const chooseMc = (opt) => {
+    if (feedback) return;
+    setMcPick(opt);
+    grade(opt.id === item.id);
+  };
   const giveUp = () => { if (feedback) return; grade(false); };
-  const retake = () => { setQueue(items); setStreak({}); setMissed({}); setAnswer(""); setFeedback(null); setLeveled(null); setDone(items.length === 0); };
+  const retake = () => { setQueue(items); setStreak({}); setMissed({}); setAnswer(""); setMcPick(null); setFeedback(null); setLeveled(null); setDone(items.length === 0); };
+  const setType = (t) => { if (t === qtype) return; setQtype(t); setAnswer(""); setMcPick(null); if (onQuizType) onQuizType(t); };
 
   if (done) {
     return (
@@ -1642,6 +1674,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
   const correct = feedback === "correct";
   const wrong = feedback === "wrong";
   const willFinish = correct && curStreak >= 2 && queue.length === 1;
+  const primaryLabel = isMc ? (feedback ? (willFinish ? "Finish" : "Next →") : null) : (feedback ? (willFinish ? "Finish" : "Next →") : "Check answer");
 
   return (
     <div className="fade">
@@ -1653,21 +1686,49 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
         <div style={{ fontSize: 12, color: T.textDim, whiteSpace: "nowrap" }}>{masteredCount}/{total} mastered</div>
       </div>
 
+      {/* quiz-type selector */}
+      <div style={{ display: "flex", gap: 5, background: T.panelHi, border: `1px solid ${T.line}`, padding: 4, borderRadius: 12, marginBottom: 12 }}>
+        {[["inapp", "⌨️ In-app keys"], ["phone", "📱 My keyboard"], ["mc", "🔘 Choices"]].map(([k, label]) => (
+          <button key={k} className="tap" onClick={() => setType(k)} style={{ flex: 1, border: "none", borderRadius: 8, padding: "8px 2px", fontSize: 11.5, fontWeight: 600, color: qtype === k ? "#fff" : T.textDim, background: qtype === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>{label}</button>
+        ))}
+      </div>
+
       <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "22px 18px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
-        <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>Type in Arabic · {item.type}</div>
+        <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>{isMc ? "Pick the Arabic" : "Type in Arabic"} · {item.type}</div>
         <div style={{ fontFamily: displayFont, fontSize: 24, color: T.text, marginTop: 8 }}>{item.en}</div>
         <div style={{ marginTop: 8, fontSize: 11, color: curStreak >= 1 ? T.green : T.textDim, fontWeight: 600 }}>{curStreak >= 1 ? "✓ 1/2 in a row — one more to clear" : "Get this right twice in a row to clear it"}</div>
       </div>
 
-      <input
-        value={answer}
-        onChange={(e) => !feedback && setAnswer(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && submit()}
-        placeholder="اكتب بالعربي…"
-        dir="rtl"
-        readOnly={!!feedback}
-        style={{ width: "100%", marginTop: 12, padding: "14px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 26, outline: "none", textAlign: "right" }}
-      />
+      {/* answer area */}
+      {isMc ? (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
+          {mcOptions.map((opt, idx) => {
+            let bg = T.panel, border = T.line, col = T.text;
+            if (feedback) {
+              if (opt.id === item.id) { bg = `${T.green}1a`; border = T.green; col = T.gold; }
+              else if (mcPick && opt.id === mcPick.id) { bg = `${T.red}1a`; border = T.red; col = T.red; }
+            }
+            return (
+              <button key={opt.id + "_" + idx} className="tap" onClick={() => chooseMc(opt)} disabled={!!feedback} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 14, padding: "16px 8px", cursor: feedback ? "default" : "pointer", minHeight: 64, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ fontFamily: arFont, fontSize: opt.type === "sentence" ? 18 : 26, color: col, direction: "rtl", lineHeight: 1.3 }}>{opt.ar}</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <input
+          ref={inputRef}
+          value={answer}
+          onChange={(e) => !feedback && setAnswer(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+          placeholder="اكتب بالعربي…"
+          dir="rtl"
+          readOnly={!!feedback}
+          inputMode={qtype === "inapp" ? "none" : undefined}
+          autoFocus={qtype === "phone"}
+          style={{ width: "100%", marginTop: 12, padding: "14px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 26, outline: "none", textAlign: "right" }}
+        />
+      )}
 
       {feedback && (
         <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${wrong ? T.red : T.green}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
@@ -1678,7 +1739,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
         </div>
       )}
 
-      {!feedback && (
+      {!feedback && qtype === "inapp" && (
         <ArabicKeyboard
           onKey={(ch) => setAnswer((a) => a + ch)}
           onSpace={() => setAnswer((a) => a + " ")}
@@ -1687,9 +1748,11 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
         />
       )}
 
-      <button className="tap" onClick={submit} style={{ width: "100%", marginTop: 12, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
-        {feedback ? (willFinish ? "Finish" : "Next →") : "Check answer"}
-      </button>
+      {primaryLabel && (
+        <button className="tap" onClick={submit} style={{ width: "100%", marginTop: 12, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
+          {primaryLabel}
+        </button>
+      )}
       {!feedback && (
         <button className="tap" onClick={giveUp} style={{ width: "100%", marginTop: 8, padding: 11, borderRadius: 12, border: `1px solid ${T.line}`, background: "transparent", color: T.textDim, fontSize: 13, fontWeight: 600 }}>
           I don't know — show me
@@ -1699,14 +1762,15 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
         End session
       </button>
       <div style={{ textAlign: "center", fontSize: 11, color: T.textDim, marginTop: 10, lineHeight: 1.6 }}>
-        Each item must be answered correctly <b style={{ color: T.text }}>twice in a row</b> to clear — miss it and the streak resets.
+        {qtype === "phone" ? "Switch your phone keyboard to Arabic to type. " : qtype === "mc" ? "Pick the matching Arabic. " : "Tap the keys above (or a hardware keyboard). "}
+        Each item must be answered correctly <b style={{ color: T.text }}>twice in a row</b> to clear.
       </div>
     </div>
   );
 }
 
 /* ===================== LEARN SESSION (teach N, then quiz them) ===================== */
-function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems }) {
+function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, quizType = "inapp", onQuizType }) {
   const [queue] = useState(() => pool.slice(0, batch));
   const [phase, setPhase] = useState("menu");
   const [i, setI] = useState(0);
@@ -1751,7 +1815,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0,
         <div style={{ textAlign: "center", fontSize: 12.5, color: T.textDim, margin: "0 0 12px", lineHeight: 1.5 }}>
           Now type each one in Arabic to lock it in 👇
         </div>
-        <TypedQuiz items={queue} mode="srs" onGrade={onGrade} onExit={() => setPhase("menu")} title="Lesson quiz" />
+        <TypedQuiz items={queue} mode="srs" onGrade={onGrade} onExit={() => setPhase("menu")} title="Lesson quiz" quizType={quizType} onQuizType={onQuizType} />
       </div>
     );
   }
@@ -2422,6 +2486,11 @@ function App() {
     if (items.length) { setPracticeItems(items); setView("practice"); }
   }, []);
 
+  const onQuizType = useCallback((t) => {
+    const s = stateRef.current;
+    persist({ ...s, settings: { ...s.settings, quizType: t } });
+  }, [persist]);
+
   const dueLetters = useMemo(() => {
     if (!state) return 0;
     const sp = (state.script && state.script.progress) || {};
@@ -2504,7 +2573,7 @@ function App() {
           />
         )}
         {view === "lessons" && (
-          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} />
+          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} />
         )}
         {view === "reviews" && (
           <ReviewsHub
@@ -2518,8 +2587,8 @@ function App() {
             onGotoScript={() => { setScriptAuto(false); setView("script"); }}
           />
         )}
-        {view === "reviewrun" && <TypedQuiz items={reviewRun} mode="srs" onGrade={grade} onExit={() => setView("reviews")} title="Reviews" />}
-        {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onExit={() => setView("items")} title="Practice" />}
+        {view === "reviewrun" && <TypedQuiz items={reviewRun} mode="srs" onGrade={grade} onExit={() => setView("reviews")} title="Reviews" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} />}
+        {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onExit={() => setView("items")} title="Practice" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} />}
         {view === "script" && <ScriptView scriptState={state.script} setScript={(next) => persist({ ...state, script: next })} autoReview={scriptAuto} onAutoConsumed={() => setScriptAuto(false)} customLetters={state.customLetters || []} onCustomLetters={onCustomLetters} />}
         {view === "items" && (
           <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} />
