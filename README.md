@@ -36,18 +36,25 @@ home screen.
   drilled on its own.
 - **Pick your own** — select specific words (Items) or letters (Script) to quiz.
 - **Custom quiz** — tap the ★ on any word or letter to save it to a personal quiz
-  you can run anytime; your picks persist across sessions.
+  you can run anytime; your picks persist across sessions. In Items the **Start custom
+  quiz** button now sticks to the top of the list, so it's one tap away no matter how
+  far you've scrolled.
 
 ### Script / alphabet
-- **Train** — learn letters in batches with real **SRS scheduling** and due-based
-  letter reviews. Every new letter now comes with a **trace pad** in the learning
-  step, so you write each one as you learn it. Three quiz styles: *see letter → pick
-  sound*, *hear sound → type the letter*, and *hear sound → **write** the letter*.
-- **Tracing quiz in the SRS** — the write-the-letter quiz is fully part of lessons
-  and spaced review: write from memory, reveal, self-grade. A miss halves that
-  letter's progress (same half-back rule as words) and re-queues it so you retake it.
-- **Chart** — the full 28-letter reference with a pronunciation key, the four
-  positional forms, and stroke-order guides.
+- **Train** — learn letters in batches with real **SRS scheduling**. Every letter is
+  tracked and quizzed **per shape** — isolated, initial, medial, and final — so the
+  six one-way letters have two shapes and the rest have four (100 shapes in all). The
+  due count, drills, and quizzes all work at the shape level. Three quiz styles: *see
+  shape → pick sound*, *hear sound → type the letter*, and *hear sound → **write** the
+  shape*, each showing which position is being tested.
+- **Tracing quiz in the SRS** — the write-the-shape quiz is part of lessons and spaced
+  review: write from memory, reveal, self-grade. A miss halves that shape's progress
+  (same half-back rule as words) and re-queues it so you retake it.
+- **Chart** — the full 28-letter reference with a pronunciation key and stroke-order
+  guides. Every one of the four positional forms now shows **its own mastery % and a
+  color bar** (green = solid, amber = improving, red = needs work, grey = not started),
+  plus an overall % per letter — so you can see at a glance exactly which shapes still
+  need drilling.
 - **Quiz** — match letters to sounds with live score, accuracy, and streaks.
 - **Trace** — finger-trace letters over a soft ghost glyph on a 2×2 grid, with
   written stroke-order steps, plus a write-from-memory quiz mode.
@@ -85,4 +92,4 @@ home screen.
 
 ---
 
-*Last updated: added a trace pad to the script learning step and a tracing quiz wired into the SRS; rebuilt the review rule so a missed word or letter loses half its progress and comes back; added green/amber/red mastery colors (with a live %) to every word in the Items list; and pinned the React/Babel scripts to the jsDelivr CDN so the app loads reliably.*
+*Last updated: the script SRS now tracks each positional shape (isolated/initial/medial/final) separately — 100 shapes in all — so quizzes test every shape and the Chart shows a mastery % and color bar for each one (plus a per-letter overall %). Existing letter progress migrates over automatically. Also moved the Items "Start custom quiz" button to a sticky bar at the top of the list so it's always in reach.*

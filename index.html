@@ -154,6 +154,36 @@ const ALPHABET = [
   ["ي", "yaa", "y / ee", "consonant y, or long “ee / i”"],
 ];
 
+/* ---- Positional shapes as first-class SRS items ----
+   Each letter is quizzed/tracked per shape: isolated, initial, medial, final.
+   Six "one-way" letters never join on the left, so they only have two distinct
+   shapes (isolated, final) — for those, initial folds into isolated and medial
+   into final. A "form token" is array-compatible ([glyph,name,tr,note,...]) so it
+   drops straight into the existing quiz code, with extra fields for the shape. */
+const NONCONNECT = new Set(["ا", "د", "ذ", "ر", "ز", "و"]);
+const FORM_LABEL = { iso: "isolated", ini: "initial", med: "medial", fin: "final" };
+const FORM_SHORT = { iso: "iso", ini: "init", med: "med", fin: "fin" };
+function distinctForms(glyph) { return NONCONNECT.has(glyph) ? ["iso", "fin"] : ["iso", "ini", "med", "fin"]; }
+function effForm(glyph, form) { if (NONCONNECT.has(glyph)) { if (form === "ini") return "iso"; if (form === "med") return "fin"; } return form; }
+function formKeyOf(glyph, form) { return glyph + ":" + effForm(glyph, form); }
+function formToken(glyph, form, row) {
+  const ef = effForm(glyph, form);
+  const shape = letterForms(glyph)[ef];
+  const key = glyph + ":" + ef;
+  const t = [glyph, row[1], row[2], row[3], shape, key, FORM_LABEL[ef]];
+  t.glyph = glyph; t.form = ef; t.shape = shape; t.key = key; t.label = FORM_LABEL[ef];
+  return t;
+}
+function buildForms(rows) {
+  const out = [];
+  for (const row of rows) for (const f of distinctForms(row[0])) out.push(formToken(row[0], f, row));
+  return out;
+}
+const SCRIPT_FORMS = buildForms(ALPHABET);
+// read a form's progress, falling back to legacy per-letter progress so old data migrates
+function formProg(prog, tok) { return normLP(prog[tok[5]]) || normLP(prog[tok[0]]) || null; }
+function letterLearnedIn(prog, glyph) { return distinctForms(glyph).every((f) => prog[glyph + ":" + f] || prog[glyph]); }
+
 const LEGEND = [
   ["ʿ", "ع — voiced throat sound (ʿain)"],
   ["ʾ", "glottal stop — also how Masri pronounces ق"],
@@ -1940,6 +1970,15 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
         </div>
       )}
 
+      {customItems.length > 0 && (
+        <div style={{ position: "sticky", top: 0, zIndex: 5, marginBottom: 10, padding: "8px 0", background: T.bg }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button className="tap" onClick={onStartCustom} style={{ flex: 1, padding: "13px 16px", borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700, fontSize: 14, boxShadow: "0 8px 20px rgba(128,29,92,.18)" }}>★ Start custom quiz ({customItems.length})</button>
+            <button className="tap" onClick={onClearCustom} style={{ padding: "13px 16px", borderRadius: 13, border: `1px solid ${T.line}`, background: T.panel, color: T.textDim, fontWeight: 600, fontSize: 13 }}>Clear</button>
+          </div>
+        </div>
+      )}
+
       {leeches > 0 && (
         <button className="tap" onClick={() => onStartPractice("leeches")} style={{ width: "100%", marginBottom: 10, padding: 11, borderRadius: 12, border: `1px solid ${T.red}`, background: `${T.red}0f`, color: T.red, fontSize: 13, fontWeight: 700 }}>
           🔁 Quiz my trouble words ({leeches})
@@ -1970,7 +2009,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
         <span style={{ color: T.textDim, marginLeft: "auto" }}>★ adds to custom quiz</span>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: customItems.length ? 70 : 0 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {shown.map((it) => {
           const b = badge(it);
           const picked = inCustom(it.id);
@@ -2002,15 +2041,6 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
           );
         })}
       </div>
-
-      {customItems.length > 0 && (
-        <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, padding: "12px 18px calc(12px + env(safe-area-inset-bottom))", background: `linear-gradient(180deg, transparent, ${T.bg} 30%)` }}>
-          <div style={{ maxWidth: 560, margin: "0 auto", display: "flex", gap: 8 }}>
-            <button className="tap" onClick={onClearCustom} style={{ padding: "13px 16px", borderRadius: 13, border: `1px solid ${T.line}`, background: T.panel, color: T.textDim, fontWeight: 600, fontSize: 13 }}>Clear</button>
-            <button className="tap" onClick={onStartCustom} style={{ flex: 1, padding: "13px 16px", borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700, fontSize: 14 }}>★ Start custom quiz ({customItems.length})</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -2354,7 +2384,7 @@ function App() {
     if (!state) return 0;
     const sp = (state.script && state.script.progress) || {};
     const n = Date.now();
-    return ALPHABET.filter((a) => { const p = normLP(sp[a[0]]); return p && (p.due || 0) <= n; }).length;
+    return SCRIPT_FORMS.filter((t) => { const p = formProg(sp, t); return p && (p.due || 0) <= n; }).length;
   }, [state]);
 
   if (!state || !derived)
@@ -2512,35 +2542,39 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     // eslint-disable-next-line
   }, [autoReview]);
 
-  const lp = (g) => normLP(prog[g]);
-  const learned = ALPHABET.filter((a) => lp(a[0]));
-  const unlearned = ALPHABET.filter((a) => !lp(a[0]));
-  const dueArr = ALPHABET.filter((a) => { const p = lp(a[0]); return p && (p.due || 0) <= now; });
-  const trouble = ALPHABET.filter((a) => (lp(a[0])?.recentWrong || 0) >= 2);
-  const mastered = ALPHABET.filter((a) => (lp(a[0])?.stage || 0) >= 5);
+  const fpOf = (t) => formProg(prog, t);
+  const learnedForms = SCRIPT_FORMS.filter(fpOf);
+  const dueArr = SCRIPT_FORMS.filter((t) => { const p = fpOf(t); return p && (p.due || 0) <= now; });
+  const trouble = SCRIPT_FORMS.filter((t) => (fpOf(t)?.recentWrong || 0) >= 2);
+  const mastered = SCRIPT_FORMS.filter((t) => (fpOf(t)?.stage || 0) >= 5);
+  const unlearnedLetters = ALPHABET.filter((a) => !letterLearnedIn(prog, a[0]));
+  const formsOfLetters = (rows) => SCRIPT_FORMS.filter((t) => rows.some((r) => r[0] === t[0]));
+  const overallPct = SCRIPT_FORMS.length ? Math.round(SCRIPT_FORMS.reduce((s, t) => s + masteryPct(fpOf(t)), 0) / SCRIPT_FORMS.length) : 0;
 
-  const saveProg = (glyph, np, newStreak) => {
-    setScript({ ...ss, progress: { ...prog, [glyph]: np }, best: Math.max(ss.best || 0, newStreak || 0) });
+  const saveProg = (key, np, newStreak) => {
+    setScript({ ...ss, progress: { ...prog, [key]: np }, best: Math.max(ss.best || 0, newStreak || 0) });
   };
-  const markLearned = (glyph) => {
-    if (lp(glyph)) return;
-    setScript({ ...ss, progress: { ...prog, [glyph]: learnItem(Date.now()) } });
+  const markLearnedLetter = (glyph) => {
+    const add = {}; const t = Date.now();
+    for (const f of distinctForms(glyph)) { const k = glyph + ":" + f; if (!prog[k]) add[k] = learnItem(t); }
+    if (Object.keys(add).length) setScript({ ...ss, progress: { ...prog, ...add } });
   };
   const setBatch = (n) => setScript({ ...ss, batch: n });
   const setDir = (d) => setScript({ ...ss, quizDir: d });
 
-  const applyResult = (glyph, correct) => {
+  // tok is an array-compatible form token; progress is saved per-shape under tok[5]
+  const applyResult = (tok, correct) => {
     const newStreak = correct ? sess.streak + 1 : 0;
     setSess((s) => ({ right: s.right + (correct ? 1 : 0), total: s.total + 1, streak: newStreak, best: Math.max(s.best, newStreak) }));
-    const cur = lp(glyph) || learnItem(Date.now());
+    const cur = fpOf(tok) || learnItem(Date.now());
     const np = quizSrs
       ? reviewSchedule(cur, correct, Date.now())
       : { ...cur, correct: cur.correct + (correct ? 1 : 0), wrong: cur.wrong + (correct ? 0 : 1), recentWrong: correct ? 0 : (cur.recentWrong || 0) + 1 };
-    saveProg(glyph, np, newStreak);
+    saveProg(tok[5], np, newStreak);
   };
 
   const startLearn = () => {
-    const next = unlearned.slice(0, batch);
+    const next = unlearnedLetters.slice(0, batch);
     if (!next.length) return;
     setTeachQueue(next);
     setTIdx(0);
@@ -2577,7 +2611,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     const correct = opt[2] === ans[2];
     speak(ans[0]);
     setPicked(opt);
-    applyResult(ans[0], correct);
+    applyResult(ans, correct);
     timer.current = setTimeout(advance, 950);
   };
   const checkType = () => {
@@ -2586,21 +2620,20 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     const correct = letterMatch(typed, ans[0]);
     speak(ans[0]);
     setFeedback(correct ? "correct" : "wrong");
-    applyResult(ans[0], correct);
+    applyResult(ans, correct);
   };
   const giveUpType = () => {
     if (feedback) return;
     speak(q.answer[0]);
     setFeedback("wrong");
-    applyResult(q.answer[0], false);
+    applyResult(q.answer, false);
   };
   const flipDir = () => { clearTimeout(timer.current); const order = ["recognize", "type", "trace"]; setDir(order[(order.indexOf(quizDir) + 1) % 3]); setPicked(null); setTyped(""); setFeedback(null); setTraceShown(false); setTraceKey((k) => k + 1); };
 
   // Tracing quiz: write from memory, reveal, then self-grade. A miss feeds the
-  // SRS (halving progress) and re-queues the letter so it must be retaken.
+  // SRS (halving progress) and re-queues the shape so it must be retaken.
   const gradeTrace = (ok) => {
-    const glyph = q.answer[0];
-    applyResult(glyph, ok);
+    applyResult(q.answer, ok);
     let qs = quizSet;
     if (!ok && quizSet.length < 40) qs = [...quizSet, q.answer]; // retake the miss
     if (qs !== quizSet) setQuizSet(qs);
@@ -2622,35 +2655,38 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
           <div style={{ fontSize: 12.5, color: T.textDim, marginTop: 3, lineHeight: 1.5 }}>
             Learn {batch} letters, quiz them, and they come back on a spaced schedule — just like the words.
           </div>
-          <div style={{ margin: "14px 0 6px" }}><Bar pct={learned.length / ALPHABET.length} /></div>
-          <div style={{ fontSize: 12, color: T.textDim }}>{learned.length} / {ALPHABET.length} learned · {mastered.length} mastered</div>
+          <div style={{ fontSize: 12.5, color: T.textDim, marginTop: 3, lineHeight: 1.5 }}>
+            Learn each letter, then quiz <b style={{ color: T.text }}>every shape</b> — isolated, initial, medial, final — on a spaced schedule, just like the words.
+          </div>
+          <div style={{ margin: "14px 0 6px" }}><Bar pct={learnedForms.length / SCRIPT_FORMS.length} /></div>
+          <div style={{ fontSize: 12, color: T.textDim }}>{learnedForms.length} / {SCRIPT_FORMS.length} shapes learned · {mastered.length} mastered · {overallPct}% overall mastery</div>
         </div>
 
         <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-          <Stat label="Best streak" value={`${ss.best || 0}🔥`} color={T.terra} />
-          <Stat label="Learned" value={learned.length} color={T.gold} />
+          <Stat label="Mastery" value={`${overallPct}%`} color={T.gold} />
+          <Stat label="Shapes learned" value={learnedForms.length} color={T.terra} />
           <Stat label="Trouble" value={trouble.length} color={trouble.length ? T.red : T.textDim} />
         </div>
 
         {/* SRS due reviews — primary */}
         <button className="tap" onClick={() => startQuiz(dueArr, true)} disabled={!dueArr.length} style={{ width: "100%", padding: 15, borderRadius: 14, marginBottom: 10, background: dueArr.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.panel, color: dueArr.length ? "#fff" : T.textDim, fontSize: 15, fontWeight: 700, boxShadow: dueArr.length ? "0 8px 20px rgba(128,29,92,.18)" : "none", border: dueArr.length ? "none" : `1px solid ${T.line}` }}>
-          {dueArr.length ? `Review due letters (${dueArr.length}) →` : "No letters due for review"}
+          {dueArr.length ? `Review due shapes (${dueArr.length}) →` : "No shapes due for review"}
         </button>
 
-        <button className="tap" onClick={startLearn} disabled={!unlearned.length} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 10, border: `1px solid ${unlearned.length ? T.gold : T.line}`, background: unlearned.length ? `${T.gold}10` : T.panel, color: unlearned.length ? T.gold : T.textDim, fontSize: 14, fontWeight: 700 }}>
-          {unlearned.length ? `Learn next ${Math.min(batch, unlearned.length)} letters` : "All 28 letters learned 🎉"}
+        <button className="tap" onClick={startLearn} disabled={!unlearnedLetters.length} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 10, border: `1px solid ${unlearnedLetters.length ? T.gold : T.line}`, background: unlearnedLetters.length ? `${T.gold}10` : T.panel, color: unlearnedLetters.length ? T.gold : T.textDim, fontSize: 14, fontWeight: 700 }}>
+          {unlearnedLetters.length ? `Learn next ${Math.min(batch, unlearnedLetters.length)} letters` : "All 28 letters learned 🎉"}
         </button>
 
         <button className="tap" onClick={() => setMode("select")} style={{ width: "100%", padding: 13, borderRadius: 13, marginBottom: 10, border: `1px solid ${T.line}`, background: T.panel, color: T.text, fontSize: 14, fontWeight: 700 }}>
           ★ Custom letter quiz {cl.length ? `(${cl.length})` : ""}
         </button>
 
-        <button className="tap" onClick={() => startQuiz(learned, false)} disabled={!learned.length} style={{ width: "100%", padding: 13, borderRadius: 13, marginBottom: 10, border: `1px solid ${learned.length ? T.line : T.line}`, background: T.panel, color: learned.length ? T.text : T.textDim, fontSize: 14, fontWeight: 700 }}>
-          ✨ Quiz all learned letters
+        <button className="tap" onClick={() => startQuiz(learnedForms, false)} disabled={!learnedForms.length} style={{ width: "100%", padding: 13, borderRadius: 13, marginBottom: 10, border: `1px solid ${learnedForms.length ? T.line : T.line}`, background: T.panel, color: learnedForms.length ? T.text : T.textDim, fontSize: 14, fontWeight: 700 }}>
+          ✨ Quiz all learned shapes
         </button>
 
         <button className="tap" onClick={() => startQuiz(trouble, false)} disabled={!trouble.length} style={{ width: "100%", padding: 13, borderRadius: 13, border: `1px solid ${trouble.length ? T.red : T.line}`, background: trouble.length ? `${T.red}0f` : T.panel, color: trouble.length ? T.red : T.textDim, fontSize: 14, fontWeight: 700 }}>
-          🔁 Drill trouble letters {trouble.length ? `(${trouble.length})` : ""}
+          🔁 Drill trouble shapes {trouble.length ? `(${trouble.length})` : ""}
         </button>
 
         {/* settings */}
@@ -2673,7 +2709,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
 
         {trouble.length > 0 && (
           <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
-            {trouble.map((a) => (<span key={a[0]} style={{ fontFamily: arFont, fontSize: 26, color: T.red, border: `1px solid ${T.red}44`, borderRadius: 9, padding: "2px 10px", direction: "rtl" }}>{a[0]}</span>))}
+            {trouble.map((a) => (<span key={a[5]} title={a[1] + " · " + a[6]} style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", color: T.red, border: `1px solid ${T.red}44`, borderRadius: 9, padding: "3px 10px", direction: "rtl" }}><span style={{ fontFamily: arFont, fontSize: 24 }}>{a[4]}</span><span style={{ fontFamily: uiFont, fontSize: 8, direction: "ltr", color: T.red, opacity: 0.8 }}>{a[6]}</span></span>))}
           </div>
         )}
       </div>
@@ -2690,13 +2726,13 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
         <div style={{ fontFamily: displayFont, fontSize: 19, marginBottom: 4 }}>Custom letter quiz</div>
         <div style={{ fontSize: 12.5, color: T.textDim, marginBottom: 12 }}>Tap any letter to add it — your picks are saved for next time.</div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          <button className="tap" onClick={() => onCustomLetters(learned.map((a) => a[0]))} style={{ flex: 1, padding: 10, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panel, color: T.text, fontSize: 12.5, fontWeight: 600 }}>Add all learned</button>
+          <button className="tap" onClick={() => onCustomLetters(ALPHABET.filter((a) => letterLearnedIn(prog, a[0])).map((a) => a[0]))} style={{ flex: 1, padding: 10, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panel, color: T.text, fontSize: 12.5, fontWeight: 600 }}>Add all learned</button>
           <button className="tap" onClick={() => onCustomLetters([])} style={{ flex: 1, padding: 10, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panel, color: T.textDim, fontSize: 12.5, fontWeight: 600 }}>Clear</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, paddingBottom: 80 }}>
           {ALPHABET.map((a) => {
             const on = isOn(a[0]);
-            const seen = !!lp(a[0]);
+            const seen = letterLearnedIn(prog, a[0]);
             return (
               <button key={a[0]} className="tap" onClick={() => toggle(a[0])} style={{ position: "relative", border: `1.5px solid ${on ? T.gold : T.line}`, background: on ? `${T.gold}14` : T.panel, borderRadius: 12, padding: "10px 4px", cursor: "pointer", textAlign: "center" }}>
                 <div style={{ fontFamily: arFont, fontSize: 30, color: seen ? T.text : T.textDim, direction: "rtl", lineHeight: 1 }}>{a[0]}</div>
@@ -2709,7 +2745,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
         <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, padding: "12px 18px calc(12px + env(safe-area-inset-bottom))", background: `linear-gradient(180deg, transparent, ${T.bg} 30%)` }}>
           <div style={{ maxWidth: 560, margin: "0 auto", display: "flex", gap: 8 }}>
             <button className="tap" onClick={() => setMode("menu")} style={{ padding: "13px 16px", borderRadius: 13, border: `1px solid ${T.line}`, background: T.panel, color: T.textDim, fontWeight: 600, fontSize: 13 }}>Back</button>
-            <button className="tap" onClick={() => startQuiz(selList, false)} disabled={!selList.length} style={{ flex: 1, padding: "13px 16px", borderRadius: 13, border: "none", background: selList.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: selList.length ? "#fff" : T.textDim, fontWeight: 700, fontSize: 14 }}>★ Start quiz ({selList.length})</button>
+            <button className="tap" onClick={() => startQuiz(formsOfLetters(selList), false)} disabled={!selList.length} style={{ flex: 1, padding: "13px 16px", borderRadius: 13, border: "none", background: selList.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: selList.length ? "#fff" : T.textDim, fontWeight: 700, fontSize: 14 }}>★ Start quiz ({selList.length})</button>
           </div>
         </div>
       </div>
@@ -2747,7 +2783,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
             <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 8, lineHeight: 1.5 }}>Trace over the gray letter, right → left. Dots and hamzas go on last.</div>
           </div>
         </div>
-        <button className="tap" onClick={() => { markLearned(a[0]); if (tIdx + 1 >= teachQueue.length) startQuiz(teachQueue, true); else setTIdx(tIdx + 1); }} style={{ width: "100%", marginTop: 14, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
+        <button className="tap" onClick={() => { markLearnedLetter(a[0]); if (tIdx + 1 >= teachQueue.length) startQuiz(formsOfLetters([...teachQueue, a]), true); else setTIdx(tIdx + 1); }} style={{ width: "100%", marginTop: 14, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
           {tIdx + 1 >= teachQueue.length ? "Got them — quiz me →" : "Learn it ✓"}
         </button>
         <div style={{ textAlign: "center", fontSize: 12, color: T.textDim, marginTop: 10 }}>Learning {tIdx + 1} of {teachQueue.length}</div>
@@ -2794,18 +2830,19 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
       {isTrace ? (
         <>
           <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "18px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 14 }}>
-            {!traceShown && <div style={{ fontSize: 11, color: T.terra, fontWeight: 700, letterSpacing: 0.4, marginBottom: 4 }}>WRITE THIS LETTER FROM MEMORY</div>}
+            {!traceShown && <div style={{ fontSize: 11, color: T.terra, fontWeight: 700, letterSpacing: 0.4, marginBottom: 4 }}>WRITE THIS SHAPE FROM MEMORY</div>}
             <div style={{ fontFamily: displayFont, fontSize: 34, color: T.gold }}>{ans[2]}</div>
             <div style={{ fontSize: 13, color: T.textDim, marginTop: 2 }}>{ans[1]}</div>
+            <div style={{ display: "inline-block", marginTop: 6, fontSize: 11, fontWeight: 700, color: T.goldSoft, border: `1px solid ${T.goldSoft}55`, borderRadius: 999, padding: "2px 10px", textTransform: "uppercase", letterSpacing: 0.5 }}>{ans[6]} form</div>
             <div style={{ marginTop: 8 }}><Speaker text={ans[0]} size={18} color={T.terra} /></div>
           </div>
 
-          <MiniTrace glyph={ans[0]} guide={traceShown} resetKey={traceKey} />
+          <MiniTrace glyph={ans[4]} guide={traceShown} resetKey={traceKey} />
 
           {traceShown && (
             <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${T.line}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
-              <div style={{ fontSize: 12, color: T.textDim, marginBottom: 2 }}>The letter is</div>
-              <div style={{ fontFamily: arFont, fontSize: 44, color: T.text, direction: "rtl", lineHeight: 1.1 }}>{ans[0]}</div>
+              <div style={{ fontSize: 12, color: T.textDim, marginBottom: 2 }}>The {ans[6]} shape is</div>
+              <div style={{ fontFamily: arFont, fontSize: 44, color: T.text, direction: "rtl", lineHeight: 1.1 }}>{ans[4]}</div>
               {STROKES[ans[0]] && <div style={{ fontSize: 12.5, color: T.gold, marginTop: 4, lineHeight: 1.5 }}>✍️ {STROKES[ans[0]][1]}</div>}
             </div>
           )}
@@ -2820,13 +2857,13 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
               <button className="tap" onClick={() => gradeTrace(true)} style={{ flex: 1, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 14, fontWeight: 700 }}>Got it ✓</button>
             </div>
           )}
-          {traceShown && <div style={{ fontSize: 11, color: T.textDim, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>Be honest — a miss halves your progress and brings the letter back.</div>}
+          {traceShown && <div style={{ fontSize: 11, color: T.textDim, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>Be honest — a miss halves this shape's progress and brings it back.</div>}
         </>
       ) : !isType ? (
         <>
           <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "26px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 16 }}>
-            <div style={{ fontSize: 12, color: T.textDim, marginBottom: 10 }}>Which sound is this?</div>
-            <div style={{ fontFamily: arFont, fontSize: 84, color: T.text, direction: "rtl", lineHeight: 1 }}>{ans[0]}</div>
+            <div style={{ fontSize: 12, color: T.textDim, marginBottom: 4 }}>Which sound is this <b style={{ color: T.goldSoft }}>{ans[6]}</b> shape?</div>
+            <div style={{ fontFamily: arFont, fontSize: 84, color: T.text, direction: "rtl", lineHeight: 1 }}>{ans[4]}</div>
             <div style={{ marginTop: 12 }}><Speaker text={ans[0]} size={18} color={T.terra} /></div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -2847,10 +2884,11 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
           </div>
           {picked && (
             <div className="fade" style={{ textAlign: "center", marginTop: 14, fontSize: 14 }}>
-              <span style={{ fontFamily: arFont, fontSize: 24, color: T.text }}>{ans[0]}</span>
+              <span style={{ fontFamily: arFont, fontSize: 24, color: T.text }}>{ans[4]}</span>
               <span style={{ color: T.textDim }}> = </span>
               <span style={{ color: T.gold, fontWeight: 700 }}>{ans[1]}</span>
               <span style={{ color: T.goldSoft, fontStyle: "italic" }}> · {ans[2]}</span>
+              <span style={{ color: T.textDim }}> ({ans[6]})</span>
             </div>
           )}
         </>
@@ -2859,7 +2897,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
           <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "22px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)" }}>
             <div style={{ fontSize: 12, color: T.textDim, marginBottom: 8 }}>Type the letter for this sound</div>
             <div style={{ fontFamily: displayFont, fontSize: 38, color: T.gold }}>{ans[2]}</div>
-            <div style={{ fontSize: 13, color: T.textDim, marginTop: 2 }}>{ans[1]}</div>
+            <div style={{ fontSize: 13, color: T.textDim, marginTop: 2 }}>{ans[1]} <span style={{ color: T.goldSoft }}>· {ans[6]} form</span></div>
             <div style={{ marginTop: 10 }}><Speaker text={ans[0]} size={18} color={T.terra} /></div>
           </div>
           <input value={typed} onChange={(e) => !feedback && setTyped(e.target.value)} onKeyDown={(e) => e.key === "Enter" && checkType()} placeholder="الحرف…" dir="rtl" readOnly={!!feedback} style={{ width: "100%", marginTop: 12, padding: "12px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 34, outline: "none", textAlign: "center" }} />
@@ -2953,7 +2991,7 @@ function ScriptView({ scriptState, setScript, autoReview, onAutoConsumed, custom
         ))}
       </div>
       {mode === "train" && <ScriptTrain scriptState={scriptState} setScript={setScript} autoReview={autoReview} onAutoConsumed={onAutoConsumed} customLetters={customLetters || []} onCustomLetters={onCustomLetters} />}
-      {mode === "learn" && <ScriptLearn onTrace={openTrace} />}
+      {mode === "learn" && <ScriptLearn onTrace={openTrace} prog={(scriptState && scriptState.progress) || {}} />}
       {mode === "quiz" && <ScriptQuiz />}
       {mode === "trace" && <ScriptTrace initialIdx={traceIdx} onBack={traceReturn ? () => { setMode(traceReturn); setTraceReturn(null); } : null} />}
     </div>
@@ -2974,7 +3012,9 @@ function makeQuestion(qmode) {
   const answer = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
   const pool = shuffle(ALPHABET.filter((x) => x[2] !== answer[2])).slice(0, 3);
   const options = shuffle([answer, ...pool]);
-  return { answer, options, qmode };
+  const forms = distinctForms(answer[0]);
+  const fcode = forms[Math.floor(Math.random() * forms.length)];
+  return { answer, options, qmode, shape: letterForms(answer[0])[fcode], formLabel: FORM_LABEL[fcode] };
 }
 
 function ScriptQuiz() {
@@ -3060,11 +3100,11 @@ function ScriptQuiz() {
         }}
       >
         <div style={{ fontSize: 12, color: T.textDim, marginBottom: 10 }}>
-          {showLetter ? "Which sound is this?" : "Which letter makes this sound?"}
+          {showLetter ? <>Which sound is this <b style={{ color: T.goldSoft }}>{q.formLabel}</b> shape?</> : "Which letter makes this sound?"}
         </div>
         {showLetter ? (
           <div style={{ fontFamily: arFont, fontSize: 84, color: T.text, direction: "rtl", lineHeight: 1 }}>
-            {q.answer[0]}
+            {q.shape}
           </div>
         ) : (
           <div style={{ fontFamily: displayFont, fontSize: 40, color: T.gold }}>
@@ -3601,7 +3641,7 @@ function ctrlBtn(active) {
   };
 }
 
-function ScriptLearn({ onTrace }) {
+function ScriptLearn({ onTrace, prog = {} }) {
   return (
     <div className="fade" style={{ paddingTop: 6 }}>
       <div style={{ fontFamily: displayFont, fontSize: 20, marginBottom: 6 }}>
@@ -3644,15 +3684,38 @@ function ScriptLearn({ onTrace }) {
       <div style={{ fontFamily: displayFont, fontSize: 16, margin: "24px 0 4px", color: T.gold }}>
         The alphabet
       </div>
-      <div style={{ fontSize: 12, color: T.textDim, marginBottom: 12, lineHeight: 1.6 }}>
+      <div style={{ fontSize: 12, color: T.textDim, marginBottom: 10, lineHeight: 1.6 }}>
         Each row shows the four shapes a letter takes:{" "}
-        <b style={{ color: T.text }}>isolated · initial · medial · final</b>. Tap the big
-        letter to <b style={{ color: T.gold }}>trace</b> it, or 🔊 to hear it.
+        <b style={{ color: T.text }}>isolated · initial · medial · final</b>. The % and
+        colored bar under each shape is <b style={{ color: T.gold }}>your mastery of that
+        exact shape</b> — so you can see which shapes still need work. Tap the big letter to{" "}
+        <b style={{ color: T.gold }}>trace</b> it, or 🔊 to hear it.
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 12px", margin: "0 2px 12px", fontSize: 11 }}>
+        {[[T.green, "solid"], [T.amber, "improving"], [T.red, "needs work"], [T.line, "not started"]].map(([c, label]) => (
+          <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: T.textDim }}>
+            <span style={{ width: 9, height: 9, borderRadius: 3, background: c }} />{label}
+          </span>
+        ))}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
         {ALPHABET.map(([l, name, tr, note], idx) => {
           const f = letterForms(l);
+          const cellInfo = (code) => {
+            const ef = effForm(l, code);
+            const p = normLP(prog[l + ":" + ef]) || normLP(prog[l]) || null;
+            return { glyph: letterForms(l)[ef], color: masteryColor(p), pct: p ? masteryPct(p) : null };
+          };
+          const dist = distinctForms(l);
+          const letterPct = Math.round(dist.reduce((s, ff) => s + masteryPct(normLP(prog[l + ":" + ff]) || normLP(prog[l])), 0) / dist.length);
+          const letterColor = (() => {
+            const ps = dist.map((ff) => normLP(prog[l + ":" + ff]) || normLP(prog[l]));
+            if (ps.some((p) => !p)) return null;
+            if (ps.some((p) => (p.recentWrong || 0) >= 2)) return T.red;
+            if (ps.every((p) => (p.wrong || 0) === 0)) return T.green;
+            return T.amber;
+          })();
           return (
             <div
               key={name}
@@ -3699,50 +3762,46 @@ function ScriptLearn({ onTrace }) {
                     </div>
                   )}
                 </div>
+                <div style={{ textAlign: "right", minWidth: 44 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: letterColor || T.textDim }}>{letterPct}%</div>
+                  <div style={{ fontSize: 8.5, color: T.textDim, textTransform: "uppercase", letterSpacing: 0.4 }}>mastery</div>
+                </div>
                 <Speaker text={l} />
               </div>
               <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
                 {[
-                  ["iso", f.iso],
-                  ["init", f.ini],
-                  ["med", f.med],
-                  ["fin", f.fin],
-                ].map(([k, glyph]) => (
-                  <div
-                    key={k}
-                    style={{
-                      flex: 1,
-                      textAlign: "center",
-                      background: T.panelHi,
-                      border: `1px solid ${T.line}`,
-                      borderRadius: 9,
-                      padding: "8px 2px",
-                    }}
-                  >
+                  ["iso", "iso"],
+                  ["init", "ini"],
+                  ["med", "med"],
+                  ["fin", "fin"],
+                ].map(([k, code]) => {
+                  const ci = cellInfo(code);
+                  return (
                     <div
+                      key={k}
                       style={{
-                        fontFamily: arFont,
-                        fontSize: 26,
-                        color: T.text,
-                        direction: "rtl",
-                        minHeight: 32,
+                        flex: 1,
+                        textAlign: "center",
+                        background: T.panelHi,
+                        border: `1px solid ${T.line}`,
+                        borderLeft: ci.color ? `3px solid ${ci.color}` : `1px solid ${T.line}`,
+                        borderRadius: 9,
+                        padding: "8px 2px",
                       }}
                     >
-                      {glyph}
+                      <div style={{ fontFamily: arFont, fontSize: 26, color: T.text, direction: "rtl", minHeight: 32 }}>
+                        {ci.glyph}
+                      </div>
+                      <div style={{ fontSize: 9, color: T.textDim, marginTop: 3, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                        {k}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 3, marginTop: 3 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: 999, background: ci.color || T.line }} />
+                        <span style={{ fontSize: 9, color: ci.pct == null ? T.textDim : T.text, fontWeight: 600 }}>{ci.pct == null ? "—" : ci.pct + "%"}</span>
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontSize: 9,
-                        color: T.textDim,
-                        marginTop: 3,
-                        textTransform: "uppercase",
-                        letterSpacing: 0.5,
-                      }}
-                    >
-                      {k}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );
