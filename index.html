@@ -1576,73 +1576,87 @@ function Bar({ pct, h = 8 }) {
 
 /* ===================== TYPED QUIZ (reused everywhere) ===================== */
 function TypedQuiz({ items, mode, onGrade, onExit, title }) {
-  const [queue] = useState(() => items);
-  const [i, setI] = useState(0);
+  const [queue, setQueue] = useState(() => items);
+  const [streak, setStreak] = useState({}); // id -> consecutive correct this session
+  const [missed, setMissed] = useState({}); // id -> ever missed this session
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState(null);
-  const [score, setScore] = useState({ right: 0, total: 0 });
   const [leveled, setLeveled] = useState(null);
   const [done, setDone] = useState(items.length === 0);
 
-  const item = queue[i];
+  const item = queue[0];
+  const total = items.length;
+  const masteredCount = items.filter((it) => (streak[it.id] || 0) >= 2).length;
+  const curStreak = item ? streak[item.id] || 0 : 0;
 
-  const submit = () => {
-    if (feedback) {
-      setFeedback(null);
-      setAnswer("");
-      if (i + 1 >= queue.length) setDone(true);
-      else setI(i + 1);
-      return;
-    }
-    const ok = answerMatches(answer, item);
-    const lvl = onGrade(item.id, ok, mode);
-    if (lvl) setLeveled(lvl);
-    setFeedback(ok ? "correct" : "wrong");
-    setScore((s) => ({ right: s.right + (ok ? 1 : 0), total: s.total + 1 }));
-  };
-  const giveUp = () => {
+  const grade = (ok) => {
     if (feedback) return;
-    const lvl = onGrade(item.id, false, mode);
-    if (lvl) setLeveled(lvl);
-    setFeedback("wrong");
-    setScore((s) => ({ right: s.right, total: s.total + 1 }));
+    setFeedback(ok ? "correct" : "wrong");
+    setStreak((s) => ({ ...s, [item.id]: ok ? (s[item.id] || 0) + 1 : 0 }));
+    if (!ok) setMissed((m) => ({ ...m, [item.id]: true }));
   };
+  const next = () => {
+    const st = streak[item.id] || 0; // updated post-grade
+    let q;
+    if (st >= 2) {
+      // graduate: grade the SRS once, counting it wrong if it was ever missed this session
+      const lvl = onGrade(item.id, !missed[item.id], mode);
+      if (lvl) setLeveled(lvl);
+      q = queue.slice(1);
+    } else {
+      q = [...queue.slice(1), item]; // not yet twice-in-a-row → retake later
+    }
+    setFeedback(null);
+    setAnswer("");
+    if (q.length === 0) setDone(true);
+    else setQueue(q);
+  };
+  const submit = () => {
+    if (feedback) { next(); return; }
+    grade(answerMatches(answer, item));
+  };
+  const giveUp = () => { if (feedback) return; grade(false); };
+  const retake = () => { setQueue(items); setStreak({}); setMissed({}); setAnswer(""); setFeedback(null); setLeveled(null); setDone(items.length === 0); };
 
   if (done) {
-    const acc = score.total ? Math.round((score.right / score.total) * 100) : 0;
     return (
       <div className="fade pop" style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
         <div style={{ fontSize: 38, marginBottom: 8 }}>{items.length === 0 ? "🌙" : "🎉"}</div>
-        <div style={{ fontFamily: displayFont, fontSize: 22 }}>{items.length === 0 ? "Nothing to quiz right now" : "All done!"}</div>
+        <div style={{ fontFamily: displayFont, fontSize: 22 }}>{items.length === 0 ? "Nothing to quiz right now" : "All mastered!"}</div>
         {items.length > 0 && (
-          <div style={{ color: T.textDim, fontSize: 14, marginTop: 8 }}>{score.right}/{score.total} correct · {acc}% accuracy</div>
+          <div style={{ color: T.textDim, fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>You got every item right twice in a row — {total} item{total === 1 ? "" : "s"} cleared.</div>
         )}
         {leveled && (
           <div style={{ marginTop: 14, background: `${T.gold}14`, border: `1px solid ${T.gold}`, borderRadius: 14, padding: "12px 14px", color: T.gold, fontWeight: 700 }}>
             🎊 Level up! You reached Level {leveled} — new words unlocked.
           </div>
         )}
-        <button className="tap" onClick={onExit} style={{ width: "100%", marginTop: 18, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back to home</button>
+        {items.length > 0 && (
+          <button className="tap" onClick={retake} style={{ width: "100%", marginTop: 18, padding: 13, borderRadius: 13, border: `1px solid ${T.gold}`, background: `${T.gold}10`, color: T.gold, fontWeight: 700 }}>🔁 Retake this set</button>
+        )}
+        <button className="tap" onClick={onExit} style={{ width: "100%", marginTop: 10, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back to home</button>
       </div>
     );
   }
 
   const correct = feedback === "correct";
   const wrong = feedback === "wrong";
+  const willFinish = correct && curStreak >= 2 && queue.length === 1;
 
   return (
     <div className="fade">
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: T.goldSoft, whiteSpace: "nowrap" }}>{title}</div>
         <div style={{ flex: 1, height: 4, background: T.line, borderRadius: 4, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${(i / queue.length) * 100}%`, background: `linear-gradient(90deg, ${T.gold}, ${T.terra})`, transition: "width .3s ease" }} />
+          <div style={{ height: "100%", width: `${(masteredCount / Math.max(1, total)) * 100}%`, background: `linear-gradient(90deg, ${T.gold}, ${T.terra})`, transition: "width .3s ease" }} />
         </div>
-        <div style={{ fontSize: 12, color: T.textDim }}>{score.right}/{score.total}</div>
+        <div style={{ fontSize: 12, color: T.textDim, whiteSpace: "nowrap" }}>{masteredCount}/{total} mastered</div>
       </div>
 
       <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "22px 18px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
         <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>Type in Arabic · {item.type}</div>
         <div style={{ fontFamily: displayFont, fontSize: 24, color: T.text, marginTop: 8 }}>{item.en}</div>
+        <div style={{ marginTop: 8, fontSize: 11, color: curStreak >= 1 ? T.green : T.textDim, fontWeight: 600 }}>{curStreak >= 1 ? "✓ 1/2 in a row — one more to clear" : "Get this right twice in a row to clear it"}</div>
       </div>
 
       <input
@@ -1657,7 +1671,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
 
       {feedback && (
         <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${wrong ? T.red : T.green}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: wrong ? T.red : T.green }}>{correct ? "Correct!" : "Answer:"}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: wrong ? T.red : T.green }}>{correct ? (curStreak >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — you'll see it again"}</div>
           <div style={{ fontFamily: arFont, fontSize: 30, color: T.text, direction: "rtl", marginTop: 4 }}>{item.ar}</div>
           <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 14 }}>{item.tr}</div>
           <div style={{ marginTop: 8 }}><Speaker text={item.ar} color={T.terra} /></div>
@@ -1674,7 +1688,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
       )}
 
       <button className="tap" onClick={submit} style={{ width: "100%", marginTop: 12, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
-        {feedback ? (i + 1 >= queue.length ? "Finish" : "Next →") : "Check answer"}
+        {feedback ? (willFinish ? "Finish" : "Next →") : "Check answer"}
       </button>
       {!feedback && (
         <button className="tap" onClick={giveUp} style={{ width: "100%", marginTop: 8, padding: 11, borderRadius: 12, border: `1px solid ${T.line}`, background: "transparent", color: T.textDim, fontSize: 13, fontWeight: 600 }}>
@@ -1685,7 +1699,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title }) {
         End session
       </button>
       <div style={{ textAlign: "center", fontSize: 11, color: T.textDim, marginTop: 10, lineHeight: 1.6 }}>
-        Use the keys above, or your phone's Arabic keyboard. Short vowels and hamza spelling don't need to be perfect.
+        Each item must be answered correctly <b style={{ color: T.text }}>twice in a row</b> to clear — miss it and the streak resets.
       </div>
     </div>
   );
@@ -2521,8 +2535,12 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   const [teachQueue, setTeachQueue] = useState([]);
   const [tIdx, setTIdx] = useState(0);
   const [quizSet, setQuizSet] = useState([]);
+  const [initialSet, setInitialSet] = useState([]);
+  const [initialLen, setInitialLen] = useState(0);
   const [quizSrs, setQuizSrs] = useState(false);
-  const [qIdx, setQIdx] = useState(0);
+  const [step, setStep] = useState(0);
+  const [sStreak, setSStreak] = useState({}); // shape key -> consecutive correct this session
+  const [sMissed, setSMissed] = useState({}); // shape key -> ever missed this session
   const [q, setQ] = useState(null);
   const [picked, setPicked] = useState(null);
   const [typed, setTyped] = useState("");
@@ -2562,15 +2580,14 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   const setBatch = (n) => setScript({ ...ss, batch: n });
   const setDir = (d) => setScript({ ...ss, quizDir: d });
 
-  // tok is an array-compatible form token; progress is saved per-shape under tok[5]
-  const applyResult = (tok, correct) => {
-    const newStreak = correct ? sess.streak + 1 : 0;
-    setSess((s) => ({ right: s.right + (correct ? 1 : 0), total: s.total + 1, streak: newStreak, best: Math.max(s.best, newStreak) }));
+  // Grade a shape into the SRS exactly once (at graduation), reflecting whether it
+  // was ever missed this session — so a stumble still applies the 50% setback.
+  const gradeSRS = (tok, ok) => {
     const cur = fpOf(tok) || learnItem(Date.now());
     const np = quizSrs
-      ? reviewSchedule(cur, correct, Date.now())
-      : { ...cur, correct: cur.correct + (correct ? 1 : 0), wrong: cur.wrong + (correct ? 0 : 1), recentWrong: correct ? 0 : (cur.recentWrong || 0) + 1 };
-    saveProg(tok[5], np, newStreak);
+      ? reviewSchedule(cur, ok, Date.now())
+      : { ...cur, correct: cur.correct + (ok ? 1 : 0), wrong: cur.wrong + (ok ? 0 : 1), recentWrong: ok ? 0 : (cur.recentWrong || 0) + 1 };
+    saveProg(tok[5], np, sess.best);
   };
 
   const startLearn = () => {
@@ -2584,8 +2601,12 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     if (!list.length) return;
     const set = shuffle(list).slice(0, 15);
     setQuizSet(set);
+    setInitialSet(set);
+    setInitialLen(set.length);
     setQuizSrs(!!srs);
-    setQIdx(0);
+    setSStreak({});
+    setSMissed({});
+    setStep(0);
     setPicked(null);
     setTyped("");
     setFeedback(null);
@@ -2595,56 +2616,51 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     setSess({ right: 0, total: 0, streak: 0, best: ss.best || 0 });
     setMode("quiz");
   };
+  const retakeQuiz = () => { if (initialSet.length) startQuiz(initialSet, quizSrs); };
 
-  const advance = () => {
-    const n = qIdx + 1;
-    if (n >= quizSet.length) { setMode("done"); return; }
-    setQIdx(n);
-    setPicked(null);
-    setTyped("");
-    setFeedback(null);
-    setQ(makeLetterQ(quizSet[n]));
+  // The drill-to-mastery step: a shape leaves the session only after TWO correct in a
+  // row; otherwise it rotates to the back to be retaken. The session ends only when
+  // every shape has been cleared.
+  const transition = (tok, ok) => {
+    clearTimeout(timer.current);
+    const key = tok[5];
+    const newStreak = ok ? (sStreak[key] || 0) + 1 : 0;
+    const wasMissed = sMissed[key] || !ok;
+    setSess((s) => { const ns = ok ? s.streak + 1 : 0; return { right: s.right + (ok ? 1 : 0), total: s.total + 1, streak: ns, best: Math.max(s.best, ns) }; });
+    setSStreak((m) => ({ ...m, [key]: newStreak }));
+    if (!ok) setSMissed((m) => ({ ...m, [key]: true }));
+    let nq;
+    if (newStreak >= 2) { gradeSRS(tok, !wasMissed); nq = quizSet.slice(1); }
+    else { nq = [...quizSet.slice(1), tok]; }
+    setPicked(null); setTyped(""); setFeedback(null); setTraceShown(false); setTraceKey((k) => k + 1); setStep((s) => s + 1);
+    if (nq.length === 0) { setMode("done"); return; }
+    setQuizSet(nq); setQ(makeLetterQ(nq[0]));
   };
+
   const choose = (opt) => {
     if (picked) return;
     const ans = q.answer;
-    const correct = opt[2] === ans[2];
+    const ok = opt[2] === ans[2];
     speak(ans[0]);
     setPicked(opt);
-    applyResult(ans, correct);
-    timer.current = setTimeout(advance, 950);
+    timer.current = setTimeout(() => transition(ans, ok), 950);
   };
   const checkType = () => {
     const ans = q.answer;
-    if (feedback) { advance(); return; }
-    const correct = letterMatch(typed, ans[0]);
+    if (feedback) { transition(ans, feedback === "correct"); return; }
+    const ok = letterMatch(typed, ans[0]);
     speak(ans[0]);
-    setFeedback(correct ? "correct" : "wrong");
-    applyResult(ans, correct);
+    setFeedback(ok ? "correct" : "wrong");
   };
   const giveUpType = () => {
     if (feedback) return;
     speak(q.answer[0]);
     setFeedback("wrong");
-    applyResult(q.answer, false);
   };
   const flipDir = () => { clearTimeout(timer.current); const order = ["recognize", "type", "trace"]; setDir(order[(order.indexOf(quizDir) + 1) % 3]); setPicked(null); setTyped(""); setFeedback(null); setTraceShown(false); setTraceKey((k) => k + 1); };
 
-  // Tracing quiz: write from memory, reveal, then self-grade. A miss feeds the
-  // SRS (halving progress) and re-queues the shape so it must be retaken.
-  const gradeTrace = (ok) => {
-    applyResult(q.answer, ok);
-    let qs = quizSet;
-    if (!ok && quizSet.length < 40) qs = [...quizSet, q.answer]; // retake the miss
-    if (qs !== quizSet) setQuizSet(qs);
-    setTraceShown(false);
-    const n = qIdx + 1;
-    if (n >= qs.length) { setMode("done"); return; }
-    setQIdx(n);
-    setPicked(null); setTyped(""); setFeedback(null);
-    setTraceKey((k) => k + 1);
-    setQ(makeLetterQ(qs[n]));
-  };
+  // Tracing quiz: write from memory, reveal, then self-grade — same mastery loop.
+  const gradeTrace = (ok) => { transition(q.answer, ok); };
 
   /* ===================== MENU ===================== */
   if (mode === "menu") {
@@ -2793,14 +2809,14 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
 
   /* ===================== DONE ===================== */
   if (mode === "done") {
-    const acc = sess.total ? Math.round((sess.right / sess.total) * 100) : 0;
     return (
       <div className="fade pop" style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
         <div style={{ fontSize: 38, marginBottom: 8 }}>🎉</div>
-        <div style={{ fontFamily: displayFont, fontSize: 22 }}>Nice work!</div>
-        <div style={{ color: T.textDim, fontSize: 14, marginTop: 8 }}>{sess.right}/{sess.total} correct · {acc}% · best streak {sess.best}🔥</div>
+        <div style={{ fontFamily: displayFont, fontSize: 22 }}>All shapes mastered!</div>
+        <div style={{ color: T.textDim, fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>You got every shape right twice in a row — {initialLen} shape{initialLen === 1 ? "" : "s"} cleared.</div>
         {quizSrs && <div style={{ fontSize: 12, color: T.goldSoft, marginTop: 6 }}>Scheduled for their next review.</div>}
-        <button className="tap" onClick={() => setMode("menu")} style={{ width: "100%", marginTop: 18, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back</button>
+        <button className="tap" onClick={retakeQuiz} style={{ width: "100%", marginTop: 18, padding: 13, borderRadius: 13, border: `1px solid ${T.gold}`, background: `${T.gold}10`, color: T.gold, fontWeight: 700 }}>🔁 Retake this set</button>
+        <button className="tap" onClick={() => setMode("menu")} style={{ width: "100%", marginTop: 10, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back</button>
       </div>
     );
   }
@@ -2812,13 +2828,16 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   const correct = feedback === "correct";
   const wrong = feedback === "wrong";
   const dirLabel = isTrace ? "Sound → write letter" : isType ? "Sound → type letter" : "Letter → pick sound";
+  const masteredShapes = initialLen - quizSet.length;
+  const curStreak = sStreak[ans[5]] || 0;
+  const typeWillFinish = feedback === "correct" && curStreak + 1 >= 2 && quizSet.length === 1;
 
   return (
     <div className="fade">
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-        <Stat label="Score" value={`${sess.right}/${sess.total}`} color={T.gold} />
+        <Stat label="Mastered" value={`${masteredShapes}/${initialLen}`} color={T.gold} />
         <Stat label="Streak" value={`${sess.streak}🔥`} color={T.terra} />
-        <Stat label="Best" value={sess.best} color={T.green} />
+        <Stat label="This shape" value={curStreak >= 1 ? `${curStreak}/2 ✓` : "0/2"} color={curStreak >= 1 ? T.green : T.textDim} />
       </div>
 
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
@@ -2829,7 +2848,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
 
       {isTrace ? (
         <>
-          <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "18px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 14 }}>
+          <div className="pop" key={ans[0] + step} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "18px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 14 }}>
             {!traceShown && <div style={{ fontSize: 11, color: T.terra, fontWeight: 700, letterSpacing: 0.4, marginBottom: 4 }}>WRITE THIS SHAPE FROM MEMORY</div>}
             <div style={{ fontFamily: displayFont, fontSize: 34, color: T.gold }}>{ans[2]}</div>
             <div style={{ fontSize: 13, color: T.textDim, marginTop: 2 }}>{ans[1]}</div>
@@ -2861,7 +2880,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
         </>
       ) : !isType ? (
         <>
-          <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "26px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 16 }}>
+          <div className="pop" key={ans[0] + step} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "26px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)", marginBottom: 16 }}>
             <div style={{ fontSize: 12, color: T.textDim, marginBottom: 4 }}>Which sound is this <b style={{ color: T.goldSoft }}>{ans[6]}</b> shape?</div>
             <div style={{ fontFamily: arFont, fontSize: 84, color: T.text, direction: "rtl", lineHeight: 1 }}>{ans[4]}</div>
             <div style={{ marginTop: 12 }}><Speaker text={ans[0]} size={18} color={T.terra} /></div>
@@ -2894,7 +2913,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
         </>
       ) : (
         <>
-          <div className="pop" key={ans[0] + qIdx} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "22px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)" }}>
+          <div className="pop" key={ans[0] + step} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "22px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)" }}>
             <div style={{ fontSize: 12, color: T.textDim, marginBottom: 8 }}>Type the letter for this sound</div>
             <div style={{ fontFamily: displayFont, fontSize: 38, color: T.gold }}>{ans[2]}</div>
             <div style={{ fontSize: 13, color: T.textDim, marginTop: 2 }}>{ans[1]} <span style={{ color: T.goldSoft }}>· {ans[6]} form</span></div>
@@ -2912,7 +2931,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
             <ArabicKeyboard onKey={(ch) => setTyped((a) => a + ch)} onSpace={() => setTyped((a) => a + " ")} onBack={() => setTyped((a) => a.slice(0, -1))} onClear={() => setTyped("")} />
           )}
           <button className="tap" onClick={checkType} style={{ width: "100%", marginTop: 12, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
-            {feedback ? (qIdx + 1 >= quizSet.length ? "Finish" : "Next →") : "Check answer"}
+            {feedback ? (typeWillFinish ? "Finish" : "Next →") : "Check answer"}
           </button>
           {!feedback && (
             <button className="tap" onClick={giveUpType} style={{ width: "100%", marginTop: 8, padding: 11, borderRadius: 12, border: `1px solid ${T.line}`, background: "transparent", color: T.textDim, fontSize: 13, fontWeight: 600 }}>I don't know — show me</button>
@@ -2922,7 +2941,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
 
       <button className="tap" onClick={() => { clearTimeout(timer.current); setMode("menu"); }} style={{ width: "100%", marginTop: 16, padding: 10, borderRadius: 12, border: "none", background: "transparent", color: T.textDim, fontSize: 12 }}>End session</button>
       <div style={{ fontSize: 11, color: T.textDim, textAlign: "center", marginTop: 6, lineHeight: 1.6 }}>
-        {qIdx + 1} of {quizSet.length}{quizSrs ? " · spaced-review session" : " · practice (won't change schedule)"}
+        {masteredShapes} of {initialLen} shapes mastered · each needs 2 correct in a row{quizSrs ? "" : " · practice"}
       </div>
     </div>
   );

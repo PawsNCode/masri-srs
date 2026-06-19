@@ -28,6 +28,12 @@ home screen.
 - **Typed-Arabic reviews** — read the English, type the Arabic using the built-in
   on-screen Arabic keyboard or your device keyboard. Grading is forgiving about
   short vowels and alef/hamza spelling.
+- **Drill to mastery** — every quiz and review (words *and* script shapes) keeps going
+  until you answer **each item correctly twice in a row**. Miss one and its streak
+  resets, and it comes back later in the same session — the quiz never ends, and never
+  congratulates you, until everything is cleared. Each item still updates the SRS just
+  once per session (counted as a miss if you slipped on it at all), so spacing stays
+  intact. The finish screen offers a one-tap **Retake**.
 
 ### Reviews hub
 - Choose **what** to review: **letters (script), words, phrases, sentences, or all
@@ -92,4 +98,4 @@ home screen.
 
 ---
 
-*Last updated: the script SRS now tracks each positional shape (isolated/initial/medial/final) separately — 100 shapes in all — so quizzes test every shape and the Chart shows a mastery % and color bar for each one (plus a per-letter overall %). Existing letter progress migrates over automatically. Also moved the Items "Start custom quiz" button to a sticky bar at the top of the list so it's always in reach.*
+*Last updated: quizzes and reviews are now drill-to-mastery — a session won't end (and won't congratulate you) until every word or script shape is answered correctly twice in a row; a miss resets that item's streak and re-queues it, while the SRS is still graded once per item (as a miss if you ever slipped). Added a Retake button on the finish screen.*
