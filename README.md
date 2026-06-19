@@ -3,7 +3,7 @@
 A web app for learning **Egyptian Arabic (Masri)** — spaced-repetition vocabulary,
 typed-Arabic quizzes, a full alphabet trainer, and a progress dashboard. The whole
 thing is a single self-contained HTML file you can run anywhere or install to your
-home screen.
+home screen..
 
 🔗 **Live app:** https://pawsncode.github.io/masri-srs/
 
