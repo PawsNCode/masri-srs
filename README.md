@@ -27,11 +27,18 @@ home screen.
   words** (3/5/7/10, your choice) and then quiz them to lock them in, **quiz all the
   words you've learned** in one shuffled drill, or **start a custom quiz** of words you
   hand-picked with the ★ in Items.
-- **Word detail & letter breakdown** — tap any Arabic word in Items to open a detail
-  page: the full word, romanization, English, sound, and a **letter-by-letter
-  breakdown** showing the exact shape each letter takes in that word (isolated /
-  initial / medial / final). Tap any letter to jump straight to its **trace guide and
-  practice**, and there's a **try-typing box with a Check button** to test yourself.
+- **Word detail & letter breakdown** — tap any Arabic word in Items, **or the correct
+  answer shown after a quiz/review question**, to open a detail page: the full word,
+  romanization, English, sound, and a **letter-by-letter breakdown** showing the exact
+  shape each letter takes in that word (isolated / initial / medial / final). Tap any
+  letter to jump straight to its **trace guide and practice**, and there's a
+  **try-typing box with a Check button** to test yourself.
+- **Answer your way** — each quiz/review lets you **Type** the Arabic or answer by
+  **Multiple choice**. The on-screen Arabic keyboard is now hidden by default (type with
+  your phone keyboard) and pops up only when you tap **Show in-app keys**. When you get
+  a typed answer checked, the result shows the correct spelling *and* its letter-by-letter
+  breakdown (tap a letter for its trace guide), and the **Next button stays pinned to the
+  bottom** so it's always in reach.
 - **Richer lessons** — when learning a new word you now see everything at once: the
   word, romanization, English, sound, the same tappable letter breakdown, and a
   type-it-yourself Check box — so you read it, hear it, see how it's built, and write
@@ -114,4 +121,4 @@ home screen.
 
 ---
 
-*Last updated: you can now focus the script on one positional shape — a new All / Iso / Init / Med / Fin filter on the script quiz menu aims every review, drill and custom quiz at just that form, and the trace guide has the same filter so you can practice tracing a single shape (initials only, medials only, etc.). One-way letters with no initial/medial form are skipped automatically.*
+*Last updated: the answer shown after a quiz/review question is now tappable — it opens the full word-detail page with the letter-by-letter breakdown (and each letter opens its trace guide), and the result also shows that breakdown inline. The on-screen Arabic keyboard is hidden by default and only appears when you tap "Show in-app keys" (so the phone keyboard is the default), and the Next button now stays pinned to the bottom of the screen so it's always visible.*

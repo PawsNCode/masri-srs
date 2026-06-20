@@ -1619,8 +1619,11 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
   const [feedback, setFeedback] = useState(null);
   const [leveled, setLeveled] = useState(null);
   const [done, setDone] = useState(items.length === 0);
-  const [qtype, setQtype] = useState(quizType || "inapp");
+  const [qtype, setQtype] = useState(quizType === "mc" ? "mc" : "type"); // type | mc
+  const [showKeys, setShowKeys] = useState(false); // in-app keyboard hidden until toggled on
   const [mcPick, setMcPick] = useState(null);
+  const [peek, setPeek] = useState(null);       // letter trace overlay
+  const [detailOpen, setDetailOpen] = useState(false); // full word-detail overlay
   const inputRef = useRef(null);
 
   const item = queue[0];
@@ -1646,9 +1649,9 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
   }, [item && item.id, isMc]);
 
   useEffect(() => {
-    if (qtype === "phone" && !feedback && inputRef.current) inputRef.current.focus();
+    if (!isMc && !showKeys && !feedback && inputRef.current) inputRef.current.focus();
     // eslint-disable-next-line
-  }, [item && item.id, qtype]);
+  }, [item && item.id, qtype, showKeys]);
 
   const grade = (ok) => {
     if (feedback) return;
@@ -1661,16 +1664,17 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
     const st = streak[item.id] || 0; // updated post-grade
     let q;
     if (st >= 2) {
-      // graduate: grade the SRS once, counting it wrong if it was ever missed this session
       const lvl = onGrade(item.id, !missed[item.id], mode);
       if (lvl) setLeveled(lvl);
       q = queue.slice(1);
     } else {
-      q = [...queue.slice(1), item]; // not yet twice-in-a-row → retake later
+      q = [...queue.slice(1), item];
     }
     setFeedback(null);
     setAnswer("");
     setMcPick(null);
+    setPeek(null);
+    setDetailOpen(false);
     if (q.length === 0) setDone(true);
     else setQueue(q);
   };
@@ -1684,7 +1688,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
     grade(opt.id === item.id);
   };
   const giveUp = () => { if (feedback) return; grade(false); };
-  const retake = () => { setQueue(items); setStreak({}); setMissed({}); setAnswer(""); setMcPick(null); setFeedback(null); setLeveled(null); setDone(items.length === 0); };
+  const retake = () => { setQueue(items); setStreak({}); setMissed({}); setAnswer(""); setMcPick(null); setFeedback(null); setLeveled(null); setPeek(null); setDetailOpen(false); setDone(items.length === 0); };
   const setType = (t) => { if (t === qtype) return; setQtype(t); setAnswer(""); setMcPick(null); if (onQuizType) onQuizType(t); };
 
   if (done) {
@@ -1723,10 +1727,10 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
         <div style={{ fontSize: 12, color: T.textDim, whiteSpace: "nowrap" }}>{masteredCount}/{total} mastered</div>
       </div>
 
-      {/* quiz-type selector */}
+      {/* answer-mode selector */}
       <div style={{ display: "flex", gap: 5, background: T.panelHi, border: `1px solid ${T.line}`, padding: 4, borderRadius: 12, marginBottom: 12 }}>
-        {[["inapp", "⌨️ In-app keys"], ["phone", "📱 My keyboard"], ["mc", "🔘 Choices"]].map(([k, label]) => (
-          <button key={k} className="tap" onClick={() => setType(k)} style={{ flex: 1, border: "none", borderRadius: 8, padding: "8px 2px", fontSize: 11.5, fontWeight: 600, color: qtype === k ? "#fff" : T.textDim, background: qtype === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>{label}</button>
+        {[["type", "✍️ Type"], ["mc", "🔘 Multiple choice"]].map(([k, label]) => (
+          <button key={k} className="tap" onClick={() => setType(k)} style={{ flex: 1, border: "none", borderRadius: 8, padding: "8px 2px", fontSize: 12.5, fontWeight: 600, color: qtype === k ? "#fff" : T.textDim, background: qtype === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>{label}</button>
         ))}
       </div>
 
@@ -1753,42 +1757,58 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
           })}
         </div>
       ) : (
-        <input
-          ref={inputRef}
-          value={answer}
-          onChange={(e) => !feedback && setAnswer(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder="اكتب بالعربي…"
-          dir="rtl"
-          readOnly={!!feedback}
-          inputMode={qtype === "inapp" ? "none" : undefined}
-          autoFocus={qtype === "phone"}
-          style={{ width: "100%", marginTop: 12, padding: "14px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 26, outline: "none", textAlign: "right" }}
-        />
+        <>
+          <input
+            ref={inputRef}
+            value={answer}
+            onChange={(e) => !feedback && setAnswer(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+            placeholder="اكتب بالعربي…"
+            dir="rtl"
+            readOnly={!!feedback}
+            inputMode={showKeys ? "none" : undefined}
+            style={{ width: "100%", marginTop: 12, padding: "14px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 26, outline: "none", textAlign: "right" }}
+          />
+          {!feedback && (
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
+              <button className="tap" onClick={() => setShowKeys((s) => !s)} style={{ padding: "8px 14px", borderRadius: 999, border: `1px solid ${showKeys ? T.gold : T.line}`, background: showKeys ? `${T.gold}12` : T.panel, color: showKeys ? T.gold : T.textDim, fontSize: 12, fontWeight: 600 }}>
+                {showKeys ? "⌨️ Hide in-app keys" : "⌨️ Show in-app keys"}
+              </button>
+            </div>
+          )}
+          {!feedback && showKeys && (
+            <ArabicKeyboard
+              onKey={(ch) => setAnswer((a) => a + ch)}
+              onSpace={() => setAnswer((a) => a + " ")}
+              onBack={() => setAnswer((a) => a.slice(0, -1))}
+              onClear={() => setAnswer("")}
+            />
+          )}
+        </>
       )}
 
       {feedback && (
-        <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${wrong ? T.red : T.green}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: wrong ? T.red : T.green }}>{correct ? (curStreak >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — you'll see it again"}</div>
-          <div style={{ fontFamily: arFont, fontSize: 30, color: T.text, direction: "rtl", marginTop: 4 }}>{item.ar}</div>
-          <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 14 }}>{item.tr}</div>
+        <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${wrong ? T.red : T.green}`, borderRadius: 14, padding: "14px 14px", textAlign: "center" }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: wrong ? T.red : T.green }}>{correct ? (curStreak >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — here's the correct answer:"}</div>
+          <button className="tap" onClick={() => setDetailOpen(true)} style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 2, background: "transparent", border: "none", cursor: "pointer", marginTop: 6 }}>
+            <span style={{ fontFamily: arFont, fontSize: 32, color: T.text, direction: "rtl" }}>{item.ar}</span>
+            <span style={{ fontSize: 10, color: T.gold, fontWeight: 700 }}>tap for full details ›</span>
+          </button>
+          <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 14, marginTop: 2 }}>{item.tr}</div>
           <div style={{ marginTop: 8 }}><Speaker text={item.ar} color={T.terra} /></div>
+          <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${T.line}` }}>
+            <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.8, color: T.goldSoft, marginBottom: 8 }}>How it's written · tap a letter</div>
+            <LetterBreakdown ar={item.ar} onTap={(idx) => setPeek(idx)} />
+          </div>
         </div>
       )}
 
-      {!feedback && qtype === "inapp" && (
-        <ArabicKeyboard
-          onKey={(ch) => setAnswer((a) => a + ch)}
-          onSpace={() => setAnswer((a) => a + " ")}
-          onBack={() => setAnswer((a) => a.slice(0, -1))}
-          onClear={() => setAnswer("")}
-        />
-      )}
-
       {primaryLabel && (
-        <button className="tap" onClick={submit} style={{ width: "100%", marginTop: 12, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
-          {primaryLabel}
-        </button>
+        <div style={{ position: feedback ? "sticky" : "static", bottom: 0, zIndex: 5, marginTop: 12, paddingBottom: feedback ? "calc(8px + env(safe-area-inset-bottom))" : 0, paddingTop: feedback ? 8 : 0, background: feedback ? `linear-gradient(180deg, transparent, ${T.bg} 32%)` : "transparent" }}>
+          <button className="tap" onClick={submit} style={{ width: "100%", padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700, boxShadow: feedback ? "0 8px 22px rgba(128,29,92,.22)" : "none" }}>
+            {primaryLabel}
+          </button>
+        </div>
       )}
       {!feedback && (
         <button className="tap" onClick={giveUp} style={{ width: "100%", marginTop: 8, padding: 11, borderRadius: 12, border: `1px solid ${T.line}`, background: "transparent", color: T.textDim, fontSize: 13, fontWeight: 600 }}>
@@ -1799,9 +1819,12 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
         End session
       </button>
       <div style={{ textAlign: "center", fontSize: 11, color: T.textDim, marginTop: 10, lineHeight: 1.6 }}>
-        {qtype === "phone" ? "Switch your phone keyboard to Arabic to type. " : qtype === "mc" ? "Pick the matching Arabic. " : "Tap the keys above (or a hardware keyboard). "}
+        {isMc ? "Pick the matching Arabic. " : showKeys ? "Tap the in-app keys above. " : "Type with your phone keyboard, or tap “Show in-app keys”. "}
         Each item must be answered correctly <b style={{ color: T.text }}>twice in a row</b> to clear.
       </div>
+
+      <ScriptPeek idx={peek} onClose={() => setPeek(null)} />
+      {detailOpen && <ItemDetail item={item} onClose={() => setDetailOpen(false)} autoPlay={autoPlay} />}
     </div>
   );
 }
