@@ -184,6 +184,42 @@ const SCRIPT_FORMS = buildForms(ALPHABET);
 function formProg(prog, tok) { return normLP(prog[tok[5]]) || normLP(prog[tok[0]]) || null; }
 function letterLearnedIn(prog, glyph) { return distinctForms(glyph).every((f) => prog[glyph + ":" + f] || prog[glyph]); }
 
+/* ---- Word → letter breakdown ----
+   Splits an Arabic string into the individual letters you'd type, working out each
+   letter's positional shape (isolated/initial/medial/final) from how Arabic joins.
+   Letter variants (hamza-carriers, taa marbuta, alef maksura…) map to a base letter
+   so the trace guide can still be opened. */
+const ZWJ_ = "\u200d";
+const NOLEFTJOIN = new Set(["ا", "د", "ذ", "ر", "ز", "و", "أ", "إ", "آ", "ٱ", "ة", "ى", "ؤ", "ء"]);
+const LETTER_VARIANTS = {
+  "أ": ["ا", "alef + hamza"], "إ": ["ا", "alef + hamza"], "آ": ["ا", "alef madda"], "ٱ": ["ا", "alef wasla"],
+  "ة": ["ه", "taa marbuta"], "ى": ["ي", "alef maksura"], "ؤ": ["و", "waw + hamza"], "ئ": ["ي", "yaa + hamza"], "ء": [null, "hamza"],
+};
+function isArabicLetter(ch) { return /[\u0621-\u064A\u0671]/.test(ch); }
+function alphaIndexOf(glyph) { return ALPHABET.findIndex((a) => a[0] === glyph); }
+function canJoinLeft(ch) { return isArabicLetter(ch) && !NOLEFTJOIN.has(ch); }
+function breakWord(ar) {
+  const chars = Array.from(ar || "");
+  const out = [];
+  for (let i = 0; i < chars.length; i++) {
+    const c = chars[i];
+    if (c === " ") { out.push({ space: true }); continue; }
+    if (!isArabicLetter(c)) { out.push({ other: true, ch: c }); continue; }
+    let joinsPrev = i > 0 && isArabicLetter(chars[i - 1]) && canJoinLeft(chars[i - 1]);
+    let joinsNext = canJoinLeft(c) && i < chars.length - 1 && isArabicLetter(chars[i + 1]);
+    if (c === "ء") { joinsPrev = false; joinsNext = false; }
+    const form = joinsPrev && joinsNext ? "med" : joinsPrev ? "fin" : joinsNext ? "ini" : "iso";
+    const shape = (joinsPrev ? ZWJ_ : "") + c + (joinsNext ? ZWJ_ : "");
+    let base = c, name = null;
+    if (LETTER_VARIANTS[c]) { base = LETTER_VARIANTS[c][0]; name = LETTER_VARIANTS[c][1]; }
+    const ai = base ? alphaIndexOf(base) : -1;
+    let tr = "";
+    if (ai >= 0) { if (!name) name = ALPHABET[ai][1]; tr = ALPHABET[ai][2]; }
+    out.push({ ch: c, shape, form, idx: ai, name: name || "", tr: tr || "" });
+  }
+  return out;
+}
+
 const LEGEND = [
   ["ʿ", "ع — voiced throat sound (ʿain)"],
   ["ʾ", "glottal stop — also how Masri pronounces ق"],
@@ -1525,7 +1561,7 @@ const DEFAULT_STATE = {
   custom: [],
   customItems: [],
   customLetters: [],
-  settings: { lessonBatch: 5, theme: "rose", quizType: "inapp" },
+  settings: { lessonBatch: 5, theme: "rose", quizType: "inapp", autoPlay: true },
   daily: { date: todayStr(), reviews: 0, lessons: 0 },
   history: {},
   script: { progress: {}, best: 0, batch: 5, quizDir: "recognize" },
@@ -1575,7 +1611,7 @@ function Bar({ pct, h = 8 }) {
 }
 
 /* ===================== TYPED QUIZ (reused everywhere) ===================== */
-function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", onQuizType }) {
+function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", onQuizType, autoPlay = true }) {
   const [queue, setQueue] = useState(() => items);
   const [streak, setStreak] = useState({}); // id -> consecutive correct this session
   const [missed, setMissed] = useState({}); // id -> ever missed this session
@@ -1617,6 +1653,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
   const grade = (ok) => {
     if (feedback) return;
     setFeedback(ok ? "correct" : "wrong");
+    if (autoPlay) speak(item.ar);
     setStreak((s) => ({ ...s, [item.id]: ok ? (s[item.id] || 0) + 1 : 0 }));
     if (!ok) setMissed((m) => ({ ...m, [item.id]: true }));
   };
@@ -1770,10 +1807,13 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
 }
 
 /* ===================== LEARN SESSION (teach N, then quiz them) ===================== */
-function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, quizType = "inapp", onQuizType }) {
+function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, quizType = "inapp", onQuizType, autoPlay = true }) {
   const [queue] = useState(() => pool.slice(0, batch));
   const [phase, setPhase] = useState("menu");
   const [i, setI] = useState(0);
+  const [peek, setPeek] = useState(null);
+  const teachItem = queue[i];
+  useEffect(() => { if (phase === "teach" && autoPlay && teachItem) speak(teachItem.ar); /* eslint-disable-next-line */ }, [phase, teachItem && teachItem.id]);
 
   if (phase === "menu") {
     const canLearn = queue.length > 0;
@@ -1815,7 +1855,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0,
         <div style={{ textAlign: "center", fontSize: 12.5, color: T.textDim, margin: "0 0 12px", lineHeight: 1.5 }}>
           Now type each one in Arabic to lock it in 👇
         </div>
-        <TypedQuiz items={queue} mode="srs" onGrade={onGrade} onExit={() => setPhase("menu")} title="Lesson quiz" quizType={quizType} onQuizType={onQuizType} />
+        <TypedQuiz items={queue} mode="srs" onGrade={onGrade} onExit={() => setPhase("menu")} title="Lesson quiz" quizType={quizType} onQuizType={onQuizType} autoPlay={autoPlay} />
       </div>
     );
   }
@@ -1827,13 +1867,21 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0,
       <div style={{ height: 4, background: T.line, borderRadius: 4, overflow: "hidden", marginBottom: 14 }}>
         <div style={{ height: "100%", width: `${(i / queue.length) * 100}%`, background: `linear-gradient(90deg, ${T.gold}, ${T.terra})` }} />
       </div>
-      <div className="pop" key={item.id} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "30px 22px", textAlign: "center", boxShadow: "0 12px 34px rgba(128,29,92,.10)" }}>
+      <div className="pop" key={item.id} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "26px 22px", textAlign: "center", boxShadow: "0 12px 34px rgba(128,29,92,.10)" }}>
         <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>New {item.type} · Level {item.level}</div>
         <div style={{ fontFamily: arFont, fontSize: item.type === "sentence" ? 32 : 48, color: T.text, direction: "rtl", margin: "14px 0", lineHeight: 1.4 }}>{item.ar}</div>
         <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 16 }}>{item.tr}</div>
         <div style={{ fontFamily: displayFont, fontSize: 20, marginTop: 6 }}>{item.en}</div>
         <div style={{ marginTop: 14 }}><Speaker text={item.ar} size={20} color={T.gold} /></div>
       </div>
+
+      <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "18px 2px 10px" }}>How to type it · tap a letter</div>
+      <LetterBreakdown ar={item.ar} onTap={(idx) => setPeek(idx)} />
+      <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 10, lineHeight: 1.5, textAlign: "center" }}>Reads right → left. Tap any letter for its trace guide and practice.</div>
+
+      <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "20px 2px 10px" }}>Try typing it</div>
+      <TypeTry item={item} />
+
       <button
         className="tap"
         onClick={() => {
@@ -1841,12 +1889,123 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0,
           if (i + 1 >= queue.length) setPhase("quiz");
           else setI(i + 1);
         }}
-        style={{ width: "100%", marginTop: 14, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}
+        style={{ width: "100%", marginTop: 18, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}
       >
         {i + 1 >= queue.length ? "Got them — start quiz →" : "Learn it ✓"}
       </button>
       <div style={{ textAlign: "center", fontSize: 12, color: T.textDim, marginTop: 10 }}>Learning {i + 1} of {queue.length}</div>
+
+      <ScriptPeek idx={peek} onClose={() => setPeek(null)} />
     </div>
+  );
+}
+
+/* ===================== SHARED: letter breakdown, type-try, script peek, item detail ===================== */
+
+// Row of tappable letter chips showing how a word is built, shape by shape.
+function LetterBreakdown({ ar, onTap }) {
+  const parts = useMemo(() => breakWord(ar), [ar]);
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, direction: "rtl" }}>
+      {parts.map((p, i) => {
+        if (p.space) return <div key={i} style={{ width: 12 }} />;
+        if (p.other) return <div key={i} style={{ fontFamily: arFont, fontSize: 22, color: T.textDim, alignSelf: "center" }}>{p.ch}</div>;
+        const tappable = p.idx >= 0 && onTap;
+        return (
+          <button key={i} className="tap" disabled={!tappable} onClick={() => tappable && onTap(p.idx)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, minWidth: 52, border: `1px solid ${tappable ? T.line : T.line}`, background: T.panelHi, borderRadius: 11, padding: "8px 6px", cursor: tappable ? "pointer" : "default", direction: "rtl" }}>
+            <span style={{ fontFamily: arFont, fontSize: 30, color: T.text, lineHeight: 1.1 }}>{p.shape}</span>
+            <span style={{ fontFamily: uiFont, fontSize: 10.5, color: T.goldSoft, fontWeight: 600, direction: "ltr" }}>{p.tr || p.ch}</span>
+            <span style={{ fontFamily: uiFont, fontSize: 8.5, color: T.textDim, textTransform: "uppercase", letterSpacing: 0.4, direction: "ltr" }}>{FORM_LABEL[p.form]}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// A “try typing it” box with the in-app Arabic keyboard and a Check button.
+function TypeTry({ item, compact }) {
+  const [val, setVal] = useState("");
+  const [res, setRes] = useState(null); // "ok" | "no" | null
+  const [showKb, setShowKb] = useState(true);
+  useEffect(() => { setVal(""); setRes(null); }, [item && item.id]);
+  const check = () => setRes(answerMatches(val, item) ? "ok" : "no");
+  return (
+    <div>
+      <input
+        value={val}
+        onChange={(e) => { setVal(e.target.value); setRes(null); }}
+        onKeyDown={(e) => e.key === "Enter" && check()}
+        placeholder="try typing it…"
+        dir="rtl"
+        style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `2px solid ${res === "ok" ? T.green : res === "no" ? T.red : T.line}`, background: res === "ok" ? `${T.green}10` : res === "no" ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 24, outline: "none", textAlign: "right" }}
+      />
+      {showKb && (
+        <ArabicKeyboard
+          onKey={(ch) => { setVal((a) => a + ch); setRes(null); }}
+          onSpace={() => { setVal((a) => a + " "); setRes(null); }}
+          onBack={() => { setVal((a) => a.slice(0, -1)); setRes(null); }}
+          onClear={() => { setVal(""); setRes(null); }}
+        />
+      )}
+      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+        <button className="tap" onClick={() => setShowKb((s) => !s)} style={{ padding: "11px 14px", borderRadius: 12, border: `1px solid ${T.line}`, background: T.panel, color: T.textDim, fontSize: 12.5, fontWeight: 600 }}>{showKb ? "Hide keys" : "Show keys"}</button>
+        <button className="tap" onClick={check} style={{ flex: 1, padding: "12px 16px", borderRadius: 12, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700, fontSize: 14 }}>Check</button>
+      </div>
+      {res === "ok" && <div className="fade" style={{ marginTop: 10, textAlign: "center", color: T.green, fontWeight: 700, fontSize: 14 }}>✓ Perfect — that's it!</div>}
+      {res === "no" && (
+        <div className="fade" style={{ marginTop: 10, textAlign: "center" }}>
+          <div style={{ color: T.red, fontWeight: 700, fontSize: 13 }}>Not quite — the spelling is:</div>
+          <div style={{ fontFamily: arFont, fontSize: 26, color: T.text, direction: "rtl", marginTop: 2 }}>{item.ar}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Full-screen overlay reusing ScriptTrace for a single letter (trace guide + trace trial).
+function ScriptPeek({ idx, onClose }) {
+  if (idx == null) return null;
+  return ReactDOM.createPortal(
+    <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: T.bg, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ maxWidth: 560, margin: "0 auto", padding: "12px 18px calc(28px + env(safe-area-inset-bottom))" }}>
+        <button className="tap" onClick={onClose} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "8px 14px", borderRadius: 999, border: `1px solid ${T.line}`, background: T.panel, color: T.gold, fontSize: 13, fontWeight: 700 }}>✕ Close letter</button>
+        <ScriptTrace initialIdx={idx} onBack={null} />
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+// Full-screen item detail: breakdown of letters, all info, sound, and a type-it-yourself box.
+function ItemDetail({ item, onClose, autoPlay }) {
+  const [peek, setPeek] = useState(null);
+  useEffect(() => { if (autoPlay && item) speak(item.ar); /* eslint-disable-next-line */ }, [item && item.id]);
+  if (!item) return null;
+  return ReactDOM.createPortal(
+    <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: T.bg, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ maxWidth: 560, margin: "0 auto", padding: "12px 18px calc(40px + env(safe-area-inset-bottom))" }}>
+        <button className="tap" onClick={onClose} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "8px 14px", borderRadius: 999, border: `1px solid ${T.line}`, background: T.panel, color: T.gold, fontSize: 13, fontWeight: 700 }}>‹ Back</button>
+
+        <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "24px 20px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.10)" }}>
+          <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>{item.type} · Level {item.level}</div>
+          <div style={{ fontFamily: arFont, fontSize: item.type === "sentence" ? 34 : 50, color: T.text, direction: "rtl", margin: "12px 0", lineHeight: 1.4 }}>{item.ar}</div>
+          <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 16 }}>{item.tr}</div>
+          <div style={{ fontFamily: displayFont, fontSize: 20, marginTop: 4 }}>{item.en}</div>
+          <div style={{ marginTop: 14 }}><Speaker text={item.ar} size={22} color={T.gold} /></div>
+        </div>
+
+        <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "20px 2px 10px" }}>How to type it · tap a letter</div>
+        <LetterBreakdown ar={item.ar} onTap={(idx) => setPeek(idx)} />
+        <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 10, lineHeight: 1.5, textAlign: "center" }}>Reads right → left. Each letter shows the shape it takes in this word — tap one for its trace guide and practice.</div>
+
+        <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "22px 2px 10px" }}>Now try it yourself</div>
+        <TypeTry item={item} />
+
+        <ScriptPeek idx={peek} onClose={() => setPeek(null)} />
+      </div>
+    </div>,
+    document.body
   );
 }
 
@@ -1975,6 +2134,15 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
             ))}
           </div>
         </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, paddingTop: 14, borderTop: `1px solid ${T.line}` }}>
+          <div>
+            <div style={{ fontSize: 14 }}>Auto-play pronunciation</div>
+            <div style={{ fontSize: 11, color: T.textDim, marginTop: 2, lineHeight: 1.4 }}>Speak the word automatically when learning or revealing it.</div>
+          </div>
+          <button className="tap" role="switch" aria-checked={state.settings.autoPlay !== false} onClick={() => onSetting({ autoPlay: !(state.settings.autoPlay !== false) })} style={{ flexShrink: 0, width: 50, height: 28, borderRadius: 999, border: "none", cursor: "pointer", background: state.settings.autoPlay !== false ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, position: "relative", transition: "background .2s" }}>
+            <span style={{ position: "absolute", top: 3, left: state.settings.autoPlay !== false ? 25 : 3, width: 22, height: 22, borderRadius: 999, background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.25)" }} />
+          </button>
+        </div>
         <div style={{ marginTop: 14 }}>
           {!confirm ? (
             <button className="tap" onClick={() => setConfirm(true)} style={{ width: "100%", padding: 12, borderRadius: 11, border: `1px solid ${T.red}55`, background: "transparent", color: T.red, fontSize: 13, fontWeight: 600 }}>Reset all progress</button>
@@ -2007,7 +2175,7 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
 }
 
 /* ===================== ITEMS (browse + select-to-quiz + add) ===================== */
-function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, customItems, onToggleCustom, onStartCustom, onClearCustom }) {
+function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, customItems, onToggleCustom, onStartCustom, onClearCustom, onOpenDetail }) {
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [showAdd, setShowAdd] = useState(false);
@@ -2119,10 +2287,10 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
           return (
             <div key={it.id} style={{ background: picked ? `${T.gold}0d` : T.panel, border: `1px solid ${picked ? T.gold : T.line}`, borderLeft: mc ? `5px solid ${mc}` : `1px solid ${picked ? T.gold : T.line}`, borderRadius: 13, padding: "11px 13px", display: "flex", alignItems: "center", gap: 10 }}>
               <button className="tap" onClick={() => onToggleCustom(it.id)} aria-label="add to custom quiz" title="Add to custom quiz" style={{ width: 24, height: 24, borderRadius: 999, flexShrink: 0, cursor: "pointer", border: `2px solid ${picked ? T.gold : T.line}`, background: picked ? T.gold : "transparent", color: picked ? "#fff" : T.textDim, fontSize: 13, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>★</button>
-              <button className="tap" onClick={() => speak(it.ar)} aria-label="play" style={{ background: "transparent", border: "none", padding: 0, cursor: "pointer", minWidth: 74, display: "flex", alignItems: "center", gap: 5 }}>
+              <button className="tap" onClick={() => onOpenDetail && onOpenDetail(it)} aria-label="open details" style={{ background: "transparent", border: "none", padding: 0, cursor: "pointer", minWidth: 64, textAlign: "right" }}>
                 <span style={{ fontFamily: arFont, fontSize: 22, direction: "rtl", color: T.text }}>{it.ar}</span>
-                <span style={{ fontSize: 10, color: T.goldSoft }}>🔊</span>
               </button>
+              <Speaker text={it.ar} size={14} color={T.terra} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, color: T.text }}>{it.en}</div>
                 <div style={{ fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}</div>
@@ -2335,6 +2503,7 @@ function App() {
   const [practiceItems, setPracticeItems] = useState([]);
   const [reviewRun, setReviewRun] = useState([]);
   const [scriptAuto, setScriptAuto] = useState(false);
+  const [detailItem, setDetailItem] = useState(null);
 
   const stateRef = useRef(state);
   useEffect(() => { stateRef.current = state; }, [state]);
@@ -2573,7 +2742,7 @@ function App() {
           />
         )}
         {view === "lessons" && (
-          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} />
+          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}
         {view === "reviews" && (
           <ReviewsHub
@@ -2587,14 +2756,15 @@ function App() {
             onGotoScript={() => { setScriptAuto(false); setView("script"); }}
           />
         )}
-        {view === "reviewrun" && <TypedQuiz items={reviewRun} mode="srs" onGrade={grade} onExit={() => setView("reviews")} title="Reviews" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} />}
-        {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onExit={() => setView("items")} title="Practice" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} />}
+        {view === "reviewrun" && <TypedQuiz items={reviewRun} mode="srs" onGrade={grade} onExit={() => setView("reviews")} title="Reviews" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
+        {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onExit={() => setView("items")} title="Practice" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
         {view === "script" && <ScriptView scriptState={state.script} setScript={(next) => persist({ ...state, script: next })} autoReview={scriptAuto} onAutoConsumed={() => setScriptAuto(false)} customLetters={state.customLetters || []} onCustomLetters={onCustomLetters} />}
         {view === "items" && (
-          <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} />
+          <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onOpenDetail={setDetailItem} />
         )}
         {view === "stats" && <StatsView state={state} allItems={allItems} level={state.currentLevel} streak={streak} />}
       </div>
+      {detailItem && <ItemDetail item={detailItem} onClose={() => setDetailItem(null)} autoPlay={state.settings.autoPlay !== false} />}
     </div>
   );
 }

@@ -27,11 +27,18 @@ home screen.
   words** (3/5/7/10, your choice) and then quiz them to lock them in, **quiz all the
   words you've learned** in one shuffled drill, or **start a custom quiz** of words you
   hand-picked with the ★ in Items.
-- **Three quiz types** — every quiz and review lets you answer the way you like, with
-  a toggle at the top that's remembered: **in-app Arabic keys** (the built-in on-screen
-  keyboard, no OS keyboard needed), **your phone keyboard** (switch it to Arabic and
-  type natively), or **multiple choice** (pick the right Arabic from four options).
-  Typed answers are graded leniently about short vowels and alef/hamza spelling.
+- **Word detail & letter breakdown** — tap any Arabic word in Items to open a detail
+  page: the full word, romanization, English, sound, and a **letter-by-letter
+  breakdown** showing the exact shape each letter takes in that word (isolated /
+  initial / medial / final). Tap any letter to jump straight to its **trace guide and
+  practice**, and there's a **try-typing box with a Check button** to test yourself.
+- **Richer lessons** — when learning a new word you now see everything at once: the
+  word, romanization, English, sound, the same tappable letter breakdown, and a
+  type-it-yourself Check box — so you read it, hear it, see how it's built, and write
+  it before moving on.
+- **Auto-play pronunciation** — a toggle in Home → settings speaks each word
+  automatically as you learn it or when an answer is revealed. Turn it off for a quiet
+  session.
 - **Drill to mastery** — every quiz and review (words *and* script shapes) keeps going
   until you answer **each item correctly twice in a row**. Miss one and its streak
   resets, and it comes back later in the same session — the quiz never ends, and never
@@ -102,4 +109,4 @@ home screen.
 
 ---
 
-*Last updated: reviews and quizzes now have three answer modes you can switch between (and the choice is remembered): type with the in-app Arabic keys, type with your phone's own Arabic keyboard, or answer by multiple choice. Applies to reviews, lessons, practice, and custom quizzes.*
+*Last updated: tapping an Arabic word now opens a detail page with a letter-by-letter breakdown (each letter shown in the exact shape it takes in that word, tappable through to its trace guide) plus a try-typing/Check box; the same breakdown and typing practice now appear while learning a new word; and there's a new Home setting to toggle auto-play pronunciation on or off.*
