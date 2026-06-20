@@ -85,7 +85,8 @@ home screen.
   guides. Every one of the four positional forms now shows **its own mastery % and a
   color bar** (green = solid, amber = improving, red = needs work, grey = not started),
   plus an overall % per letter — so you can see at a glance exactly which shapes still
-  need drilling.
+  need drilling. **Each form cell (iso / init / med / fin) is tappable** and opens the
+  trace guide right on that shape, so you can practice writing exactly the form you want.
 - **Quiz** — match letters to sounds with live score, accuracy, and streaks.
 - **Trace** — finger-trace letters over a soft ghost glyph on a 2×2 grid, with
   written stroke-order steps, plus a write-from-memory quiz mode.
@@ -94,8 +95,9 @@ home screen.
   and dagger-alef in the reference). Flip through illustrated cards (each mark shown on
   a dotted circle and on a carrier letter, with a real example word), then take a
   **pronunciation quiz**: see a marked letter and choose how it's read (بَ → "ba"), or
-  see a sound and choose how it's written ("ba" → بَ). The carrier letter varies and the
-  same drill-to-mastery loop applies — twice in a row to clear each mark.
+  see a sound and choose how it's written ("ba" → بَ). You can **🔊 hear the marked
+  letter** (the sound prompt and the answer reveal both play it), the carrier letter
+  varies, and the same drill-to-mastery loop applies — twice in a row to clear each mark.
 - **Marks explained in context** — anywhere a word is broken into letters (Items
   detail, lessons, and the answer shown after a quiz question), letters that carry a
   mark are highlighted, and a **"Marks in this word"** panel explains each one. Tapping
@@ -134,4 +136,4 @@ home screen.
 
 ---
 
-*Last updated: tapping a letter in a word's breakdown now opens its trace guide on the **exact positional shape it had in that word** — tap a letter shown in its final form and the guide opens on the final form (initial → initial, medial → medial, and so on), instead of always defaulting to the isolated shape.*
+*Last updated: the marks quiz now has a 🔊 pronunciation button on every card — the "how is this pronounced?" prompt, the "how is this written?" prompt, and the answer reveal all play the marked syllable (e.g. بَ → "ba").*

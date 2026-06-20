@@ -2279,13 +2279,15 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
           <>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>How is this pronounced?</div>
             <div style={{ fontFamily: arFont, fontSize: 64, color: T.gold, lineHeight: 1.2, marginTop: 10 }}>{q.g + cur.ch}</div>
-            <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 4 }}>the mark on it: <span style={{ fontFamily: arFont, fontSize: 18, color: T.text }}>{"\u25CC" + cur.ch}</span></div>
+            <div style={{ marginTop: 6 }}><Speaker text={q.g + cur.ch} color={T.terra} /></div>
+            <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 6 }}>the mark on it: <span style={{ fontFamily: arFont, fontSize: 18, color: T.text }}>{"\u25CC" + cur.ch}</span></div>
           </>
         ) : (
           <>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>How is this sound written?</div>
             <div style={{ fontFamily: displayFont, fontSize: 40, color: T.gold, marginTop: 8 }}>{curSound}<span style={{ fontSize: 15, color: T.textDim }}>{sukunNote(cur)}</span></div>
-            <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 4 }}>pick the right mark on <span style={{ fontFamily: arFont, fontSize: 18, color: T.text }}>{q.g}</span></div>
+            <div style={{ marginTop: 6 }}><Speaker text={q.g + cur.ch} color={T.terra} /></div>
+            <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 6 }}>pick the right mark on <span style={{ fontFamily: arFont, fontSize: 18, color: T.text }}>{q.g}</span></div>
           </>
         )}
       </div>
@@ -2313,6 +2315,7 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
         <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${correct ? T.green : T.red}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: correct ? T.green : T.red }}>{correct ? ((streak[cur.ch] || 0) >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — here's how it works:"}</div>
           <div style={{ fontSize: 20, color: T.text, marginTop: 6 }}><span style={{ fontFamily: arFont, fontSize: 30 }}>{q.g + cur.ch}</span> &nbsp;=&nbsp; <b style={{ color: T.gold }}>{curSound}</b>{sukunNote(cur)}</div>
+          <div style={{ marginTop: 6 }}><Speaker text={q.g + cur.ch} color={T.terra} /></div>
           <div style={{ fontSize: 12, color: T.textDim, marginTop: 6, lineHeight: 1.5 }}><b>{cur.name}</b> · {cur.info}</div>
         </div>
       )}
@@ -3575,8 +3578,9 @@ function Stat({ label, value, color }) {
 function ScriptView({ scriptState, setScript, autoReview, onAutoConsumed, customLetters, onCustomLetters }) {
   const [mode, setMode] = useState("train");
   const [traceIdx, setTraceIdx] = useState(0);
+  const [traceForm, setTraceForm] = useState("iso");
   const [traceReturn, setTraceReturn] = useState(null);
-  const openTrace = (idx) => { setTraceIdx(idx); setTraceReturn("learn"); setMode("trace"); };
+  const openTrace = (idx, form) => { setTraceIdx(idx); setTraceForm(form || "iso"); setTraceReturn("learn"); setMode("trace"); };
   return (
     <div className="fade" style={{ paddingTop: 6 }}>
       <div
@@ -3621,7 +3625,7 @@ function ScriptView({ scriptState, setScript, autoReview, onAutoConsumed, custom
       {mode === "learn" && <ScriptLearn onTrace={openTrace} prog={(scriptState && scriptState.progress) || {}} />}
       {mode === "marks" && <HarakatLessons harakat={(scriptState && scriptState.harakat) || {}} onLearned={(ch) => setScript({ ...scriptState, harakat: { ...((scriptState && scriptState.harakat) || {}), [ch]: true } })} />}
       {mode === "quiz" && <ScriptQuiz />}
-      {mode === "trace" && <ScriptTrace initialIdx={traceIdx} onBack={traceReturn ? () => { setMode(traceReturn); setTraceReturn(null); } : null} />}
+      {mode === "trace" && <ScriptTrace initialIdx={traceIdx} initialForm={traceForm} onBack={traceReturn ? () => { setMode(traceReturn); setTraceReturn(null); } : null} />}
     </div>
   );
 }
@@ -4431,8 +4435,11 @@ function ScriptLearn({ onTrace, prog = {} }) {
                 ].map(([k, code]) => {
                   const ci = cellInfo(code);
                   return (
-                    <div
+                    <button
                       key={k}
+                      className="tap"
+                      onClick={() => onTrace && onTrace(idx, code)}
+                      title={"Trace the " + k + " form"}
                       style={{
                         flex: 1,
                         textAlign: "center",
@@ -4441,19 +4448,20 @@ function ScriptLearn({ onTrace, prog = {} }) {
                         borderLeft: ci.color ? `3px solid ${ci.color}` : `1px solid ${T.line}`,
                         borderRadius: 9,
                         padding: "8px 2px",
+                        cursor: "pointer",
                       }}
                     >
                       <div style={{ fontFamily: arFont, fontSize: 26, color: T.text, direction: "rtl", minHeight: 32 }}>
                         {ci.glyph}
                       </div>
-                      <div style={{ fontSize: 9, color: T.textDim, marginTop: 3, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                        {k}
+                      <div style={{ fontSize: 9, color: T.gold, fontWeight: 700, marginTop: 3, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                        ✍️ {k}
                       </div>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 3, marginTop: 3 }}>
                         <span style={{ width: 6, height: 6, borderRadius: 999, background: ci.color || T.line }} />
                         <span style={{ fontSize: 9, color: ci.pct == null ? T.textDim : T.text, fontWeight: 600 }}>{ci.pct == null ? "—" : ci.pct + "%"}</span>
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
