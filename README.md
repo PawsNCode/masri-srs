@@ -64,6 +64,11 @@ home screen.
   due count, drills, and quizzes all work at the shape level. Three quiz styles: *see
   shape → pick sound*, *hear sound → type the letter*, and *hear sound → **write** the
   shape*, each showing which position is being tested.
+- **Focus a shape** — a filter (All / Iso / Init / Med / Fin) at the top of the script
+  menu lets you aim every quiz and drill at just one positional form, so you can grind
+  the shape you find hardest. The trace guide has the same filter, so you can practice
+  tracing only initials, only medials, and so on (one-way letters with no initial or
+  medial form are skipped automatically).
 - **Tracing quiz in the SRS** — the write-the-shape quiz is part of lessons and spaced
   review: write from memory, reveal, self-grade. A miss halves that shape's progress
   (same half-back rule as words) and re-queues it so you retake it.
@@ -109,4 +114,4 @@ home screen.
 
 ---
 
-*Last updated: tapping an Arabic word now opens a detail page with a letter-by-letter breakdown (each letter shown in the exact shape it takes in that word, tappable through to its trace guide) plus a try-typing/Check box; the same breakdown and typing practice now appear while learning a new word; and there's a new Home setting to toggle auto-play pronunciation on or off.*
+*Last updated: you can now focus the script on one positional shape — a new All / Iso / Init / Med / Fin filter on the script quiz menu aims every review, drill and custom quiz at just that form, and the trace guide has the same filter so you can practice tracing a single shape (initials only, medials only, etc.). One-way letters with no initial/medial form are skipped automatically.*

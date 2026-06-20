@@ -2799,6 +2799,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   const now = Date.now();
 
   const [mode, setMode] = useState("menu"); // menu | teach | quiz | done | select
+  const [formFilter, setFormFilter] = useState("all"); // all | iso | ini | med | fin
   const [teachQueue, setTeachQueue] = useState([]);
   const [tIdx, setTIdx] = useState(0);
   const [quizSet, setQuizSet] = useState([]);
@@ -2835,6 +2836,12 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   const unlearnedLetters = ALPHABET.filter((a) => !letterLearnedIn(prog, a[0]));
   const formsOfLetters = (rows) => SCRIPT_FORMS.filter((t) => rows.some((r) => r[0] === t[0]));
   const overallPct = SCRIPT_FORMS.length ? Math.round(SCRIPT_FORMS.reduce((s, t) => s + masteryPct(fpOf(t)), 0) / SCRIPT_FORMS.length) : 0;
+  // Filter a list of shape tokens by the chosen positional form (form code lives in the key, e.g. "ب:med").
+  const byForm = (list) => (formFilter === "all" ? list : list.filter((t) => t[5].split(":")[1] === formFilter));
+  const formLabel = formFilter === "all" ? "shapes" : FORM_LABEL[formFilter];
+  const dueF = byForm(dueArr);
+  const learnedF = byForm(learnedForms);
+  const troubleF = byForm(trouble);
 
   const saveProg = (key, np, newStreak) => {
     setScript({ ...ss, progress: { ...prog, [key]: np }, best: Math.max(ss.best || 0, newStreak || 0) });
@@ -2945,15 +2952,23 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
           <div style={{ fontSize: 12, color: T.textDim }}>{learnedForms.length} / {SCRIPT_FORMS.length} shapes learned · {mastered.length} mastered · {overallPct}% overall mastery</div>
         </div>
 
-        <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           <Stat label="Mastery" value={`${overallPct}%`} color={T.gold} />
           <Stat label="Shapes learned" value={learnedForms.length} color={T.terra} />
           <Stat label="Trouble" value={trouble.length} color={trouble.length ? T.red : T.textDim} />
         </div>
 
+        {/* focus on a positional shape */}
+        <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.6, color: T.goldSoft, margin: "2px 2px 7px" }}>Focus shape</div>
+        <div style={{ display: "flex", gap: 5, background: T.panelHi, border: `1px solid ${T.line}`, padding: 4, borderRadius: 12, marginBottom: 14 }}>
+          {[["all", "All"], ["iso", "Iso"], ["ini", "Init"], ["med", "Med"], ["fin", "Fin"]].map(([k, label]) => (
+            <button key={k} className="tap" onClick={() => setFormFilter(k)} style={{ flex: 1, border: "none", borderRadius: 8, padding: "8px 2px", fontSize: 12, fontWeight: 700, color: formFilter === k ? "#fff" : T.textDim, background: formFilter === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>{label}</button>
+          ))}
+        </div>
+
         {/* SRS due reviews — primary */}
-        <button className="tap" onClick={() => startQuiz(dueArr, true)} disabled={!dueArr.length} style={{ width: "100%", padding: 15, borderRadius: 14, marginBottom: 10, background: dueArr.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.panel, color: dueArr.length ? "#fff" : T.textDim, fontSize: 15, fontWeight: 700, boxShadow: dueArr.length ? "0 8px 20px rgba(128,29,92,.18)" : "none", border: dueArr.length ? "none" : `1px solid ${T.line}` }}>
-          {dueArr.length ? `Review due shapes (${dueArr.length}) →` : "No shapes due for review"}
+        <button className="tap" onClick={() => startQuiz(dueF, true)} disabled={!dueF.length} style={{ width: "100%", padding: 15, borderRadius: 14, marginBottom: 10, background: dueF.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.panel, color: dueF.length ? "#fff" : T.textDim, fontSize: 15, fontWeight: 700, boxShadow: dueF.length ? "0 8px 20px rgba(128,29,92,.18)" : "none", border: dueF.length ? "none" : `1px solid ${T.line}` }}>
+          {dueF.length ? `Review due ${formLabel} (${dueF.length}) →` : `No ${formLabel} due for review`}
         </button>
 
         <button className="tap" onClick={startLearn} disabled={!unlearnedLetters.length} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 10, border: `1px solid ${unlearnedLetters.length ? T.gold : T.line}`, background: unlearnedLetters.length ? `${T.gold}10` : T.panel, color: unlearnedLetters.length ? T.gold : T.textDim, fontSize: 14, fontWeight: 700 }}>
@@ -2964,12 +2979,12 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
           ★ Custom letter quiz {cl.length ? `(${cl.length})` : ""}
         </button>
 
-        <button className="tap" onClick={() => startQuiz(learnedForms, false)} disabled={!learnedForms.length} style={{ width: "100%", padding: 13, borderRadius: 13, marginBottom: 10, border: `1px solid ${learnedForms.length ? T.line : T.line}`, background: T.panel, color: learnedForms.length ? T.text : T.textDim, fontSize: 14, fontWeight: 700 }}>
-          ✨ Quiz all learned shapes
+        <button className="tap" onClick={() => startQuiz(learnedF, false)} disabled={!learnedF.length} style={{ width: "100%", padding: 13, borderRadius: 13, marginBottom: 10, border: `1px solid ${learnedF.length ? T.line : T.line}`, background: T.panel, color: learnedF.length ? T.text : T.textDim, fontSize: 14, fontWeight: 700 }}>
+          ✨ Quiz all learned {formLabel} {formFilter === "all" ? "" : `(${learnedF.length})`}
         </button>
 
-        <button className="tap" onClick={() => startQuiz(trouble, false)} disabled={!trouble.length} style={{ width: "100%", padding: 13, borderRadius: 13, border: `1px solid ${trouble.length ? T.red : T.line}`, background: trouble.length ? `${T.red}0f` : T.panel, color: trouble.length ? T.red : T.textDim, fontSize: 14, fontWeight: 700 }}>
-          🔁 Drill trouble shapes {trouble.length ? `(${trouble.length})` : ""}
+        <button className="tap" onClick={() => startQuiz(troubleF, false)} disabled={!troubleF.length} style={{ width: "100%", padding: 13, borderRadius: 13, border: `1px solid ${troubleF.length ? T.red : T.line}`, background: troubleF.length ? `${T.red}0f` : T.panel, color: troubleF.length ? T.red : T.textDim, fontSize: 14, fontWeight: 700 }}>
+          🔁 Drill trouble {formLabel} {troubleF.length ? `(${troubleF.length})` : ""}
         </button>
 
         {/* settings */}
@@ -3007,7 +3022,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     return (
       <div className="fade">
         <div style={{ fontFamily: displayFont, fontSize: 19, marginBottom: 4 }}>Custom letter quiz</div>
-        <div style={{ fontSize: 12.5, color: T.textDim, marginBottom: 12 }}>Tap any letter to add it — your picks are saved for next time.</div>
+        <div style={{ fontSize: 12.5, color: T.textDim, marginBottom: 12 }}>Tap any letter to add it — your picks are saved for next time.{formFilter !== "all" ? ` Quizzing the ${formLabel} shape only (set on the menu).` : ""}</div>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           <button className="tap" onClick={() => onCustomLetters(ALPHABET.filter((a) => letterLearnedIn(prog, a[0])).map((a) => a[0]))} style={{ flex: 1, padding: 10, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panel, color: T.text, fontSize: 12.5, fontWeight: 600 }}>Add all learned</button>
           <button className="tap" onClick={() => onCustomLetters([])} style={{ flex: 1, padding: 10, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panel, color: T.textDim, fontSize: 12.5, fontWeight: 600 }}>Clear</button>
@@ -3028,7 +3043,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
         <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, padding: "12px 18px calc(12px + env(safe-area-inset-bottom))", background: `linear-gradient(180deg, transparent, ${T.bg} 30%)` }}>
           <div style={{ maxWidth: 560, margin: "0 auto", display: "flex", gap: 8 }}>
             <button className="tap" onClick={() => setMode("menu")} style={{ padding: "13px 16px", borderRadius: 13, border: `1px solid ${T.line}`, background: T.panel, color: T.textDim, fontWeight: 600, fontSize: 13 }}>Back</button>
-            <button className="tap" onClick={() => startQuiz(formsOfLetters(selList), false)} disabled={!selList.length} style={{ flex: 1, padding: "13px 16px", borderRadius: 13, border: "none", background: selList.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: selList.length ? "#fff" : T.textDim, fontWeight: 700, fontSize: 14 }}>★ Start quiz ({selList.length})</button>
+            <button className="tap" onClick={() => startQuiz(byForm(formsOfLetters(selList)), false)} disabled={!selList.length} style={{ flex: 1, padding: "13px 16px", borderRadius: 13, border: "none", background: selList.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: selList.length ? "#fff" : T.textDim, fontWeight: 700, fontSize: 14 }}>★ Start quiz ({selList.length})</button>
           </div>
         </div>
       </div>
@@ -3560,6 +3575,8 @@ function ScriptTrace({ initialIdx, onBack }) {
   const [qIdx, setQIdx] = useState(() => Math.floor(Math.random() * ALPHABET.length));
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState({ right: 0, total: 0, streak: 0, best: 0 });
+  const [traceForm, setTraceForm] = useState("iso"); // all | iso | ini | med | fin
+  const [qForm, setQForm] = useState("iso"); // the form being quizzed this question
   const canvasRef = React.useRef(null);
   const drawing = React.useRef(false);
   const last = React.useRef(null);
@@ -3571,6 +3588,15 @@ function ScriptTrace({ initialIdx, onBack }) {
   const sk = STROKES[letter[0]];
   const guideOn = isQuiz ? revealed : showGuide;
   const showDetails = !isQuiz || revealed; // when to reveal name-shape details
+  // which positional shape is shown / traced
+  const effCode = isQuiz ? (traceForm === "all" ? qForm : traceForm) : (traceForm === "all" ? "iso" : traceForm);
+  const efForm = effForm(letter[0], effCode);
+  const traceShape = letterForms(letter[0])[efForm];
+  const formNm = FORM_LABEL[efForm];
+  const allIdx = ALPHABET.map((_, i) => i);
+  const connIdx = allIdx.filter((i) => !NONCONNECT.has(ALPHABET[i][0]));
+  const poolFor = (f) => (f === "ini" || f === "med" ? connIdx : allIdx);
+  const pickForm = (glyph, f) => { if (f !== "all") return f; const df = distinctForms(glyph); return df[Math.floor(Math.random() * df.length)]; };
 
   const setup = useCallback(() => {
     const c = canvasRef.current;
@@ -3602,10 +3628,10 @@ function ScriptTrace({ initialIdx, onBack }) {
     setStrokes(0);
   }, []);
 
-  // clear whenever the active letter or mode changes
+  // clear whenever the active letter, mode, or traced shape changes
   useEffect(() => {
     clear();
-  }, [activeIdx, tmode, clear]);
+  }, [activeIdx, tmode, efForm, clear]);
 
   const pos = (e) => {
     const c = canvasRef.current;
@@ -3638,13 +3664,11 @@ function ScriptTrace({ initialIdx, onBack }) {
   const nextQuiz = () => {
     setRevealed(false);
     clear();
-    setQIdx((prev) => {
-      let n;
-      do {
-        n = Math.floor(Math.random() * ALPHABET.length);
-      } while (n === prev && ALPHABET.length > 1);
-      return n;
-    });
+    const pool = poolFor(traceForm);
+    let n;
+    do { n = pool[Math.floor(Math.random() * pool.length)]; } while (n === qIdx && pool.length > 1);
+    setQIdx(n);
+    setQForm(pickForm(ALPHABET[n][0], traceForm));
   };
   const grade = (ok) => {
     setScore((s) => {
@@ -3663,7 +3687,13 @@ function ScriptTrace({ initialIdx, onBack }) {
     setTmode(m);
     setRevealed(false);
     clear();
-    if (m === "quiz") setQIdx(Math.floor(Math.random() * ALPHABET.length));
+    if (m === "quiz") { const pool = poolFor(traceForm); const n = pool[Math.floor(Math.random() * pool.length)]; setQIdx(n); setQForm(pickForm(ALPHABET[n][0], traceForm)); }
+  };
+  const setForm = (f) => {
+    setTraceForm(f);
+    setRevealed(false);
+    clear();
+    if (isQuiz) { const pool = poolFor(f); const n = pool[Math.floor(Math.random() * pool.length)]; setQIdx(n); setQForm(pickForm(ALPHABET[n][0], f)); }
   };
 
   const acc = score.total ? Math.round((score.right / score.total) * 100) : 0;
@@ -3711,7 +3741,16 @@ function ScriptTrace({ initialIdx, onBack }) {
         ))}
       </div>
 
-      {/* golden rules primer */}
+      {/* positional shape focus */}
+      <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.6, color: T.goldSoft, margin: "0 2px 7px" }}>Shape to {isQuiz ? "quiz" : "trace"}</div>
+      <div style={{ display: "flex", gap: 5, background: T.panelHi, border: `1px solid ${T.line}`, padding: 4, borderRadius: 12, marginBottom: 14 }}>
+        {[["all", "All"], ["iso", "Iso"], ["ini", "Init"], ["med", "Med"], ["fin", "Fin"]].map(([k, label]) => (
+          <button key={k} className="tap" onClick={() => setForm(k)} style={{ flex: 1, border: "none", borderRadius: 8, padding: "8px 2px", fontSize: 12, fontWeight: 700, color: traceForm === k ? "#fff" : T.textDim, background: traceForm === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>{label}</button>
+        ))}
+      </div>
+      {(traceForm === "ini" || traceForm === "med") && (
+        <div style={{ fontSize: 11, color: T.textDim, margin: "-8px 2px 14px", lineHeight: 1.5 }}>The six one-way letters (ا د ذ ر ز و) don't join on the left, so they have no {FORM_LABEL[traceForm]} form — they're skipped in quiz and show their nearest shape in practice.</div>
+      )}
       <div
         style={{
           background: T.panelHi,
@@ -3761,7 +3800,7 @@ function ScriptTrace({ initialIdx, onBack }) {
         <div style={{ flex: 1 }}>
           {isQuiz && !revealed && (
             <div style={{ fontSize: 11, color: T.terra, fontWeight: 700, letterSpacing: 0.4, marginBottom: 3 }}>
-              WRITE THIS LETTER FROM MEMORY
+              WRITE THE {formNm.toUpperCase()} SHAPE FROM MEMORY
             </div>
           )}
           <div style={{ fontSize: 16, color: T.text, fontWeight: 600 }}>
@@ -3769,9 +3808,11 @@ function ScriptTrace({ initialIdx, onBack }) {
             <span style={{ color: T.goldSoft, fontStyle: "italic", fontWeight: 400 }}>
               · {letter[2]}
             </span>
+            <span style={{ marginInlineStart: 8, fontSize: 10.5, fontWeight: 700, color: T.gold, border: `1px solid ${T.gold}55`, borderRadius: 999, padding: "1px 8px", textTransform: "uppercase", letterSpacing: 0.4 }}>{formNm}</span>
           </div>
           {showDetails && (
             <>
+              <div style={{ fontSize: 12, color: T.textDim, marginTop: 4 }}>This shape: <span style={{ fontFamily: arFont, fontSize: 20, color: T.text }}>{traceShape}</span></div>
               <div style={{ fontSize: 12, color: T.textDim, marginTop: 2 }}>{letter[3]}</div>
               {sk && (
                 <div style={{ fontSize: 12.5, color: T.gold, marginTop: 5, lineHeight: 1.5 }}>
@@ -3803,7 +3844,7 @@ function ScriptTrace({ initialIdx, onBack }) {
         }}
       >
         {/* letter ghost + 2×2 grid + numbered stroke-order guide (anchored to the glyph) */}
-        <GuideOverlay glyph={letter[0]} show={guideOn} />
+        <GuideOverlay glyph={traceShape} show={guideOn} />
         <canvas
           ref={canvasRef}
           onMouseDown={start}
