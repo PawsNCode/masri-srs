@@ -91,10 +91,10 @@ home screen.
 - **Marks (harakat)** — a dedicated section that teaches the short-vowel and helper
   marks: **fatha, kasra, damma, sukun, shadda** and the **tanwin** endings (plus madda
   and dagger-alef in the reference). Flip through illustrated cards (each mark shown on
-  a dotted circle and on a carrier letter), **tap 🔊 to hear the mark pronounced** — the
-  vowel marks are spoken on a carrier (بَ, بِ, بُ…) and sukun/shadda through a real
-  example word — then take a **multiple-choice quiz** that runs the same drill-to-mastery
-  loop (name the mark, or pick the mark for a given sound, twice in a row to clear it).
+  a dotted circle and on a carrier letter, with a real example word), then take a
+  **pronunciation quiz**: see a marked letter and choose how it's read (بَ → "ba"), or
+  see a sound and choose how it's written ("ba" → بَ). The carrier letter varies and the
+  same drill-to-mastery loop applies — twice in a row to clear each mark.
 - **Marks explained in context** — anywhere a word is broken into letters (Items
   detail, lessons, and the answer shown after a quiz question), letters that carry a
   mark are highlighted, and a **"Marks in this word"** panel explains each one. Tapping
@@ -133,4 +133,4 @@ home screen.
 
 ---
 
-*Last updated: every haraka mark is now pronounceable (🔊 on each mark card, in the marks lesson, and in the marks quiz — vowels spoken on a carrier like بَ/بِ/بُ, sukun and shadda via an example word). The on-screen Arabic keyboard is now hidden by default in every typing spot (quizzes, reviews, the script type-quiz, and the try-typing boxes) and only appears via a toggle, and the Check button now sits directly under the input so it's visible right away instead of below the keyboard.*
+*Last updated: removed the spoken pronunciation of the harakat marks, and reworked the marks quiz to test reading instead — it now shows a marked letter and asks how it's pronounced (بَ → "ba"), or shows a sound and asks how it's written ("ba" → بَ), with the carrier letter varying each question.*

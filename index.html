@@ -224,12 +224,6 @@ const HARAKAT_EXAMPLES = {
   "\u064B": ["شُكْرًا", "shukran", "thank you"],
 };
 function isHaraka(ch) { return Object.prototype.hasOwnProperty.call(HARAKAT, ch); }
-// what to speak to demo a mark: vowels on a ب carrier; sukun/shadda use their example word
-function haraSay(m) {
-  if ((m.ch === "\u0652" || m.ch === "\u0651") && HARAKAT_EXAMPLES[m.ch]) return HARAKAT_EXAMPLES[m.ch][0];
-  if (m.ch === "\u0653") return "\u0622"; // madda → آ
-  return "\u0628" + m.ch; // ب + the mark
-}
 
 function breakWord(ar) {
   const chars = Array.from(ar || "");
@@ -2072,7 +2066,6 @@ function MarkCard({ mark }) {
         <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>{mark.name} <span style={{ color: T.goldSoft, fontStyle: "italic", fontWeight: 400 }}>· {mark.tr}</span></div>
         <div style={{ fontSize: 12, color: T.textDim, marginTop: 3, lineHeight: 1.5 }}>{mark.info}</div>
       </div>
-      <div style={{ flexShrink: 0 }}><Speaker text={haraSay(mark)} size={16} color={T.terra} /></div>
     </div>
   );
 }
@@ -2145,7 +2138,7 @@ function ItemDetail({ item, onClose, autoPlay }) {
 function HarakatLessons({ harakat = {}, onLearned }) {
   const [phase, setPhase] = useState("menu");
   const all = HARAKAT_LIST.map((c) => HARAKAT[c]);
-  const quizMarks = HARAKAT_LIST.slice(0, 6).map((c) => HARAKAT[c]);
+  const quizMarks = ["\u064E", "\u0650", "\u064F", "\u0652", "\u064B", "\u064D", "\u064C"].map((c) => HARAKAT[c]);
   const learnedCount = HARAKAT_LIST.filter((c) => harakat[c]).length;
 
   if (phase === "learn") return <HarakatLearn marks={all} onDone={() => setPhase("menu")} onLearned={onLearned} />;
@@ -2190,13 +2183,11 @@ function HarakatLearn({ marks, onDone, onLearned }) {
         </div>
         <div style={{ fontFamily: displayFont, fontSize: 22, color: T.text }}>{m.name} <span style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 17 }}>· {m.tr}</span></div>
         <div style={{ fontSize: 13, color: T.textDim, marginTop: 8, lineHeight: 1.6 }}>{m.info}</div>
-        <div style={{ marginTop: 10 }}><Speaker text={haraSay(m)} size={20} color={T.gold} /></div>
         {ex && (
           <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${T.line}` }}>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.8, color: T.goldSoft, marginBottom: 4 }}>Example</div>
             <div style={{ fontFamily: arFont, fontSize: 30, color: T.text, direction: "rtl" }}>{ex[0]}</div>
             <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 14 }}>{ex[1]} — {ex[2]}</div>
-            <div style={{ marginTop: 6 }}><Speaker text={ex[0]} color={T.terra} /></div>
           </div>
         )}
       </div>
@@ -2213,19 +2204,20 @@ function HarakatLearn({ marks, onDone, onLearned }) {
   );
 }
 
-const harakaRole = (m) =>
-  m.ch === "\u0652" ? "“no vowel” (a silent consonant)" :
-  m.ch === "\u0651" ? "a doubled / stressed consonant" :
-  m.ch === "\u064B" ? "the “-an” ending (tanwin)" :
-  m.ch === "\u064D" ? "the “-in” ending (tanwin)" :
-  m.ch === "\u064C" ? "the “-un” ending (tanwin)" :
-  `the short “${m.tr}” sound`;
+// vowel each mark adds to a carrier consonant (sukun adds none)
+const HARA_VOWEL = { "\u064E": "a", "\u0650": "i", "\u064F": "u", "\u0652": "", "\u064B": "an", "\u064D": "in", "\u064C": "un" };
+const QUIZ_CARRIERS = [["ب", "b"], ["ت", "t"], ["د", "d"], ["ر", "r"], ["س", "s"], ["ك", "k"], ["ل", "l"], ["م", "m"], ["ن", "n"], ["ف", "f"]];
+function carrierSound(consonant, markCh) { const v = HARA_VOWEL[markCh]; return v ? consonant + v : consonant; }
+function sukunNote(mk) { return mk && mk.ch === "\u0652" ? " (no vowel)" : ""; }
 
+// Quiz: match a marked letter to how it's pronounced, and vice-versa.
 function HarakatQuiz({ marks, onDone, onLearned }) {
   const makeQ = (ans) => {
-    const dir = Math.random() < 0.5 ? "name" : "mark";
+    const [g, c] = QUIZ_CARRIERS[Math.floor(Math.random() * QUIZ_CARRIERS.length)];
+    const dir = Math.random() < 0.5 ? "read" : "write";
     const distract = shuffle(marks.filter((x) => x.ch !== ans.ch)).slice(0, 3);
-    return { dir, answer: ans, options: shuffle([ans, ...distract]) };
+    const options = shuffle([ans, ...distract]).map((mk) => ({ mark: mk, sound: carrierSound(c, mk.ch), written: g + mk.ch }));
+    return { dir, g, c, answer: ans, options };
   };
   const [queue, setQueue] = useState(() => shuffle(marks));
   const [streak, setStreak] = useState({});
@@ -2242,15 +2234,13 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
     if (feedback) return;
     setPick(opt);
     setFeedback(true);
-    const ok = opt.ch === cur.ch;
+    const ok = opt.mark.ch === cur.ch;
     setStreak((s) => ({ ...s, [cur.ch]: ok ? (s[cur.ch] || 0) + 1 : 0 }));
     if (ok && (streak[cur.ch] || 0) + 1 >= 2 && onLearned) onLearned(cur.ch);
   };
   const next = () => {
     const st = streak[cur.ch] || 0;
-    let nq;
-    if (st >= 2) nq = queue.slice(1);
-    else nq = [...queue.slice(1), cur];
+    const nq = st >= 2 ? queue.slice(1) : [...queue.slice(1), cur];
     setFeedback(false);
     setPick(null);
     if (nq.length === 0) { setDone(true); return; }
@@ -2264,14 +2254,15 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
       <div className="fade pop" style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
         <div style={{ fontSize: 38, marginBottom: 8 }}>🎉</div>
         <div style={{ fontFamily: displayFont, fontSize: 22 }}>Marks mastered!</div>
-        <div style={{ color: T.textDim, fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>You named every mark right twice in a row.</div>
+        <div style={{ color: T.textDim, fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>You matched every mark to its sound right twice in a row.</div>
         <button className="tap" onClick={retake} style={{ width: "100%", marginTop: 18, padding: 13, borderRadius: 13, border: `1px solid ${T.gold}`, background: `${T.gold}10`, color: T.gold, fontWeight: 700 }}>🔁 Retake</button>
         <button className="tap" onClick={onDone} style={{ width: "100%", marginTop: 10, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back to marks menu</button>
       </div>
     );
   }
   if (!q) return null;
-  const correct = feedback && pick && pick.ch === cur.ch;
+  const correct = feedback && pick && pick.mark.ch === cur.ch;
+  const curSound = carrierSound(q.c, cur.ch);
 
   return (
     <div className="fade">
@@ -2284,17 +2275,17 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
       </div>
 
       <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "24px 18px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
-        {q.dir === "name" ? (
+        {q.dir === "read" ? (
           <>
-            <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>What is this mark?</div>
-            <div style={{ fontFamily: arFont, fontSize: 64, color: T.gold, lineHeight: 1.1, marginTop: 10 }}>{"\u25CC" + cur.ch}</div>
-            <div style={{ fontFamily: arFont, fontSize: 30, color: T.textDim, marginTop: 2 }}>{"\u0628" + cur.ch}</div>
-            <div style={{ marginTop: 8 }}><Speaker text={haraSay(cur)} size={18} color={T.terra} /></div>
+            <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>How is this pronounced?</div>
+            <div style={{ fontFamily: arFont, fontSize: 64, color: T.gold, lineHeight: 1.2, marginTop: 10 }}>{q.g + cur.ch}</div>
+            <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 4 }}>the mark on it: <span style={{ fontFamily: arFont, fontSize: 18, color: T.text }}>{"\u25CC" + cur.ch}</span></div>
           </>
         ) : (
           <>
-            <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>Pick the mark</div>
-            <div style={{ fontFamily: displayFont, fontSize: 22, color: T.text, marginTop: 10, lineHeight: 1.4 }}>Which mark gives {harakaRole(cur)}?</div>
+            <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>How is this sound written?</div>
+            <div style={{ fontFamily: displayFont, fontSize: 40, color: T.gold, marginTop: 8 }}>{curSound}<span style={{ fontSize: 15, color: T.textDim }}>{sukunNote(cur)}</span></div>
+            <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 4 }}>pick the right mark on <span style={{ fontFamily: arFont, fontSize: 18, color: T.text }}>{q.g}</span></div>
           </>
         )}
       </div>
@@ -2303,15 +2294,15 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
         {q.options.map((opt, idx) => {
           let bg = T.panel, border = T.line, col = T.text;
           if (feedback) {
-            if (opt.ch === cur.ch) { bg = `${T.green}1a`; border = T.green; col = T.gold; }
-            else if (pick && opt.ch === pick.ch) { bg = `${T.red}1a`; border = T.red; col = T.red; }
+            if (opt.mark.ch === cur.ch) { bg = `${T.green}1a`; border = T.green; col = T.gold; }
+            else if (pick && opt.mark.ch === pick.mark.ch) { bg = `${T.red}1a`; border = T.red; col = T.red; }
           }
           return (
-            <button key={idx} className="tap" onClick={() => choose(opt)} disabled={feedback} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 14, padding: "14px 8px", cursor: feedback ? "default" : "pointer", minHeight: 60, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
-              {q.dir === "name" ? (
-                <span style={{ fontSize: 14, fontWeight: 700, color: col }}>{opt.name} <span style={{ color: T.goldSoft, fontWeight: 400, fontStyle: "italic" }}>· {opt.tr}</span></span>
+            <button key={idx} className="tap" onClick={() => choose(opt)} disabled={feedback} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 14, padding: "16px 8px", cursor: feedback ? "default" : "pointer", minHeight: 62, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {q.dir === "read" ? (
+                <span style={{ fontFamily: displayFont, fontSize: 22, fontWeight: 700, color: col }}>{opt.sound}<span style={{ fontSize: 11, color: T.textDim }}>{sukunNote(opt.mark)}</span></span>
               ) : (
-                <span style={{ fontFamily: arFont, fontSize: 34, color: col }}>{"\u25CC" + opt.ch}</span>
+                <span style={{ fontFamily: arFont, fontSize: 40, color: col }}>{opt.written}</span>
               )}
             </button>
           );
@@ -2320,10 +2311,9 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
 
       {feedback && (
         <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${correct ? T.green : T.red}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: correct ? T.green : T.red }}>{correct ? ((streak[cur.ch] || 0) >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — it's:"}</div>
-          <div style={{ fontSize: 14, color: T.text, marginTop: 4 }}>{"\u25CC" + cur.ch} &nbsp; <b>{cur.name}</b> · {cur.tr}</div>
-          <div style={{ fontSize: 12, color: T.textDim, marginTop: 4, lineHeight: 1.5 }}>{cur.info}</div>
-          <div style={{ marginTop: 6 }}><Speaker text={haraSay(cur)} size={16} color={T.terra} /></div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: correct ? T.green : T.red }}>{correct ? ((streak[cur.ch] || 0) >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — here's how it works:"}</div>
+          <div style={{ fontSize: 20, color: T.text, marginTop: 6 }}><span style={{ fontFamily: arFont, fontSize: 30 }}>{q.g + cur.ch}</span> &nbsp;=&nbsp; <b style={{ color: T.gold }}>{curSound}</b>{sukunNote(cur)}</div>
+          <div style={{ fontSize: 12, color: T.textDim, marginTop: 6, lineHeight: 1.5 }}><b>{cur.name}</b> · {cur.info}</div>
         </div>
       )}
 
@@ -2333,7 +2323,7 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
         </button>
       )}
       <button className="tap" onClick={onDone} style={{ width: "100%", marginTop: 8, padding: 10, borderRadius: 12, border: "none", background: "transparent", color: T.textDim, fontSize: 12 }}>End — back to marks menu</button>
-      <div style={{ textAlign: "center", fontSize: 11, color: T.textDim, marginTop: 10, lineHeight: 1.6 }}>Answer each mark correctly <b style={{ color: T.text }}>twice in a row</b> to clear it.</div>
+      <div style={{ textAlign: "center", fontSize: 11, color: T.textDim, marginTop: 10, lineHeight: 1.6 }}>Match the mark to how it's pronounced — get each one right <b style={{ color: T.text }}>twice in a row</b> to clear it.</div>
     </div>
   );
 }
