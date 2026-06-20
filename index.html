@@ -224,6 +224,12 @@ const HARAKAT_EXAMPLES = {
   "\u064B": ["شُكْرًا", "shukran", "thank you"],
 };
 function isHaraka(ch) { return Object.prototype.hasOwnProperty.call(HARAKAT, ch); }
+// Normalize a stored mark progress: object as-is, legacy `true` → a minimal learned progress, else null.
+function markProg(v) {
+  if (!v) return null;
+  if (typeof v === "object") return v;
+  return { stage: 1, correct: 0, wrong: 0, recentWrong: 0 };
+}
 
 function breakWord(ar) {
   const chars = Array.from(ar || "");
@@ -2054,8 +2060,10 @@ function TypeTry({ item, compact }) {
   );
 }
 
-// Explanation card for a single haraka mark.
-function MarkCard({ mark }) {
+// Explanation card for a single haraka mark. Pass showMastery to display its mastery %.
+function MarkCard({ mark, prog, showMastery }) {
+  const pct = prog ? masteryPct(prog) : null;
+  const color = masteryColor(prog) || T.line;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, background: T.panel, border: `1px solid ${T.line}`, borderRadius: 14, padding: "12px 14px" }}>
       <div style={{ flexShrink: 0, width: 52, textAlign: "center" }}>
@@ -2065,6 +2073,14 @@ function MarkCard({ mark }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>{mark.name} <span style={{ color: T.goldSoft, fontStyle: "italic", fontWeight: 400 }}>· {mark.tr}</span></div>
         <div style={{ fontSize: 12, color: T.textDim, marginTop: 3, lineHeight: 1.5 }}>{mark.info}</div>
+        {showMastery && (
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+            <div style={{ flex: 1, height: 4, background: T.line, borderRadius: 4, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${pct || 0}%`, background: color, transition: "width .3s ease" }} />
+            </div>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: prog ? color : T.textDim, minWidth: 50, textAlign: "right" }}>{pct == null ? "not started" : pct + "%"}</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2135,14 +2151,21 @@ function ItemDetail({ item, onClose, autoPlay }) {
 }
 
 /* ===================== HARAKAT (marks) LESSONS + QUIZ ===================== */
-function HarakatLessons({ harakat = {}, onLearned }) {
+function HarakatLessons({ harakat = {}, onSetMark }) {
   const [phase, setPhase] = useState("menu");
   const all = HARAKAT_LIST.map((c) => HARAKAT[c]);
   const quizMarks = ["\u064E", "\u0650", "\u064F", "\u0652", "\u064B", "\u064D", "\u064C"].map((c) => HARAKAT[c]);
-  const learnedCount = HARAKAT_LIST.filter((c) => harakat[c]).length;
+  const progOf = (ch) => markProg(harakat[ch]);
+  const coreChars = ["\u064E", "\u0650", "\u064F", "\u0652", "\u064B", "\u064D", "\u064C"];
+  const startedCount = coreChars.filter((c) => progOf(c)).length;
+  const overallPct = Math.round(coreChars.reduce((s, c) => s + masteryPct(progOf(c)), 0) / coreChars.length);
 
-  if (phase === "learn") return <HarakatLearn marks={all} onDone={() => setPhase("menu")} onLearned={onLearned} />;
-  if (phase === "quiz") return <HarakatQuiz marks={quizMarks} onDone={() => setPhase("menu")} onLearned={onLearned} />;
+  // SRS transitions for marks (stored in scriptState.harakat)
+  const onLearn = (ch) => { if (onSetMark && !progOf(ch)) onSetMark(ch, learnItem(Date.now())); };
+  const onGrade = (ch, correct) => { if (onSetMark) onSetMark(ch, reviewSchedule(progOf(ch), correct, Date.now())); };
+
+  if (phase === "learn") return <HarakatLearn marks={all} onDone={() => setPhase("menu")} onLearn={onLearn} />;
+  if (phase === "quiz") return <HarakatQuiz marks={quizMarks} harakat={harakat} onDone={() => setPhase("menu")} onGrade={onGrade} />;
 
   return (
     <div className="fade" style={{ paddingTop: 4 }}>
@@ -2151,25 +2174,26 @@ function HarakatLessons({ harakat = {}, onLearned }) {
         <div style={{ fontSize: 12.5, color: T.textDim, marginTop: 4, lineHeight: 1.6 }}>
           Harakat are the little marks that show the short vowels and a few other sounds. Everyday Arabic usually leaves them out, but they're worth knowing — they appear in the Qurʼan, in children's books, in dictionaries, and whenever a word would otherwise be ambiguous.
         </div>
-        <div style={{ marginTop: 12, fontSize: 12, color: T.textDim }}>{learnedCount} / {HARAKAT_LIST.length} marks seen</div>
+        <div style={{ margin: "14px 0 6px" }}><Bar pct={overallPct / 100} /></div>
+        <div style={{ fontSize: 12, color: T.textDim }}>{startedCount} / {coreChars.length} marks started · {overallPct}% overall mastery</div>
       </div>
 
       <button className="tap" onClick={() => setPhase("learn")} style={{ width: "100%", padding: 15, borderRadius: 14, marginBottom: 10, background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700, boxShadow: "0 8px 20px rgba(128,29,92,.18)", border: "none" }}>📖 Learn the marks</button>
       <button className="tap" onClick={() => setPhase("quiz")} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 16, border: `1px solid ${T.gold}`, background: `${T.gold}10`, color: T.gold, fontSize: 14, fontWeight: 700 }}>✨ Quiz the marks</button>
 
-      <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 10px" }}>Quick reference</div>
+      <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 10px" }}>Quick reference · mastery</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {all.map((m, i) => <MarkCard key={i} mark={m} />)}
+        {all.map((m, i) => <MarkCard key={i} mark={m} prog={progOf(m.ch)} showMastery />)}
       </div>
     </div>
   );
 }
 
-function HarakatLearn({ marks, onDone, onLearned }) {
+function HarakatLearn({ marks, onDone, onLearn }) {
   const [i, setI] = useState(0);
   const m = marks[i];
   const ex = HARAKAT_EXAMPLES[m.ch];
-  useEffect(() => { if (onLearned) onLearned(m.ch); /* eslint-disable-next-line */ }, [i]);
+  useEffect(() => { if (onLearn) onLearn(m.ch); /* eslint-disable-next-line */ }, [i]);
   return (
     <div className="fade">
       <div style={{ height: 4, background: T.line, borderRadius: 4, overflow: "hidden", marginBottom: 14 }}>
@@ -2211,7 +2235,7 @@ function carrierSound(consonant, markCh) { const v = HARA_VOWEL[markCh]; return 
 function sukunNote(mk) { return mk && mk.ch === "\u0652" ? " (no vowel)" : ""; }
 
 // Quiz: match a marked letter to how it's pronounced, and vice-versa.
-function HarakatQuiz({ marks, onDone, onLearned }) {
+function HarakatQuiz({ marks, onDone, onGrade }) {
   const makeQ = (ans) => {
     const [g, c] = QUIZ_CARRIERS[Math.floor(Math.random() * QUIZ_CARRIERS.length)];
     const dir = Math.random() < 0.5 ? "read" : "write";
@@ -2221,6 +2245,7 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
   };
   const [queue, setQueue] = useState(() => shuffle(marks));
   const [streak, setStreak] = useState({});
+  const [missed, setMissed] = useState({}); // ever missed this session
   const [q, setQ] = useState(() => (marks.length ? makeQ(shuffle(marks)[0]) : null));
   const [pick, setPick] = useState(null);
   const [feedback, setFeedback] = useState(false);
@@ -2236,7 +2261,9 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
     setFeedback(true);
     const ok = opt.mark.ch === cur.ch;
     setStreak((s) => ({ ...s, [cur.ch]: ok ? (s[cur.ch] || 0) + 1 : 0 }));
-    if (ok && (streak[cur.ch] || 0) + 1 >= 2 && onLearned) onLearned(cur.ch);
+    if (!ok) setMissed((m) => ({ ...m, [cur.ch]: true }));
+    // graduate (twice in a row) → grade into the SRS once, counting a miss if it ever slipped
+    if (ok && (streak[cur.ch] || 0) + 1 >= 2 && onGrade) onGrade(cur.ch, !missed[cur.ch]);
   };
   const next = () => {
     const st = streak[cur.ch] || 0;
@@ -2247,7 +2274,7 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
     setQueue(nq);
     setQ(makeQ(nq[0]));
   };
-  const retake = () => { const s = shuffle(marks); setQueue(s); setStreak({}); setQ(makeQ(s[0])); setPick(null); setFeedback(false); setDone(false); };
+  const retake = () => { const s = shuffle(marks); setQueue(s); setStreak({}); setMissed({}); setQ(makeQ(s[0])); setPick(null); setFeedback(false); setDone(false); };
 
   if (done) {
     return (
@@ -2279,14 +2306,12 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
           <>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>How is this pronounced?</div>
             <div style={{ fontFamily: arFont, fontSize: 64, color: T.gold, lineHeight: 1.2, marginTop: 10 }}>{q.g + cur.ch}</div>
-            <div style={{ marginTop: 6 }}><Speaker text={q.g + cur.ch} color={T.terra} /></div>
             <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 6 }}>the mark on it: <span style={{ fontFamily: arFont, fontSize: 18, color: T.text }}>{"\u25CC" + cur.ch}</span></div>
           </>
         ) : (
           <>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>How is this sound written?</div>
             <div style={{ fontFamily: displayFont, fontSize: 40, color: T.gold, marginTop: 8 }}>{curSound}<span style={{ fontSize: 15, color: T.textDim }}>{sukunNote(cur)}</span></div>
-            <div style={{ marginTop: 6 }}><Speaker text={q.g + cur.ch} color={T.terra} /></div>
             <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 6 }}>pick the right mark on <span style={{ fontFamily: arFont, fontSize: 18, color: T.text }}>{q.g}</span></div>
           </>
         )}
@@ -2315,7 +2340,6 @@ function HarakatQuiz({ marks, onDone, onLearned }) {
         <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${correct ? T.green : T.red}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: correct ? T.green : T.red }}>{correct ? ((streak[cur.ch] || 0) >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — here's how it works:"}</div>
           <div style={{ fontSize: 20, color: T.text, marginTop: 6 }}><span style={{ fontFamily: arFont, fontSize: 30 }}>{q.g + cur.ch}</span> &nbsp;=&nbsp; <b style={{ color: T.gold }}>{curSound}</b>{sukunNote(cur)}</div>
-          <div style={{ marginTop: 6 }}><Speaker text={q.g + cur.ch} color={T.terra} /></div>
           <div style={{ fontSize: 12, color: T.textDim, marginTop: 6, lineHeight: 1.5 }}><b>{cur.name}</b> · {cur.info}</div>
         </div>
       )}
@@ -3623,7 +3647,7 @@ function ScriptView({ scriptState, setScript, autoReview, onAutoConsumed, custom
       </div>
       {mode === "train" && <ScriptTrain scriptState={scriptState} setScript={setScript} autoReview={autoReview} onAutoConsumed={onAutoConsumed} customLetters={customLetters || []} onCustomLetters={onCustomLetters} />}
       {mode === "learn" && <ScriptLearn onTrace={openTrace} prog={(scriptState && scriptState.progress) || {}} />}
-      {mode === "marks" && <HarakatLessons harakat={(scriptState && scriptState.harakat) || {}} onLearned={(ch) => setScript({ ...scriptState, harakat: { ...((scriptState && scriptState.harakat) || {}), [ch]: true } })} />}
+      {mode === "marks" && <HarakatLessons harakat={(scriptState && scriptState.harakat) || {}} onSetMark={(ch, prog) => setScript({ ...scriptState, harakat: { ...((scriptState && scriptState.harakat) || {}), [ch]: prog } })} />}
       {mode === "quiz" && <ScriptQuiz />}
       {mode === "trace" && <ScriptTrace initialIdx={traceIdx} initialForm={traceForm} onBack={traceReturn ? () => { setMode(traceReturn); setTraceReturn(null); } : null} />}
     </div>

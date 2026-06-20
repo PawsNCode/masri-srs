@@ -95,9 +95,11 @@ home screen.
   and dagger-alef in the reference). Flip through illustrated cards (each mark shown on
   a dotted circle and on a carrier letter, with a real example word), then take a
   **pronunciation quiz**: see a marked letter and choose how it's read (بَ → "ba"), or
-  see a sound and choose how it's written ("ba" → بَ). You can **🔊 hear the marked
-  letter** (the sound prompt and the answer reveal both play it), the carrier letter
-  varies, and the same drill-to-mastery loop applies — twice in a row to clear each mark.
+  see a sound and choose how it's written ("ba" → بَ). The carrier letter varies and the
+  same drill-to-mastery loop applies — twice in a row to clear each mark. Every mark now
+  carries its **own mastery %** (a color bar on each reference card, plus an overall
+  mastery figure for the section), so progress on the marks is tracked just like words
+  and letter shapes.
 - **Marks explained in context** — anywhere a word is broken into letters (Items
   detail, lessons, and the answer shown after a quiz question), letters that carry a
   mark are highlighted, and a **"Marks in this word"** panel explains each one. Tapping
@@ -136,4 +138,4 @@ home screen.
 
 ---
 
-*Last updated: the marks quiz now has a 🔊 pronunciation button on every card — the "how is this pronounced?" prompt, the "how is this written?" prompt, and the answer reveal all play the marked syllable (e.g. بَ → "ba").*
+*Last updated: removed the marks-quiz audio (the text-to-speech for marked syllables was unreliable), and gave the **marks their own mastery %** — each reference card shows a color-coded mastery bar, the marks section shows an overall mastery figure, and the quiz now feeds an SRS score per mark. Mastery percentages now appear on everything learnable: words (Items), letter shapes (Chart: iso / init / med / fin and per-letter), and the marks.*
