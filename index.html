@@ -198,26 +198,82 @@ const LETTER_VARIANTS = {
 function isArabicLetter(ch) { return /[\u0621-\u064A\u0671]/.test(ch); }
 function alphaIndexOf(glyph) { return ALPHABET.findIndex((a) => a[0] === glyph); }
 function canJoinLeft(ch) { return isArabicLetter(ch) && !NOLEFTJOIN.has(ch); }
+
+/* ---- Harakat (the short-vowel & helper marks) ----
+   These are combining marks that sit on a letter rather than standing alone. */
+const HARAKAT = {
+  "\u064E": { ch: "\u064E", name: "Fatha", tr: "a", info: "A short “a” sound. Written as a small diagonal stroke above the letter." },
+  "\u0650": { ch: "\u0650", name: "Kasra", tr: "i", info: "A short “i”/“e” sound. Written as a small diagonal stroke below the letter." },
+  "\u064F": { ch: "\u064F", name: "Damma", tr: "u", info: "A short “u”/“o” sound. Written as a tiny waw (و) above the letter." },
+  "\u0652": { ch: "\u0652", name: "Sukun", tr: "(none)", info: "Means “no vowel” — the consonant has no vowel after it. A small circle above the letter." },
+  "\u0651": { ch: "\u0651", name: "Shadda", tr: "(double)", info: "Doubles the consonant — you hold or stress it. A small “w”-shaped mark above the letter." },
+  "\u064B": { ch: "\u064B", name: "Fathatan", tr: "an", info: "Tanwin “-an” ending (nunation). Two strokes above; common in MSA, rarely written in spoken Masri." },
+  "\u064D": { ch: "\u064D", name: "Kasratan", tr: "in", info: "Tanwin “-in” ending. Two strokes below the letter." },
+  "\u064C": { ch: "\u064C", name: "Dammatan", tr: "un", info: "Tanwin “-un” ending. A doubled damma above the letter." },
+  "\u0653": { ch: "\u0653", name: "Madda", tr: "aa", info: "A long “aa” glide, drawn as a wavy line — most often on alef, giving آ." },
+  "\u0670": { ch: "\u0670", name: "Dagger alef", tr: "aa", info: "A miniature vertical alef standing in for a long “aa” (e.g. in هٰذا)." },
+};
+// teaching order: the everyday core first, then tanwin/rare
+const HARAKAT_LIST = ["\u064E", "\u0650", "\u064F", "\u0652", "\u0651", "\u064B", "\u064D", "\u064C", "\u0670"];
+const HARAKAT_EXAMPLES = {
+  "\u064E": ["كَلب", "kalb", "dog"],
+  "\u0650": ["بِنت", "bint", "girl"],
+  "\u064F": ["كُتُب", "kutub", "books"],
+  "\u0652": ["مِشْ", "mish", "not"],
+  "\u0651": ["جَوّ", "gaww", "weather / vibe"],
+  "\u064B": ["شُكْرًا", "shukran", "thank you"],
+};
+function isHaraka(ch) { return Object.prototype.hasOwnProperty.call(HARAKAT, ch); }
+// what to speak to demo a mark: vowels on a ب carrier; sukun/shadda use their example word
+function haraSay(m) {
+  if ((m.ch === "\u0652" || m.ch === "\u0651") && HARAKAT_EXAMPLES[m.ch]) return HARAKAT_EXAMPLES[m.ch][0];
+  if (m.ch === "\u0653") return "\u0622"; // madda → آ
+  return "\u0628" + m.ch; // ب + the mark
+}
+
 function breakWord(ar) {
   const chars = Array.from(ar || "");
+  // group combining marks onto the letter they sit on
+  const tokens = []; // {type:'letter',ch,marks:[]} | {type:'space'} | {type:'other',ch}
+  for (const c of chars) {
+    if (isHaraka(c)) {
+      for (let j = tokens.length - 1; j >= 0; j--) { if (tokens[j].type === "letter") { tokens[j].marks.push(c); break; } break; }
+      continue;
+    }
+    if (c === " ") tokens.push({ type: "space" });
+    else if (!isArabicLetter(c)) tokens.push({ type: "other", ch: c });
+    else tokens.push({ type: "letter", ch: c, marks: [] });
+  }
   const out = [];
-  for (let i = 0; i < chars.length; i++) {
-    const c = chars[i];
-    if (c === " ") { out.push({ space: true }); continue; }
-    if (!isArabicLetter(c)) { out.push({ other: true, ch: c }); continue; }
-    let joinsPrev = i > 0 && isArabicLetter(chars[i - 1]) && canJoinLeft(chars[i - 1]);
-    let joinsNext = canJoinLeft(c) && i < chars.length - 1 && isArabicLetter(chars[i + 1]);
+  let prevLetter = null;
+  for (let ti = 0; ti < tokens.length; ti++) {
+    const t = tokens[ti];
+    if (t.type === "space") { out.push({ space: true }); prevLetter = null; continue; }
+    if (t.type === "other") { out.push({ other: true, ch: t.ch }); prevLetter = null; continue; }
+    let nextLetter = null;
+    for (let tj = ti + 1; tj < tokens.length; tj++) { if (tokens[tj].type !== "letter") break; nextLetter = tokens[tj]; break; }
+    const c = t.ch;
+    let joinsPrev = !!prevLetter && canJoinLeft(prevLetter.ch);
+    let joinsNext = canJoinLeft(c) && !!nextLetter;
     if (c === "ء") { joinsPrev = false; joinsNext = false; }
     const form = joinsPrev && joinsNext ? "med" : joinsPrev ? "fin" : joinsNext ? "ini" : "iso";
-    const shape = (joinsPrev ? ZWJ_ : "") + c + (joinsNext ? ZWJ_ : "");
+    const marksStr = t.marks.join("");
+    const shape = (joinsPrev ? ZWJ_ : "") + c + marksStr + (joinsNext ? ZWJ_ : "");
     let base = c, name = null;
     if (LETTER_VARIANTS[c]) { base = LETTER_VARIANTS[c][0]; name = LETTER_VARIANTS[c][1]; }
     const ai = base ? alphaIndexOf(base) : -1;
     let tr = "";
     if (ai >= 0) { if (!name) name = ALPHABET[ai][1]; tr = ALPHABET[ai][2]; }
-    out.push({ ch: c, shape, form, idx: ai, name: name || "", tr: tr || "" });
+    const marks = t.marks.map((m) => HARAKAT[m]).filter(Boolean);
+    out.push({ ch: c, shape, form, idx: ai, name: name || "", tr: tr || "", marks });
+    prevLetter = t;
   }
   return out;
+}
+// all unique marks present in a string, in teaching order
+function marksInWord(ar) {
+  const present = new Set(Array.from(ar || "").filter(isHaraka));
+  return HARAKAT_LIST.filter((m) => present.has(m)).map((m) => HARAKAT[m]);
 }
 
 const LEGEND = [
@@ -1715,7 +1771,6 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
   const correct = feedback === "correct";
   const wrong = feedback === "wrong";
   const willFinish = correct && curStreak >= 2 && queue.length === 1;
-  const primaryLabel = isMc ? (feedback ? (willFinish ? "Finish" : "Next →") : null) : (feedback ? (willFinish ? "Finish" : "Next →") : "Check answer");
 
   return (
     <div className="fade">
@@ -1770,6 +1825,9 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
             style={{ width: "100%", marginTop: 12, padding: "14px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 26, outline: "none", textAlign: "right" }}
           />
           {!feedback && (
+            <button className="tap" onClick={submit} style={{ width: "100%", marginTop: 10, padding: 14, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>Check answer</button>
+          )}
+          {!feedback && (
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
               <button className="tap" onClick={() => setShowKeys((s) => !s)} style={{ padding: "8px 14px", borderRadius: 999, border: `1px solid ${showKeys ? T.gold : T.line}`, background: showKeys ? `${T.gold}12` : T.panel, color: showKeys ? T.gold : T.textDim, fontSize: 12, fontWeight: 600 }}>
                 {showKeys ? "⌨️ Hide in-app keys" : "⌨️ Show in-app keys"}
@@ -1798,15 +1856,20 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
           <div style={{ marginTop: 8 }}><Speaker text={item.ar} color={T.terra} /></div>
           <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${T.line}` }}>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.8, color: T.goldSoft, marginBottom: 8 }}>How it's written · tap a letter</div>
-            <LetterBreakdown ar={item.ar} onTap={(idx) => setPeek(idx)} />
+            <LetterBreakdown ar={item.ar} onTap={(part) => setPeek(part)} />
+            {marksInWord(item.ar).length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
+                {marksInWord(item.ar).map((m, i) => <MarkCard key={i} mark={m} />)}
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {primaryLabel && (
-        <div style={{ position: feedback ? "sticky" : "static", bottom: 0, zIndex: 5, marginTop: 12, paddingBottom: feedback ? "calc(8px + env(safe-area-inset-bottom))" : 0, paddingTop: feedback ? 8 : 0, background: feedback ? `linear-gradient(180deg, transparent, ${T.bg} 32%)` : "transparent" }}>
-          <button className="tap" onClick={submit} style={{ width: "100%", padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700, boxShadow: feedback ? "0 8px 22px rgba(128,29,92,.22)" : "none" }}>
-            {primaryLabel}
+      {feedback && (
+        <div style={{ position: "sticky", bottom: 0, zIndex: 5, marginTop: 12, paddingBottom: "calc(8px + env(safe-area-inset-bottom))", paddingTop: 8, background: `linear-gradient(180deg, transparent, ${T.bg} 32%)` }}>
+          <button className="tap" onClick={submit} style={{ width: "100%", padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700, boxShadow: "0 8px 22px rgba(128,29,92,.22)" }}>
+            {willFinish ? "Finish" : "Next →"}
           </button>
         </div>
       )}
@@ -1823,7 +1886,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
         Each item must be answered correctly <b style={{ color: T.text }}>twice in a row</b> to clear.
       </div>
 
-      <ScriptPeek idx={peek} onClose={() => setPeek(null)} />
+      <ScriptPeek peek={peek} onClose={() => setPeek(null)} />
       {detailOpen && <ItemDetail item={item} onClose={() => setDetailOpen(false)} autoPlay={autoPlay} />}
     </div>
   );
@@ -1899,8 +1962,17 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0,
       </div>
 
       <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "18px 2px 10px" }}>How to type it · tap a letter</div>
-      <LetterBreakdown ar={item.ar} onTap={(idx) => setPeek(idx)} />
+      <LetterBreakdown ar={item.ar} onTap={(part) => setPeek(part)} />
       <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 10, lineHeight: 1.5, textAlign: "center" }}>Reads right → left. Tap any letter for its trace guide and practice.</div>
+
+      {marksInWord(item.ar).length > 0 && (
+        <>
+          <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "20px 2px 10px" }}>Marks in this word</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {marksInWord(item.ar).map((m, i) => <MarkCard key={i} mark={m} />)}
+          </div>
+        </>
+      )}
 
       <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "20px 2px 10px" }}>Try typing it</div>
       <TypeTry item={item} />
@@ -1918,7 +1990,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0,
       </button>
       <div style={{ textAlign: "center", fontSize: 12, color: T.textDim, marginTop: 10 }}>Learning {i + 1} of {queue.length}</div>
 
-      <ScriptPeek idx={peek} onClose={() => setPeek(null)} />
+      <ScriptPeek peek={peek} onClose={() => setPeek(null)} />
     </div>
   );
 }
@@ -1933,12 +2005,13 @@ function LetterBreakdown({ ar, onTap }) {
       {parts.map((p, i) => {
         if (p.space) return <div key={i} style={{ width: 12 }} />;
         if (p.other) return <div key={i} style={{ fontFamily: arFont, fontSize: 22, color: T.textDim, alignSelf: "center" }}>{p.ch}</div>;
-        const tappable = p.idx >= 0 && onTap;
+        const hasMarks = p.marks && p.marks.length > 0;
+        const tappable = (p.idx >= 0 || hasMarks) && onTap;
         return (
-          <button key={i} className="tap" disabled={!tappable} onClick={() => tappable && onTap(p.idx)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, minWidth: 52, border: `1px solid ${tappable ? T.line : T.line}`, background: T.panelHi, borderRadius: 11, padding: "8px 6px", cursor: tappable ? "pointer" : "default", direction: "rtl" }}>
+          <button key={i} className="tap" disabled={!tappable} onClick={() => tappable && onTap(p)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, minWidth: 52, border: `1px solid ${hasMarks ? T.gold : T.line}`, background: hasMarks ? `${T.gold}0c` : T.panelHi, borderRadius: 11, padding: "8px 6px", cursor: tappable ? "pointer" : "default", direction: "rtl" }}>
             <span style={{ fontFamily: arFont, fontSize: 30, color: T.text, lineHeight: 1.1 }}>{p.shape}</span>
-            <span style={{ fontFamily: uiFont, fontSize: 10.5, color: T.goldSoft, fontWeight: 600, direction: "ltr" }}>{p.tr || p.ch}</span>
-            <span style={{ fontFamily: uiFont, fontSize: 8.5, color: T.textDim, textTransform: "uppercase", letterSpacing: 0.4, direction: "ltr" }}>{FORM_LABEL[p.form]}</span>
+            <span style={{ fontFamily: uiFont, fontSize: 10.5, color: T.goldSoft, fontWeight: 600, direction: "ltr" }}>{(p.tr || p.ch) + (hasMarks ? p.marks.map((m) => m.tr.startsWith("(") ? "" : m.tr).join("") : "")}</span>
+            <span style={{ fontFamily: uiFont, fontSize: 8.5, color: hasMarks ? T.gold : T.textDim, textTransform: "uppercase", letterSpacing: 0.4, direction: "ltr" }}>{hasMarks ? "+ " + p.marks.map((m) => m.name).join(", ") : FORM_LABEL[p.form]}</span>
           </button>
         );
       })}
@@ -1950,7 +2023,7 @@ function LetterBreakdown({ ar, onTap }) {
 function TypeTry({ item, compact }) {
   const [val, setVal] = useState("");
   const [res, setRes] = useState(null); // "ok" | "no" | null
-  const [showKb, setShowKb] = useState(true);
+  const [showKb, setShowKb] = useState(false);
   useEffect(() => { setVal(""); setRes(null); }, [item && item.id]);
   const check = () => setRes(answerMatches(val, item) ? "ok" : "no");
   return (
@@ -1961,18 +2034,11 @@ function TypeTry({ item, compact }) {
         onKeyDown={(e) => e.key === "Enter" && check()}
         placeholder="try typing it…"
         dir="rtl"
+        inputMode={showKb ? "none" : undefined}
         style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `2px solid ${res === "ok" ? T.green : res === "no" ? T.red : T.line}`, background: res === "ok" ? `${T.green}10` : res === "no" ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 24, outline: "none", textAlign: "right" }}
       />
-      {showKb && (
-        <ArabicKeyboard
-          onKey={(ch) => { setVal((a) => a + ch); setRes(null); }}
-          onSpace={() => { setVal((a) => a + " "); setRes(null); }}
-          onBack={() => { setVal((a) => a.slice(0, -1)); setRes(null); }}
-          onClear={() => { setVal(""); setRes(null); }}
-        />
-      )}
       <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-        <button className="tap" onClick={() => setShowKb((s) => !s)} style={{ padding: "11px 14px", borderRadius: 12, border: `1px solid ${T.line}`, background: T.panel, color: T.textDim, fontSize: 12.5, fontWeight: 600 }}>{showKb ? "Hide keys" : "Show keys"}</button>
+        <button className="tap" onClick={() => setShowKb((s) => !s)} style={{ padding: "11px 14px", borderRadius: 12, border: `1px solid ${showKb ? T.gold : T.line}`, background: showKb ? `${T.gold}12` : T.panel, color: showKb ? T.gold : T.textDim, fontSize: 12.5, fontWeight: 600 }}>{showKb ? "⌨️ Hide keys" : "⌨️ Keys"}</button>
         <button className="tap" onClick={check} style={{ flex: 1, padding: "12px 16px", borderRadius: 12, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700, fontSize: 14 }}>Check</button>
       </div>
       {res === "ok" && <div className="fade" style={{ marginTop: 10, textAlign: "center", color: T.green, fontWeight: 700, fontSize: 14 }}>✓ Perfect — that's it!</div>}
@@ -1982,18 +2048,52 @@ function TypeTry({ item, compact }) {
           <div style={{ fontFamily: arFont, fontSize: 26, color: T.text, direction: "rtl", marginTop: 2 }}>{item.ar}</div>
         </div>
       )}
+      {showKb && (
+        <ArabicKeyboard
+          onKey={(ch) => { setVal((a) => a + ch); setRes(null); }}
+          onSpace={() => { setVal((a) => a + " "); setRes(null); }}
+          onBack={() => { setVal((a) => a.slice(0, -1)); setRes(null); }}
+          onClear={() => { setVal(""); setRes(null); }}
+        />
+      )}
     </div>
   );
 }
 
-// Full-screen overlay reusing ScriptTrace for a single letter (trace guide + trace trial).
-function ScriptPeek({ idx, onClose }) {
-  if (idx == null) return null;
+// Explanation card for a single haraka mark.
+function MarkCard({ mark }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, background: T.panel, border: `1px solid ${T.line}`, borderRadius: 14, padding: "12px 14px" }}>
+      <div style={{ flexShrink: 0, width: 52, textAlign: "center" }}>
+        <div style={{ fontFamily: arFont, fontSize: 34, color: T.gold, lineHeight: 1 }}>{"\u25CC" + mark.ch}</div>
+        <div style={{ fontFamily: arFont, fontSize: 18, color: T.textDim, lineHeight: 1.2, marginTop: 2 }}>{"\u0628" + mark.ch}</div>
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>{mark.name} <span style={{ color: T.goldSoft, fontStyle: "italic", fontWeight: 400 }}>· {mark.tr}</span></div>
+        <div style={{ fontSize: 12, color: T.textDim, marginTop: 3, lineHeight: 1.5 }}>{mark.info}</div>
+      </div>
+      <div style={{ flexShrink: 0 }}><Speaker text={haraSay(mark)} size={16} color={T.terra} /></div>
+    </div>
+  );
+}
+
+// Full-screen overlay: trace guide for a letter, plus any marks sitting on it.
+function ScriptPeek({ peek, onClose }) {
+  if (!peek) return null;
+  const marks = peek.marks || [];
   return ReactDOM.createPortal(
     <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: T.bg, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "12px 18px calc(28px + env(safe-area-inset-bottom))" }}>
-        <button className="tap" onClick={onClose} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "8px 14px", borderRadius: 999, border: `1px solid ${T.line}`, background: T.panel, color: T.gold, fontSize: 13, fontWeight: 700 }}>✕ Close letter</button>
-        <ScriptTrace initialIdx={idx} onBack={null} />
+        <button className="tap" onClick={onClose} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "8px 14px", borderRadius: 999, border: `1px solid ${T.line}`, background: T.panel, color: T.gold, fontSize: 13, fontWeight: 700 }}>✕ Close</button>
+        {marks.length > 0 && (
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "0 2px 8px" }}>Mark{marks.length > 1 ? "s" : ""} on this letter</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {marks.map((m, i) => <MarkCard key={i} mark={m} />)}
+            </div>
+          </div>
+        )}
+        {peek.idx >= 0 && <ScriptTrace initialIdx={peek.idx} onBack={null} />}
       </div>
     </div>,
     document.body
@@ -2019,16 +2119,222 @@ function ItemDetail({ item, onClose, autoPlay }) {
         </div>
 
         <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "20px 2px 10px" }}>How to type it · tap a letter</div>
-        <LetterBreakdown ar={item.ar} onTap={(idx) => setPeek(idx)} />
+        <LetterBreakdown ar={item.ar} onTap={(part) => setPeek(part)} />
         <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 10, lineHeight: 1.5, textAlign: "center" }}>Reads right → left. Each letter shows the shape it takes in this word — tap one for its trace guide and practice.</div>
+
+        {marksInWord(item.ar).length > 0 && (
+          <>
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "22px 2px 10px" }}>Marks in this word</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {marksInWord(item.ar).map((m, i) => <MarkCard key={i} mark={m} />)}
+            </div>
+          </>
+        )}
 
         <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "22px 2px 10px" }}>Now try it yourself</div>
         <TypeTry item={item} />
 
-        <ScriptPeek idx={peek} onClose={() => setPeek(null)} />
+        <ScriptPeek peek={peek} onClose={() => setPeek(null)} />
       </div>
     </div>,
     document.body
+  );
+}
+
+/* ===================== HARAKAT (marks) LESSONS + QUIZ ===================== */
+function HarakatLessons({ harakat = {}, onLearned }) {
+  const [phase, setPhase] = useState("menu");
+  const all = HARAKAT_LIST.map((c) => HARAKAT[c]);
+  const quizMarks = HARAKAT_LIST.slice(0, 6).map((c) => HARAKAT[c]);
+  const learnedCount = HARAKAT_LIST.filter((c) => harakat[c]).length;
+
+  if (phase === "learn") return <HarakatLearn marks={all} onDone={() => setPhase("menu")} onLearned={onLearned} />;
+  if (phase === "quiz") return <HarakatQuiz marks={quizMarks} onDone={() => setPhase("menu")} onLearned={onLearned} />;
+
+  return (
+    <div className="fade" style={{ paddingTop: 4 }}>
+      <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "18px 18px 16px", marginBottom: 14, boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
+        <div style={{ fontFamily: displayFont, fontSize: 21, color: T.gold }}>The marks (harakat)</div>
+        <div style={{ fontSize: 12.5, color: T.textDim, marginTop: 4, lineHeight: 1.6 }}>
+          Harakat are the little marks that show the short vowels and a few other sounds. Everyday Arabic usually leaves them out, but they're worth knowing — they appear in the Qurʼan, in children's books, in dictionaries, and whenever a word would otherwise be ambiguous.
+        </div>
+        <div style={{ marginTop: 12, fontSize: 12, color: T.textDim }}>{learnedCount} / {HARAKAT_LIST.length} marks seen</div>
+      </div>
+
+      <button className="tap" onClick={() => setPhase("learn")} style={{ width: "100%", padding: 15, borderRadius: 14, marginBottom: 10, background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700, boxShadow: "0 8px 20px rgba(128,29,92,.18)", border: "none" }}>📖 Learn the marks</button>
+      <button className="tap" onClick={() => setPhase("quiz")} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 16, border: `1px solid ${T.gold}`, background: `${T.gold}10`, color: T.gold, fontSize: 14, fontWeight: 700 }}>✨ Quiz the marks</button>
+
+      <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 10px" }}>Quick reference</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {all.map((m, i) => <MarkCard key={i} mark={m} />)}
+      </div>
+    </div>
+  );
+}
+
+function HarakatLearn({ marks, onDone, onLearned }) {
+  const [i, setI] = useState(0);
+  const m = marks[i];
+  const ex = HARAKAT_EXAMPLES[m.ch];
+  useEffect(() => { if (onLearned) onLearned(m.ch); /* eslint-disable-next-line */ }, [i]);
+  return (
+    <div className="fade">
+      <div style={{ height: 4, background: T.line, borderRadius: 4, overflow: "hidden", marginBottom: 14 }}>
+        <div style={{ height: "100%", width: `${(i / marks.length) * 100}%`, background: `linear-gradient(90deg, ${T.gold}, ${T.terra})` }} />
+      </div>
+      <div className="pop" key={m.ch} style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 22, padding: "26px 20px", textAlign: "center", boxShadow: "0 12px 34px rgba(128,29,92,.10)" }}>
+        <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>Mark {i + 1} of {marks.length}</div>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline", gap: 18, margin: "14px 0 6px" }}>
+          <div style={{ fontFamily: arFont, fontSize: 60, color: T.gold, lineHeight: 1 }}>{"\u25CC" + m.ch}</div>
+          <div style={{ fontFamily: arFont, fontSize: 46, color: T.text, lineHeight: 1 }}>{"\u0628" + m.ch}</div>
+        </div>
+        <div style={{ fontFamily: displayFont, fontSize: 22, color: T.text }}>{m.name} <span style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 17 }}>· {m.tr}</span></div>
+        <div style={{ fontSize: 13, color: T.textDim, marginTop: 8, lineHeight: 1.6 }}>{m.info}</div>
+        <div style={{ marginTop: 10 }}><Speaker text={haraSay(m)} size={20} color={T.gold} /></div>
+        {ex && (
+          <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${T.line}` }}>
+            <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.8, color: T.goldSoft, marginBottom: 4 }}>Example</div>
+            <div style={{ fontFamily: arFont, fontSize: 30, color: T.text, direction: "rtl" }}>{ex[0]}</div>
+            <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 14 }}>{ex[1]} — {ex[2]}</div>
+            <div style={{ marginTop: 6 }}><Speaker text={ex[0]} color={T.terra} /></div>
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+        <button className="tap" onClick={() => setI((x) => Math.max(0, x - 1))} disabled={i === 0} style={{ flex: 1, padding: 13, borderRadius: 13, border: `1px solid ${T.line}`, background: T.panel, color: i === 0 ? T.textDim : T.text, fontWeight: 600, fontSize: 14 }}>‹ Prev</button>
+        {i + 1 < marks.length ? (
+          <button className="tap" onClick={() => setI((x) => x + 1)} style={{ flex: 2, padding: 13, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700, fontSize: 14 }}>Next ›</button>
+        ) : (
+          <button className="tap" onClick={onDone} style={{ flex: 2, padding: 13, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700, fontSize: 14 }}>Done ✓</button>
+        )}
+      </div>
+      <button className="tap" onClick={onDone} style={{ width: "100%", marginTop: 10, padding: 10, borderRadius: 12, border: "none", background: "transparent", color: T.textDim, fontSize: 12 }}>Back to marks menu</button>
+    </div>
+  );
+}
+
+const harakaRole = (m) =>
+  m.ch === "\u0652" ? "“no vowel” (a silent consonant)" :
+  m.ch === "\u0651" ? "a doubled / stressed consonant" :
+  m.ch === "\u064B" ? "the “-an” ending (tanwin)" :
+  m.ch === "\u064D" ? "the “-in” ending (tanwin)" :
+  m.ch === "\u064C" ? "the “-un” ending (tanwin)" :
+  `the short “${m.tr}” sound`;
+
+function HarakatQuiz({ marks, onDone, onLearned }) {
+  const makeQ = (ans) => {
+    const dir = Math.random() < 0.5 ? "name" : "mark";
+    const distract = shuffle(marks.filter((x) => x.ch !== ans.ch)).slice(0, 3);
+    return { dir, answer: ans, options: shuffle([ans, ...distract]) };
+  };
+  const [queue, setQueue] = useState(() => shuffle(marks));
+  const [streak, setStreak] = useState({});
+  const [q, setQ] = useState(() => (marks.length ? makeQ(shuffle(marks)[0]) : null));
+  const [pick, setPick] = useState(null);
+  const [feedback, setFeedback] = useState(false);
+  const [done, setDone] = useState(marks.length === 0);
+
+  const cur = queue[0];
+  const total = marks.length;
+  const masteredCount = marks.filter((m) => (streak[m.ch] || 0) >= 2).length;
+
+  const choose = (opt) => {
+    if (feedback) return;
+    setPick(opt);
+    setFeedback(true);
+    const ok = opt.ch === cur.ch;
+    setStreak((s) => ({ ...s, [cur.ch]: ok ? (s[cur.ch] || 0) + 1 : 0 }));
+    if (ok && (streak[cur.ch] || 0) + 1 >= 2 && onLearned) onLearned(cur.ch);
+  };
+  const next = () => {
+    const st = streak[cur.ch] || 0;
+    let nq;
+    if (st >= 2) nq = queue.slice(1);
+    else nq = [...queue.slice(1), cur];
+    setFeedback(false);
+    setPick(null);
+    if (nq.length === 0) { setDone(true); return; }
+    setQueue(nq);
+    setQ(makeQ(nq[0]));
+  };
+  const retake = () => { const s = shuffle(marks); setQueue(s); setStreak({}); setQ(makeQ(s[0])); setPick(null); setFeedback(false); setDone(false); };
+
+  if (done) {
+    return (
+      <div className="fade pop" style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
+        <div style={{ fontSize: 38, marginBottom: 8 }}>🎉</div>
+        <div style={{ fontFamily: displayFont, fontSize: 22 }}>Marks mastered!</div>
+        <div style={{ color: T.textDim, fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>You named every mark right twice in a row.</div>
+        <button className="tap" onClick={retake} style={{ width: "100%", marginTop: 18, padding: 13, borderRadius: 13, border: `1px solid ${T.gold}`, background: `${T.gold}10`, color: T.gold, fontWeight: 700 }}>🔁 Retake</button>
+        <button className="tap" onClick={onDone} style={{ width: "100%", marginTop: 10, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700 }}>Back to marks menu</button>
+      </div>
+    );
+  }
+  if (!q) return null;
+  const correct = feedback && pick && pick.ch === cur.ch;
+
+  return (
+    <div className="fade">
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: T.goldSoft, whiteSpace: "nowrap" }}>Marks quiz</div>
+        <div style={{ flex: 1, height: 4, background: T.line, borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${(masteredCount / Math.max(1, total)) * 100}%`, background: `linear-gradient(90deg, ${T.gold}, ${T.terra})`, transition: "width .3s ease" }} />
+        </div>
+        <div style={{ fontSize: 12, color: T.textDim, whiteSpace: "nowrap" }}>{masteredCount}/{total}</div>
+      </div>
+
+      <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "24px 18px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
+        {q.dir === "name" ? (
+          <>
+            <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>What is this mark?</div>
+            <div style={{ fontFamily: arFont, fontSize: 64, color: T.gold, lineHeight: 1.1, marginTop: 10 }}>{"\u25CC" + cur.ch}</div>
+            <div style={{ fontFamily: arFont, fontSize: 30, color: T.textDim, marginTop: 2 }}>{"\u0628" + cur.ch}</div>
+            <div style={{ marginTop: 8 }}><Speaker text={haraSay(cur)} size={18} color={T.terra} /></div>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>Pick the mark</div>
+            <div style={{ fontFamily: displayFont, fontSize: 22, color: T.text, marginTop: 10, lineHeight: 1.4 }}>Which mark gives {harakaRole(cur)}?</div>
+          </>
+        )}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
+        {q.options.map((opt, idx) => {
+          let bg = T.panel, border = T.line, col = T.text;
+          if (feedback) {
+            if (opt.ch === cur.ch) { bg = `${T.green}1a`; border = T.green; col = T.gold; }
+            else if (pick && opt.ch === pick.ch) { bg = `${T.red}1a`; border = T.red; col = T.red; }
+          }
+          return (
+            <button key={idx} className="tap" onClick={() => choose(opt)} disabled={feedback} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 14, padding: "14px 8px", cursor: feedback ? "default" : "pointer", minHeight: 60, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
+              {q.dir === "name" ? (
+                <span style={{ fontSize: 14, fontWeight: 700, color: col }}>{opt.name} <span style={{ color: T.goldSoft, fontWeight: 400, fontStyle: "italic" }}>· {opt.tr}</span></span>
+              ) : (
+                <span style={{ fontFamily: arFont, fontSize: 34, color: col }}>{"\u25CC" + opt.ch}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {feedback && (
+        <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${correct ? T.green : T.red}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: correct ? T.green : T.red }}>{correct ? ((streak[cur.ch] || 0) >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — it's:"}</div>
+          <div style={{ fontSize: 14, color: T.text, marginTop: 4 }}>{"\u25CC" + cur.ch} &nbsp; <b>{cur.name}</b> · {cur.tr}</div>
+          <div style={{ fontSize: 12, color: T.textDim, marginTop: 4, lineHeight: 1.5 }}>{cur.info}</div>
+          <div style={{ marginTop: 6 }}><Speaker text={haraSay(cur)} size={16} color={T.terra} /></div>
+        </div>
+      )}
+
+      {feedback && (
+        <button className="tap" onClick={next} style={{ width: "100%", marginTop: 12, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
+          {(streak[cur.ch] || 0) >= 2 && queue.length === 1 ? "Finish" : "Next →"}
+        </button>
+      )}
+      <button className="tap" onClick={onDone} style={{ width: "100%", marginTop: 8, padding: 10, borderRadius: 12, border: "none", background: "transparent", color: T.textDim, fontSize: 12 }}>End — back to marks menu</button>
+      <div style={{ textAlign: "center", fontSize: 11, color: T.textDim, marginTop: 10, lineHeight: 1.6 }}>Answer each mark correctly <b style={{ color: T.text }}>twice in a row</b> to clear it.</div>
+    </div>
   );
 }
 
@@ -2823,6 +3129,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
 
   const [mode, setMode] = useState("menu"); // menu | teach | quiz | done | select
   const [formFilter, setFormFilter] = useState("all"); // all | iso | ini | med | fin
+  const [showKeys, setShowKeys] = useState(false); // in-app keyboard hidden until toggled on
   const [teachQueue, setTeachQueue] = useState([]);
   const [tIdx, setTIdx] = useState(0);
   const [quizSet, setQuizSet] = useState([]);
@@ -3224,7 +3531,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
             <div style={{ fontSize: 13, color: T.textDim, marginTop: 2 }}>{ans[1]} <span style={{ color: T.goldSoft }}>· {ans[6]} form</span></div>
             <div style={{ marginTop: 10 }}><Speaker text={ans[0]} size={18} color={T.terra} /></div>
           </div>
-          <input value={typed} onChange={(e) => !feedback && setTyped(e.target.value)} onKeyDown={(e) => e.key === "Enter" && checkType()} placeholder="الحرف…" dir="rtl" readOnly={!!feedback} style={{ width: "100%", marginTop: 12, padding: "12px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 34, outline: "none", textAlign: "center" }} />
+          <input value={typed} onChange={(e) => !feedback && setTyped(e.target.value)} onKeyDown={(e) => e.key === "Enter" && checkType()} placeholder="الحرف…" dir="rtl" readOnly={!!feedback} inputMode={showKeys ? "none" : undefined} style={{ width: "100%", marginTop: 12, padding: "12px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 34, outline: "none", textAlign: "center" }} />
           {feedback && (
             <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${wrong ? T.red : T.green}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: wrong ? T.red : T.green }}>{correct ? "Correct!" : "Answer:"}</div>
@@ -3232,12 +3539,17 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
               <div style={{ color: T.text, fontSize: 14 }}>{ans[1]} <span style={{ color: T.goldSoft, fontStyle: "italic" }}>· {ans[2]}</span></div>
             </div>
           )}
-          {!feedback && (
-            <ArabicKeyboard onKey={(ch) => setTyped((a) => a + ch)} onSpace={() => setTyped((a) => a + " ")} onBack={() => setTyped((a) => a.slice(0, -1))} onClear={() => setTyped("")} />
-          )}
           <button className="tap" onClick={checkType} style={{ width: "100%", marginTop: 12, padding: 15, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>
             {feedback ? (typeWillFinish ? "Finish" : "Next →") : "Check answer"}
           </button>
+          {!feedback && (
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
+              <button className="tap" onClick={() => setShowKeys((s) => !s)} style={{ padding: "8px 14px", borderRadius: 999, border: `1px solid ${showKeys ? T.gold : T.line}`, background: showKeys ? `${T.gold}12` : T.panel, color: showKeys ? T.gold : T.textDim, fontSize: 12, fontWeight: 600 }}>{showKeys ? "⌨️ Hide in-app keys" : "⌨️ Show in-app keys"}</button>
+            </div>
+          )}
+          {!feedback && showKeys && (
+            <ArabicKeyboard onKey={(ch) => setTyped((a) => a + ch)} onSpace={() => setTyped((a) => a + " ")} onBack={() => setTyped((a) => a.slice(0, -1))} onClear={() => setTyped("")} />
+          )}
           {!feedback && (
             <button className="tap" onClick={giveUpType} style={{ width: "100%", marginTop: 8, padding: 11, borderRadius: 12, border: `1px solid ${T.line}`, background: "transparent", color: T.textDim, fontSize: 13, fontWeight: 600 }}>I don't know — show me</button>
           )}
@@ -3291,6 +3603,7 @@ function ScriptView({ scriptState, setScript, autoReview, onAutoConsumed, custom
         {[
           ["train", "🎓 Train"],
           ["learn", "📖 Chart"],
+          ["marks", "🪶 Marks"],
           ["quiz", "✨ Quiz"],
           ["trace", "✍️ Trace"],
         ].map(([k, label]) => (
@@ -3302,8 +3615,8 @@ function ScriptView({ scriptState, setScript, autoReview, onAutoConsumed, custom
               flex: 1,
               border: "none",
               borderRadius: 9,
-              padding: "9px 2px",
-              fontSize: 12,
+              padding: "9px 1px",
+              fontSize: 10.5,
               fontWeight: 600,
               color: mode === k ? "#ffffff" : T.textDim,
               background:
@@ -3316,6 +3629,7 @@ function ScriptView({ scriptState, setScript, autoReview, onAutoConsumed, custom
       </div>
       {mode === "train" && <ScriptTrain scriptState={scriptState} setScript={setScript} autoReview={autoReview} onAutoConsumed={onAutoConsumed} customLetters={customLetters || []} onCustomLetters={onCustomLetters} />}
       {mode === "learn" && <ScriptLearn onTrace={openTrace} prog={(scriptState && scriptState.progress) || {}} />}
+      {mode === "marks" && <HarakatLessons harakat={(scriptState && scriptState.harakat) || {}} onLearned={(ch) => setScript({ ...scriptState, harakat: { ...((scriptState && scriptState.harakat) || {}), [ch]: true } })} />}
       {mode === "quiz" && <ScriptQuiz />}
       {mode === "trace" && <ScriptTrace initialIdx={traceIdx} onBack={traceReturn ? () => { setMode(traceReturn); setTraceReturn(null); } : null} />}
     </div>

@@ -34,11 +34,12 @@ home screen.
   letter to jump straight to its **trace guide and practice**, and there's a
   **try-typing box with a Check button** to test yourself.
 - **Answer your way** — each quiz/review lets you **Type** the Arabic or answer by
-  **Multiple choice**. The on-screen Arabic keyboard is now hidden by default (type with
-  your phone keyboard) and pops up only when you tap **Show in-app keys**. When you get
-  a typed answer checked, the result shows the correct spelling *and* its letter-by-letter
-  breakdown (tap a letter for its trace guide), and the **Next button stays pinned to the
-  bottom** so it's always in reach.
+  **Multiple choice**. The on-screen Arabic keyboard is **hidden by default everywhere**
+  (type with your phone keyboard) and pops up only when you tap **Show in-app keys**. The
+  **Check button sits right under the input** so it's visible without scrolling, and the
+  in-app keys (when shown) drop in below it. When you get a typed answer checked, the
+  result shows the correct spelling *and* its letter-by-letter breakdown (tap a letter for
+  its trace guide), and the **Next button stays pinned to the bottom** so it's always in reach.
 - **Richer lessons** — when learning a new word you now see everything at once: the
   word, romanization, English, sound, the same tappable letter breakdown, and a
   type-it-yourself Check box — so you read it, hear it, see how it's built, and write
@@ -87,6 +88,17 @@ home screen.
 - **Quiz** — match letters to sounds with live score, accuracy, and streaks.
 - **Trace** — finger-trace letters over a soft ghost glyph on a 2×2 grid, with
   written stroke-order steps, plus a write-from-memory quiz mode.
+- **Marks (harakat)** — a dedicated section that teaches the short-vowel and helper
+  marks: **fatha, kasra, damma, sukun, shadda** and the **tanwin** endings (plus madda
+  and dagger-alef in the reference). Flip through illustrated cards (each mark shown on
+  a dotted circle and on a carrier letter), **tap 🔊 to hear the mark pronounced** — the
+  vowel marks are spoken on a carrier (بَ, بِ, بُ…) and sukun/shadda through a real
+  example word — then take a **multiple-choice quiz** that runs the same drill-to-mastery
+  loop (name the mark, or pick the mark for a given sound, twice in a row to clear it).
+- **Marks explained in context** — anywhere a word is broken into letters (Items
+  detail, lessons, and the answer shown after a quiz question), letters that carry a
+  mark are highlighted, and a **"Marks in this word"** panel explains each one. Tapping
+  a marked letter opens its trace guide *and* the explanation of the mark sitting on it.
 
 ### Dictionary, stats & looks
 - **Items** is a searchable dictionary (English / transliteration / Arabic) with a
@@ -121,4 +133,4 @@ home screen.
 
 ---
 
-*Last updated: the answer shown after a quiz/review question is now tappable — it opens the full word-detail page with the letter-by-letter breakdown (and each letter opens its trace guide), and the result also shows that breakdown inline. The on-screen Arabic keyboard is hidden by default and only appears when you tap "Show in-app keys" (so the phone keyboard is the default), and the Next button now stays pinned to the bottom of the screen so it's always visible.*
+*Last updated: every haraka mark is now pronounceable (🔊 on each mark card, in the marks lesson, and in the marks quiz — vowels spoken on a carrier like بَ/بِ/بُ, sukun and shadda via an example word). The on-screen Arabic keyboard is now hidden by default in every typing spot (quizzes, reviews, the script type-quiz, and the try-typing boxes) and only appears via a toggle, and the Check button now sits directly under the input so it's visible right away instead of below the keyboard.*
