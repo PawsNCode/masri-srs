@@ -31,8 +31,9 @@ home screen.
   answer shown after a quiz/review question**, to open a detail page: the full word,
   romanization, English, sound, and a **letter-by-letter breakdown** showing the exact
   shape each letter takes in that word (isolated / initial / medial / final). Tap any
-  letter to jump straight to its **trace guide and practice**, and there's a
-  **try-typing box with a Check button** to test yourself.
+  letter to jump straight to its **trace guide and practice — opened on the exact shape
+  it had in the word** (tap a final-form letter, land on its final-form guide), and
+  there's a **try-typing box with a Check button** to test yourself.
 - **Answer your way** — each quiz/review lets you **Type** the Arabic or answer by
   **Multiple choice**. The on-screen Arabic keyboard is **hidden by default everywhere**
   (type with your phone keyboard) and pops up only when you tap **Show in-app keys**. The
@@ -133,4 +134,4 @@ home screen.
 
 ---
 
-*Last updated: removed the spoken pronunciation of the harakat marks, and reworked the marks quiz to test reading instead — it now shows a marked letter and asks how it's pronounced (بَ → "ba"), or shows a sound and asks how it's written ("ba" → بَ), with the carrier letter varying each question.*
+*Last updated: tapping a letter in a word's breakdown now opens its trace guide on the **exact positional shape it had in that word** — tap a letter shown in its final form and the guide opens on the final form (initial → initial, medial → medial, and so on), instead of always defaulting to the isolated shape.*

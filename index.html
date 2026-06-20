@@ -2086,7 +2086,7 @@ function ScriptPeek({ peek, onClose }) {
             </div>
           </div>
         )}
-        {peek.idx >= 0 && <ScriptTrace initialIdx={peek.idx} onBack={null} />}
+        {peek.idx >= 0 && <ScriptTrace initialIdx={peek.idx} initialForm={peek.form} onBack={null} />}
       </div>
     </div>,
     document.body
@@ -3895,15 +3895,15 @@ function MiniTrace({ glyph, guide = true, resetKey = 0 }) {
   );
 }
 
-function ScriptTrace({ initialIdx, onBack }) {
+function ScriptTrace({ initialIdx, onBack, initialForm }) {
   const [tmode, setTmode] = useState("practice"); // practice | quiz
   const [idx, setIdx] = useState(initialIdx || 0);
   const [showGuide, setShowGuide] = useState(true);
   const [qIdx, setQIdx] = useState(() => Math.floor(Math.random() * ALPHABET.length));
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState({ right: 0, total: 0, streak: 0, best: 0 });
-  const [traceForm, setTraceForm] = useState("iso"); // all | iso | ini | med | fin
-  const [qForm, setQForm] = useState("iso"); // the form being quizzed this question
+  const [traceForm, setTraceForm] = useState(initialForm || "iso"); // all | iso | ini | med | fin
+  const [qForm, setQForm] = useState(initialForm || "iso"); // the form being quizzed this question
   const canvasRef = React.useRef(null);
   const drawing = React.useRef(false);
   const last = React.useRef(null);
