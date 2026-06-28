@@ -31,8 +31,8 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "1.0.1";
-const APP_UPDATED = "6/29/2026, 7:31:08 AM";
+const APP_VERSION = "1.0.2";
+const APP_UPDATED = "6/29/2026, 7:37:50 AM";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
 // makes the home-screen shortcut go stale). Progress lives in localStorage,
@@ -3167,7 +3167,7 @@ function WritePad({ text, resetKey = 0 }) {
   const drawing = useRef(false);
   const last = useRef(null);
   const len = (text || "").replace(/\s/g, "").length;
-  const ghostSize = len > 14 ? 34 : len > 9 ? 44 : len > 5 ? 58 : 72;
+  const ghostSize = len > 16 ? 48 : len > 11 ? 66 : len > 7 ? 88 : len > 4 ? 110 : 128;
 
   const setup = useCallback(() => {
     const c = canvasRef.current;
@@ -3180,7 +3180,7 @@ function WritePad({ text, resetKey = 0 }) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.lineWidth = 9;
+    ctx.lineWidth = 5;
     ctx.strokeStyle = T.gold;
   }, []);
 
@@ -3221,8 +3221,8 @@ function WritePad({ text, resetKey = 0 }) {
   const end = () => { drawing.current = false; };
 
   return (
-    <div style={{ position: "relative", width: "100%", height: 170, background: T.panel, border: `1px solid ${T.line}`, borderRadius: 18, overflow: "hidden", boxShadow: "0 10px 28px rgba(128,29,92,.08)" }}>
-      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: arFont, fontSize: ghostSize, color: T.textDim, opacity: 0.22, direction: "rtl", padding: "0 14px", lineHeight: 1.3, textAlign: "center", userSelect: "none", pointerEvents: "none" }}>{text}</div>
+    <div style={{ position: "relative", width: "100%", height: 220, background: T.panel, border: `1px solid ${T.line}`, borderRadius: 18, overflow: "hidden", boxShadow: "0 10px 28px rgba(128,29,92,.08)" }}>
+      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: arFont, fontSize: ghostSize, color: T.textDim, opacity: 0.26, direction: "rtl", padding: "0 14px", lineHeight: 1.25, textAlign: "center", userSelect: "none", pointerEvents: "none" }}>{text}</div>
       <canvas
         ref={canvasRef}
         onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}

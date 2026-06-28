@@ -148,4 +148,4 @@ home screen.
 
 ---
 
-*Last updated (v1.0.1 · 6/29/2026, 7:24 AM Manila): added a **"Try writing it" pad** to word lessons and the word detail page — a finger-trace canvas with the whole word shown faintly behind it (and a Clear button), so you can practice writing a word before tapping **Learn it**. Learning a new letter already had the matching "Now write it" trace pad.*
+*Last updated (v1.0.2 · 6/29/2026, 7:37 AM Manila): made the **"Try writing it" pad** much easier to trace — the faint word/script is now considerably larger (and the pad taller), and the tracing ink is thinner so it no longer overpowers the guide.*
