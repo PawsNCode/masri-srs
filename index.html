@@ -31,8 +31,8 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "1.0";
-const APP_UPDATED = "June 29, 2026 · 7:11 AM (Manila, GMT+8)";
+const APP_VERSION = "1.0.0";
+const APP_UPDATED = "6/29/2026, 7:16:52 AM";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
 // makes the home-screen shortcut go stale). Progress lives in localStorage,
@@ -3130,19 +3130,22 @@ function App() {
       {detailItem && <ItemDetail item={detailItem} onClose={() => setDetailItem(null)} autoPlay={state.settings.autoPlay !== false} />}
 
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "8px 18px calc(30px + env(safe-area-inset-bottom))" }}>
-        <div style={{ borderTop: `1px solid ${T.line}`, marginTop: 14, paddingTop: 18, textAlign: "center" }}>
-          <button className="tap" onClick={hardRefresh} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", borderRadius: 999, border: `1px solid ${T.gold}`, background: `${T.gold}12`, color: T.gold, fontSize: 13.5, fontWeight: 700 }}>
-            ↻ Check for updates
+        <div style={{ marginTop: 16, background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "18px 18px 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+            <span style={{ fontSize: 20, lineHeight: 1 }}>🔄</span>
+            <span style={{ fontSize: 16, fontWeight: 700, color: T.text }}>Refresh app</span>
+          </div>
+          <div style={{ fontSize: 12.5, color: T.textDim, marginTop: 9, lineHeight: 1.6 }}>
+            Pull the latest version of the app. Use this after an update if your home-screen icon is showing an old version. Your progress, levels, custom quizzes, and settings are kept — this only refetches the app itself.
+          </div>
+          <button className="tap" onClick={hardRefresh} style={{ width: "100%", marginTop: 15, padding: "14px 16px", borderRadius: 12, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700, boxShadow: "0 8px 20px rgba(128,29,92,.18)" }}>
+            Refresh to latest version
           </button>
-          <div style={{ fontSize: 11, color: T.textDim, marginTop: 9, lineHeight: 1.6, maxWidth: 300, marginLeft: "auto", marginRight: "auto" }}>
-            Reloads the newest version from the web. Your progress stays saved — nothing is reset.
-          </div>
-          <div style={{ fontSize: 11, color: T.textDim, marginTop: 14 }}>
-            v{APP_VERSION} · updated {APP_UPDATED}
-          </div>
-          <div style={{ fontFamily: displayFont, fontSize: 14, color: T.goldSoft, marginTop: 6 }}>
-            made by Niza
-          </div>
+          <div style={{ fontSize: 11.5, color: T.textDim, textAlign: "center", marginTop: 12 }}>Version {APP_VERSION}</div>
+          <div style={{ fontSize: 11.5, color: T.textDim, textAlign: "center", marginTop: 2 }}>Last updated: {APP_UPDATED}</div>
+        </div>
+        <div style={{ fontFamily: displayFont, fontSize: 14, color: T.goldSoft, textAlign: "center", marginTop: 14 }}>
+          made by Niza
         </div>
       </div>
     </div>

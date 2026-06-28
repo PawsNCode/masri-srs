@@ -121,10 +121,11 @@ home screen.
   (download a file, copy it, or show it as text) and import it back on any device,
   so your data is never stuck on one phone.
 - **Progress saves on your device** and the app installs to your home screen.
-- **Check for updates** — a button in the footer reloads the newest version of the app
-  straight from the web, so the home-screen shortcut never gets stuck on an old build.
-  It only refreshes the code — your progress is kept (it lives in your browser's storage,
-  which the reload doesn't touch). The footer also shows the **app version** and the
+- **Refresh app** — a card in the footer with a **"Refresh to latest version"** button
+  that reloads the newest version of the app straight from the web, so the home-screen
+  shortcut never gets stuck on an old build. It only refreshes the code — your progress,
+  levels, custom quizzes, and settings are all kept (they live in your browser's storage,
+  which the reload doesn't touch). The card also shows the **app version** and the
   **exact date and time** of the last update.
 
 ## How to use
@@ -132,9 +133,9 @@ home screen.
 - Open the live link above, or download `index.html` and open it in any browser.
 - **On iPhone:** open the link in Safari → **Share** → **Add to Home Screen** for a
   full-screen, app-like icon.
-- After the app is updated, just tap **↻ Check for updates** in the footer to pull the
-  latest version — no need to delete and re-add the home-screen icon, and nothing you've
-  learned is lost.
+- After the app is updated, just tap **Refresh to latest version** in the footer to pull
+  the latest version — no need to delete and re-add the home-screen icon, and nothing
+  you've learned is lost.
 
 ## Built with
 
@@ -144,4 +145,4 @@ home screen.
 
 ---
 
-*Last updated (v1.0 · June 29, 2026 · 7:11 AM Manila): added a footer with a **"Check for updates"** button that force-reloads the newest version of the app from the web while keeping all your progress — so the iPhone home-screen shortcut no longer gets stuck on an old build. The footer also shows the **app version** and the **exact last-updated date and time**, and credits **made by Niza**.*
+*Last updated (v1.0.0 · 6/29/2026, 7:16:52 AM Manila): restyled the footer refresh control into a **"Refresh app"** card — a clear heading, an explanation that your progress/levels/custom quizzes/settings are kept, a full-width **"Refresh to latest version"** button, and the app version (1.0.0) with the exact last-updated date and time. Still credited **made by Niza**.*
