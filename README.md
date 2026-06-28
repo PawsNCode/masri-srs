@@ -121,14 +121,20 @@ home screen.
   (download a file, copy it, or show it as text) and import it back on any device,
   so your data is never stuck on one phone.
 - **Progress saves on your device** and the app installs to your home screen.
+- **Check for updates** — a button in the footer reloads the newest version of the app
+  straight from the web, so the home-screen shortcut never gets stuck on an old build.
+  It only refreshes the code — your progress is kept (it lives in your browser's storage,
+  which the reload doesn't touch). The footer also shows the **app version** and the
+  **exact date and time** of the last update.
 
 ## How to use
 
 - Open the live link above, or download `index.html` and open it in any browser.
 - **On iPhone:** open the link in Safari → **Share** → **Add to Home Screen** for a
   full-screen, app-like icon.
-- After updating the site, you can append `?v=2` to the URL in Safari to bypass the
-  cache, or re-add the home-screen icon to refresh it.
+- After the app is updated, just tap **↻ Check for updates** in the footer to pull the
+  latest version — no need to delete and re-add the home-screen icon, and nothing you've
+  learned is lost.
 
 ## Built with
 
@@ -138,4 +144,4 @@ home screen.
 
 ---
 
-*Last updated: removed the marks-quiz audio (the text-to-speech for marked syllables was unreliable), and gave the **marks their own mastery %** — each reference card shows a color-coded mastery bar, the marks section shows an overall mastery figure, and the quiz now feeds an SRS score per mark. Mastery percentages now appear on everything learnable: words (Items), letter shapes (Chart: iso / init / med / fin and per-letter), and the marks.*
+*Last updated (v1.0 · June 29, 2026 · 7:11 AM Manila): added a footer with a **"Check for updates"** button that force-reloads the newest version of the app from the web while keeping all your progress — so the iPhone home-screen shortcut no longer gets stuck on an old build. The footer also shows the **app version** and the **exact last-updated date and time**, and credits **made by Niza**.*

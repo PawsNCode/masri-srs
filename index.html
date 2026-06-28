@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -28,6 +29,22 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
    ============================================================ */
 
 const STORE_KEY = "masri-wk-v1";
+
+/* ---- App version + build stamp (bump these on each release) ---- */
+const APP_VERSION = "1.0";
+const APP_UPDATED = "June 29, 2026 · 7:11 AM (Manila, GMT+8)";
+
+// Force-fetch the freshest copy of the app from the web (busts the cache that
+// makes the home-screen shortcut go stale). Progress lives in localStorage,
+// which is keyed to the site — not the URL — so reloading keeps every bit of it.
+function hardRefresh() {
+  try {
+    const base = location.href.split("?")[0].split("#")[0];
+    location.replace(base + "?u=" + Date.now());
+  } catch (e) {
+    location.reload();
+  }
+}
 
 /* ---- Themes (live object T is mutated by applyTheme) ---- */
 const THEMES = {
@@ -3111,6 +3128,23 @@ function App() {
         {view === "stats" && <StatsView state={state} allItems={allItems} level={state.currentLevel} streak={streak} />}
       </div>
       {detailItem && <ItemDetail item={detailItem} onClose={() => setDetailItem(null)} autoPlay={state.settings.autoPlay !== false} />}
+
+      <div style={{ maxWidth: 560, margin: "0 auto", padding: "8px 18px calc(30px + env(safe-area-inset-bottom))" }}>
+        <div style={{ borderTop: `1px solid ${T.line}`, marginTop: 14, paddingTop: 18, textAlign: "center" }}>
+          <button className="tap" onClick={hardRefresh} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", borderRadius: 999, border: `1px solid ${T.gold}`, background: `${T.gold}12`, color: T.gold, fontSize: 13.5, fontWeight: 700 }}>
+            ↻ Check for updates
+          </button>
+          <div style={{ fontSize: 11, color: T.textDim, marginTop: 9, lineHeight: 1.6, maxWidth: 300, marginLeft: "auto", marginRight: "auto" }}>
+            Reloads the newest version from the web. Your progress stays saved — nothing is reset.
+          </div>
+          <div style={{ fontSize: 11, color: T.textDim, marginTop: 14 }}>
+            v{APP_VERSION} · updated {APP_UPDATED}
+          </div>
+          <div style={{ fontFamily: displayFont, fontSize: 14, color: T.goldSoft, marginTop: 6 }}>
+            made by Niza
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
