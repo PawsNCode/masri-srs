@@ -32,8 +32,9 @@ home screen.
   romanization, English, sound, and a **letter-by-letter breakdown** showing the exact
   shape each letter takes in that word (isolated / initial / medial / final). Tap any
   letter to jump straight to its **trace guide and practice — opened on the exact shape
-  it had in the word** (tap a final-form letter, land on its final-form guide), and
-  there's a **try-typing box with a Check button** to test yourself.
+  it had in the word** (tap a final-form letter, land on its final-form guide). There's a
+  **try-typing box with a Check button** to test yourself, plus a **"Try writing it"
+  pad** where you can finger-trace the whole word over a faint guide.
 - **Answer your way** — each quiz/review lets you **Type** the Arabic or answer by
   **Multiple choice**. The on-screen Arabic keyboard is **hidden by default everywhere**
   (type with your phone keyboard) and pops up only when you tap **Show in-app keys**. The
@@ -42,9 +43,11 @@ home screen.
   result shows the correct spelling *and* its letter-by-letter breakdown (tap a letter for
   its trace guide), and the **Next button stays pinned to the bottom** so it's always in reach.
 - **Richer lessons** — when learning a new word you now see everything at once: the
-  word, romanization, English, sound, the same tappable letter breakdown, and a
-  type-it-yourself Check box — so you read it, hear it, see how it's built, and write
-  it before moving on.
+  word, romanization, English, sound, the same tappable letter breakdown, a
+  type-it-yourself Check box, and a **"Try writing it" pad** to finger-trace the whole
+  word — so you read it, hear it, see how it's built, type it, and physically write it
+  before tapping **Learn it**. (Learning a new letter has its own "Now write it" trace
+  pad in the same spot.)
 - **Auto-play pronunciation** — a toggle in Home → settings speaks each word
   automatically as you learn it or when an answer is revealed. Turn it off for a quiet
   session.
@@ -145,4 +148,4 @@ home screen.
 
 ---
 
-*Last updated (v1.0.0 · 6/29/2026, 7:16:52 AM Manila): restyled the footer refresh control into a **"Refresh app"** card — a clear heading, an explanation that your progress/levels/custom quizzes/settings are kept, a full-width **"Refresh to latest version"** button, and the app version (1.0.0) with the exact last-updated date and time. Still credited **made by Niza**.*
+*Last updated (v1.0.1 · 6/29/2026, 7:24 AM Manila): added a **"Try writing it" pad** to word lessons and the word detail page — a finger-trace canvas with the whole word shown faintly behind it (and a Clear button), so you can practice writing a word before tapping **Learn it**. Learning a new letter already had the matching "Now write it" trace pad.*
