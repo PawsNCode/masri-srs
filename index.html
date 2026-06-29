@@ -31,8 +31,8 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "1.0.2";
-const APP_UPDATED = "6/29/2026, 7:37:50 AM";
+const APP_VERSION = "1.1.0";
+const APP_UPDATED = "6/30/2026, 2:15:00 PM";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
 // makes the home-screen shortcut go stale). Progress lives in localStorage,
@@ -83,6 +83,124 @@ const arFont =
 const displayFont = '"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif';
 const uiFont =
   'ui-sans-serif,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif';
+
+/* ---- Fixed answer-feedback colours (theme-independent, so "correct" always
+   reads as a true green and "wrong" as a true red, no matter the theme) ---- */
+const OK_GREEN = "#1ba35e";
+const BAD_RED = "#e04b54";
+
+/* ---- Mastery tiers ----
+   Mastery = your current run of consecutive correct answers across every quiz
+   type (each correct +1%, a miss resets to 0). 100 in a row = fully mastered.
+   The five tiers below colour every item by that run. */
+const MASTERY_TIERS = [
+  { min: 90, label: "Mastered", color: "#1ba35e" },
+  { min: 70, label: "Strong", color: "#7bbf3a" },
+  { min: 45, label: "Familiar", color: "#e0b400" },
+  { min: 20, label: "Shaky", color: "#ef8a3c" },
+  { min: 0, label: "Learning", color: "#e35d6a" },
+];
+function masteryTier(pct) {
+  const p = Math.max(0, Math.min(100, pct || 0));
+  return MASTERY_TIERS.find((t) => p >= t.min) || MASTERY_TIERS[MASTERY_TIERS.length - 1];
+}
+// Legend in screen order (Learning → Mastered) for displaying the scale.
+const MASTERY_LEGEND = [...MASTERY_TIERS].slice().reverse();
+
+/* ============================================================
+   Universal mnemonics
+   ------------------------------------------------------------
+   Two proven memory techniques, applied automatically:
+   • Letters & marks  → visual "looks-like" + sound association
+   • Words            → keyword/link method (sound-alike + meaning)
+   • Phrases/sentences→ chunk-and-story method
+   ============================================================ */
+
+// Visual + sound hook for each of the 28 letters (shape image, then sound cue).
+const LETTER_MN = {
+  "ا": { shape: "A tall, straight stroke — a flagpole standing to attention.", sound: "Look up the pole and say a long “Aaah”." },
+  "ب": { shape: "A boat (a smile) with ONE dot below — a bead of water under the hull.", sound: "B for Boat." },
+  "ت": { shape: "The same boat with TWO dots above — two cups for Tea on a table.", sound: "T for Tea." },
+  "ث": { shape: "The boat with THREE dots above — THree crumbs sprinkled on top.", sound: "TH as in “THree” (Masri usually softens it to s)." },
+  "ج": { shape: "A hook with a round belly and ONE dot inside — a Goose tucked in its nest.", sound: "Hard G as in “Go” — the Egyptian giim." },
+  "ح": { shape: "An open mouth / cheek with NO dot — a Hippo mid-yawn.", sound: "A breathy H from the throat, like fogging a mirror: “Haa”." },
+  "خ": { shape: "The yawning mouth with ONE dot above — a speck of dust in the throat.", sound: "KH — the throaty rasp in Scottish “loch”." },
+  "د": { shape: "A bent elbow — the little nook of a Door handle.", sound: "D for Door." },
+  "ذ": { shape: "The same elbow with ONE dot above — a Zip pull on the sleeve.", sound: "Soft “th” (this); in Masri usually Z." },
+  "ر": { shape: "A short tail curving below the line — a Rolling wave.", sound: "A rolled / tapped R." },
+  "ز": { shape: "The same wave with ONE dot above — a bee buzzing “zzz”.", sound: "Z for Zip." },
+  "س": { shape: "Three little teeth in a row — the blade of a Saw.", sound: "S for Saw — “sss”." },
+  "ش": { shape: "The three teeth with THREE dots above — “Shush!”, sugar sprinkled on.", sound: "SH as in “Shush”." },
+  "ص": { shape: "A round loop with a flat tail — a big round Sun.", sound: "A heavy, deep S (mouth wide and full)." },
+  "ض": { shape: "The same loop + tail with ONE dot above — Arabic’s signature letter.", sound: "A heavy, deep D." },
+  "ط": { shape: "A loop with a tall upright stroke — a Teapot with its spout up.", sound: "A heavy, deep T." },
+  "ظ": { shape: "The teapot with ONE dot above — steam curling off the lid.", sound: "A heavy, deep Z." },
+  "ع": { shape: "A curl shaped like a backwards 3 — an Ear cocked to listen.", sound: "A deep throat squeeze — the “catch” at the very start of “Arab”." },
+  "غ": { shape: "The same ear with ONE dot above — a Gargle bubble rising.", sound: "GH — a soft, gargled French-style R." },
+  "ف": { shape: "A small loop with ONE dot above and a tail forward — a Flag on a pole.", sound: "F for Flag." },
+  "ق": { shape: "A loop dipping below with TWO dots above — a Queen’s crown with two jewels.", sound: "In Masri a glottal catch (“uh-oh”); in MSA a deep K." },
+  "ك": { shape: "A folded shape — a little Key, or a person Kneeling.", sound: "K for Key." },
+  "ل": { shape: "A tall hook — a walking stick / hockey stick (an L).", sound: "L for Leg." },
+  "م": { shape: "A round head with a tail dropping down — a balloon on a string.", sound: "M for Moon." },
+  "ن": { shape: "A bowl / canoe with ONE dot above — a bowl catching the mooN.", sound: "N — one dot, “Noon”." },
+  "ه": { shape: "A small round knot — a Hula hoop.", sound: "A soft H, as in “Hello”." },
+  "و": { shape: "A loop with a tail — a Wave curling over, or a fish-hook.", sound: "W, or a long “oo” as in “moon”." },
+  "ي": { shape: "A long hook below with TWO dots under it — a Yacht with two portholes.", sound: "Y, or a long “ee”." },
+};
+
+// Hook for each haraka mark (keyed by the combining character).
+const MARK_MN = {
+  "\u064E": "Fatha — a little slash leaning ABOVE the letter, like the accent on “á”. Picture an axe-cut on top. Adds a short “a”.",
+  "\u0650": "Kasra — a slash sitting BELOW the letter; it “sits low”, like the i in “sit”. Adds a short “i”.",
+  "\u064F": "Damma — a tiny curl above (a baby و). Round your lips like blowing a kiss: “u”. Adds a short “u”.",
+  "\u0652": "Sukun — a small empty circle (a zero) above. Zero vowel: the letter just stops, no vowel at all.",
+  "\u064B": "Tanwin fath — DOUBLE fatha. Two slashes = say it twice: “…an”. Marks an indefinite ending.",
+  "\u064D": "Tanwin kasr — DOUBLE kasra below. Two = “…in”.",
+  "\u064C": "Tanwin damm — DOUBLE damma. Two curls = “…un”.",
+};
+
+// Common, easy-to-picture English words used to seed sound-alike links.
+const PICTURE_WORDS = ["ant","apple","arm","ball","banana","barn","bat","bath","bead","bean","bear","bee","bell","belly","bird","boat","bone","book","boot","box","boy","bread","brick","bug","bus","cake","camel","can","cap","car","card","cat","cave","chair","cheese","coin","cook","cop","cork","corn","cow","cup","dad","date","deer","desk","dish","dog","doll","door","duck","ear","egg","fan","farm","fig","fire","fish","flag","fly","fork","fox","frog","gate","goat","gold","goose","gun","hall","hat","hen","hill","hook","horn","horse","house","ice","ink","jam","jar","jeep","key","king","kite","knee","lamb","lamp","leg","lemon","lion","mall","man","map","mask","mat","mill","mint","mole","money","monkey","moon","mop","mouse","nail","nest","net","nose","nun","nut","oar","oil","owl","ox","pan","pea","pear","pen","pig","pin","pipe","pot","queen","rain","ram","rat","ring","road","rock","rope","sack","sail","salt","sand","saw","sea","seed","sheep","shell","ship","shoe","sock","soda","spoon","star","sun","table","tail","tank","tea","tent","tie","tin","toe","tool","tooth","top","town","toy","train","tree","tub","van","wall","water","wave","web","well","whale","wheel","wig","wolf","worm","yacht","yard","yarn"];
+
+function mnSkeleton(s) {
+  return (s || "").toLowerCase()
+    .replace(/[^a-z]/g, "")
+    .replace(/(kh|gh|sh|th|dh|ch)/g, (m) => m[0])
+    .replace(/(.)\1+/g, "$1")
+    .replace(/q/g, "k").replace(/c/g, "k").replace(/x/g, "k")
+    .replace(/y/g, "i").replace(/w/g, "u")
+    .replace(/ee/g, "i").replace(/oo/g, "u").replace(/aa/g, "a");
+}
+// Best-matching picturable English word for a romanization (longest shared start).
+function soundalike(tr) {
+  const sk = mnSkeleton(tr);
+  if (!sk) return null;
+  let best = null, bestLen = 1;
+  for (const w of PICTURE_WORDS) {
+    const wsk = mnSkeleton(w);
+    let n = 0;
+    while (n < sk.length && n < wsk.length && sk[n] === wsk[n]) n++;
+    if (n > bestLen) { bestLen = n; best = w; }
+  }
+  if (best) return best;
+  const first = sk[0];
+  return PICTURE_WORDS.find((w) => mnSkeleton(w)[0] === first) || null;
+}
+// Break a romanization into pronounceable beats (chunking aids recall).
+function syllableBeats(tr) {
+  return (tr || "").trim().split(/\s+/).map((w) => {
+    const parts = w.match(/[^aeiou\s]*[aeiou]+[^aeiou\s]*?(?=[^aeiou\s][aeiou])|[^aeiou\s]*[aeiou]+[^aeiou\s]*|[^aeiou\s]+/gi);
+    return parts ? parts.join("\u2011") : w;
+  }).join("  ");
+}
+// Build the right kind of mnemonic for an item (link method vs chunk-and-story).
+function wordMnemonic(item) {
+  if (!item) return null;
+  const beats = syllableBeats(item.tr);
+  const multi = item.type !== "word" || (item.tr || "").trim().includes(" ");
+  if (multi) return { kind: "story", beats, meaning: item.en };
+  return { kind: "link", beats, like: soundalike(item.tr), meaning: item.en };
+}
 
 /* ---- Pronunciation (Web Speech API — uses the device's Arabic voice) ---- */
 function speak(text) {
@@ -1576,7 +1694,7 @@ function stageMeta(stage) {
 }
 const STAGE_GROUPS = ["Apprentice", "Guru", "Master", "Enlightened", "Burned"];
 function learnItem(now) {
-  return { stage: 1, due: now + STAGE_MS[1], correct: 0, wrong: 0, recentWrong: 0, learnedAt: now };
+  return { stage: 1, due: now + STAGE_MS[1], correct: 0, wrong: 0, recentWrong: 0, run: 0, learnedAt: now };
 }
 function reviewSchedule(prog, correct, now) {
   let stage = prog ? prog.stage : 1;
@@ -1591,29 +1709,33 @@ function reviewSchedule(prog, correct, now) {
     correct: (prog ? prog.correct : 0) + (correct ? 1 : 0),
     wrong: (prog ? prog.wrong : 0) + (correct ? 0 : 1),
     recentWrong: correct ? 0 : (prog ? prog.recentWrong || 0 : 0) + 1,
+    run: prog ? prog.run || 0 : 0, // mastery run is bumped per-answer, preserved here
   };
+}
+// Bump an item's mastery run: +1 for a correct answer (capped at 100), reset to 0 on a miss.
+function bumpRun(prog, ok) {
+  const base = prog || {};
+  return { ...base, run: ok ? Math.min(100, (base.run || 0) + 1) : 0 };
 }
 function isLeech(prog) {
   return !!prog && (prog.recentWrong || 0) >= 2;
 }
-// How far up the SRS ladder (0–100%). Burned = 100%.
+// Mastery 0–100% = your current run of consecutive correct answers (capped at 100).
 function masteryPct(prog) {
-  const st = prog && prog.stage ? prog.stage : 0;
-  return Math.round((st / 9) * 100);
+  if (!prog) return 0;
+  return Math.max(0, Math.min(100, prog.run || 0));
 }
-// Traffic-light mastery: red = struggling, green = never missed, amber = recovering.
+// Tier colour for the mastery run (Learning → Mastered).
 function masteryColor(prog) {
   if (!prog) return null;
-  if ((prog.recentWrong || 0) >= 2) return T.red;
-  if ((prog.wrong || 0) === 0) return T.green;
-  return T.amber;
+  return masteryTier(masteryPct(prog)).color;
 }
 function masteryLabel(prog) {
   if (!prog) return "";
-  if ((prog.recentWrong || 0) >= 2) return "needs work";
-  if ((prog.wrong || 0) === 0) return "solid";
-  return "improving";
+  return masteryTier(masteryPct(prog)).label.toLowerCase();
 }
+// An item counts as "mastered" once its run reaches the Mastered tier (90%+).
+function isMastered(prog) { return !!prog && masteryPct(prog) >= 90; }
 function fmtUntil(due, now) {
   if (due === Infinity) return "burned";
   const d = due - now;
@@ -1684,7 +1806,7 @@ function Bar({ pct, h = 8 }) {
 }
 
 /* ===================== TYPED QUIZ (reused everywhere) ===================== */
-function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", onQuizType, autoPlay = true }) {
+function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "inapp", onQuizType, autoPlay = true }) {
   const [queue, setQueue] = useState(() => items);
   const [streak, setStreak] = useState({}); // id -> consecutive correct this session
   const [missed, setMissed] = useState({}); // id -> ever missed this session
@@ -1730,6 +1852,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
     if (feedback) return;
     setFeedback(ok ? "correct" : "wrong");
     if (autoPlay) speak(item.ar);
+    if (onAnswer) onAnswer(item.id, ok); // mastery run: +1 correct / reset on miss, every answer
     setStreak((s) => ({ ...s, [item.id]: ok ? (s[item.id] || 0) + 1 : 0 }));
     if (!ok) setMissed((m) => ({ ...m, [item.id]: true }));
   };
@@ -1809,7 +1932,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
       <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "22px 18px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
         <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>{isMc ? "Pick the Arabic" : "Type in Arabic"} · {item.type}</div>
         <div style={{ fontFamily: displayFont, fontSize: 24, color: T.text, marginTop: 8 }}>{item.en}</div>
-        <div style={{ marginTop: 8, fontSize: 11, color: curStreak >= 1 ? T.green : T.textDim, fontWeight: 600 }}>{curStreak >= 1 ? "✓ 1/2 in a row — one more to clear" : "Get this right twice in a row to clear it"}</div>
+        <div style={{ marginTop: 8, fontSize: 11, color: curStreak >= 1 ? OK_GREEN : T.textDim, fontWeight: 600 }}>{curStreak >= 1 ? "✓ 1/2 in a row — one more to clear" : "Get this right twice in a row to clear it"}</div>
       </div>
 
       {/* answer area */}
@@ -1818,8 +1941,8 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
           {mcOptions.map((opt, idx) => {
             let bg = T.panel, border = T.line, col = T.text;
             if (feedback) {
-              if (opt.id === item.id) { bg = `${T.green}1a`; border = T.green; col = T.gold; }
-              else if (mcPick && opt.id === mcPick.id) { bg = `${T.red}1a`; border = T.red; col = T.red; }
+              if (opt.id === item.id) { bg = `${OK_GREEN}1f`; border = OK_GREEN; col = OK_GREEN; }
+              else if (mcPick && opt.id === mcPick.id) { bg = `${BAD_RED}1a`; border = BAD_RED; col = BAD_RED; }
             }
             return (
               <button key={opt.id + "_" + idx} className="tap" onClick={() => chooseMc(opt)} disabled={!!feedback} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 14, padding: "16px 8px", cursor: feedback ? "default" : "pointer", minHeight: 64, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -1839,7 +1962,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
             dir="rtl"
             readOnly={!!feedback}
             inputMode={showKeys ? "none" : undefined}
-            style={{ width: "100%", marginTop: 12, padding: "14px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 26, outline: "none", textAlign: "right" }}
+            style={{ width: "100%", marginTop: 12, padding: "14px 16px", borderRadius: 14, border: `2px solid ${correct ? OK_GREEN : wrong ? BAD_RED : T.line}`, background: correct ? `${OK_GREEN}12` : wrong ? `${BAD_RED}12` : T.panel, color: T.text, fontFamily: arFont, fontSize: 26, outline: "none", textAlign: "right" }}
           />
           {!feedback && (
             <button className="tap" onClick={submit} style={{ width: "100%", marginTop: 10, padding: 14, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>Check answer</button>
@@ -1863,8 +1986,9 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
       )}
 
       {feedback && (
-        <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${wrong ? T.red : T.green}`, borderRadius: 14, padding: "14px 14px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: wrong ? T.red : T.green }}>{correct ? (curStreak >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — here's the correct answer:"}</div>
+        <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1.5px solid ${wrong ? BAD_RED : OK_GREEN}`, borderRadius: 14, padding: "14px 14px", textAlign: "center" }}>
+          <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: 0.5, color: wrong ? BAD_RED : OK_GREEN }}>{correct ? "CORRECT ✓" : "NOT QUITE ✗"}</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: wrong ? BAD_RED : OK_GREEN, marginTop: 2 }}>{correct ? (curStreak >= 2 ? "cleared! ✓✓" : "once more to clear it") : "here's the correct answer:"}</div>
           <button className="tap" onClick={() => setDetailOpen(true)} style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 2, background: "transparent", border: "none", cursor: "pointer", marginTop: 6 }}>
             <span style={{ fontFamily: arFont, fontSize: 32, color: T.text, direction: "rtl" }}>{item.ar}</span>
             <span style={{ fontSize: 10, color: T.gold, fontWeight: 700 }}>tap for full details ›</span>
@@ -1910,7 +2034,7 @@ function TypedQuiz({ items, mode, onGrade, onExit, title, quizType = "inapp", on
 }
 
 /* ===================== LEARN SESSION (teach N, then quiz them) ===================== */
-function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, quizType = "inapp", onQuizType, autoPlay = true }) {
+function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, quizType = "inapp", onQuizType, autoPlay = true }) {
   const [queue] = useState(() => pool.slice(0, batch));
   const [phase, setPhase] = useState("menu");
   const [i, setI] = useState(0);
@@ -1958,7 +2082,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0,
         <div style={{ textAlign: "center", fontSize: 12.5, color: T.textDim, margin: "0 0 12px", lineHeight: 1.5 }}>
           Now type each one in Arabic to lock it in 👇
         </div>
-        <TypedQuiz items={queue} mode="srs" onGrade={onGrade} onExit={() => setPhase("menu")} title="Lesson quiz" quizType={quizType} onQuizType={onQuizType} autoPlay={autoPlay} />
+        <TypedQuiz items={queue} mode="srs" onGrade={onGrade} onAnswer={onAnswer} onExit={() => setPhase("menu")} title="Lesson quiz" quizType={quizType} onQuizType={onQuizType} autoPlay={autoPlay} />
       </div>
     );
   }
@@ -1981,6 +2105,9 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0,
       <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "18px 2px 10px" }}>How to type it · tap a letter</div>
       <LetterBreakdown ar={item.ar} onTap={(part) => setPeek(part)} />
       <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 10, lineHeight: 1.5, textAlign: "center" }}>Reads right → left. Tap any letter for its trace guide and practice.</div>
+
+      <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "20px 2px 10px" }}>Remember it</div>
+      <MnemonicCard item={item} />
 
       {marksInWord(item.ar).length > 0 && (
         <>
@@ -2017,6 +2144,51 @@ function LearnSession({ pool, batch, onLearn, onGrade, onExit, learnedCount = 0,
 }
 
 /* ===================== SHARED: letter breakdown, type-try, script peek, item detail ===================== */
+
+// Universal mnemonic for a word/phrase/sentence (keyword-link or chunk-and-story).
+function MnemonicCard({ item }) {
+  const mn = useMemo(() => wordMnemonic(item), [item && item.id]);
+  if (!mn) return null;
+  return (
+    <div style={{ background: `${T.gold}0c`, border: `1px solid ${T.gold}40`, borderRadius: 14, padding: "13px 15px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
+        <span style={{ fontSize: 16 }}>🧠</span>
+        <span style={{ fontSize: 12.5, fontWeight: 700, color: T.gold }}>Memory hook</span>
+      </div>
+      <div style={{ fontSize: 13, color: T.text, lineHeight: 1.65 }}>
+        Say it in beats: <b style={{ color: T.gold }}>{mn.beats}</b>.
+      </div>
+      {mn.kind === "link" ? (
+        <div style={{ fontSize: 13, color: T.text, lineHeight: 1.65, marginTop: 5 }}>
+          {mn.like
+            ? <>It sounds a bit like <b style={{ color: T.gold }}>“{mn.like}”</b> — now picture a <b>{mn.like}</b> tangled up with <b>“{mn.meaning}”</b> in one silly image.</>
+            : <>Picture <b>“{mn.meaning}”</b> acting the word out as you say it aloud.</>}
+        </div>
+      ) : (
+        <div style={{ fontSize: 13, color: T.text, lineHeight: 1.65, marginTop: 5 }}>
+          Link each beat to a quick picture, then string them into one little scene that means <b>“{mn.meaning}”</b>.
+        </div>
+      )}
+      <div style={{ fontSize: 11.5, color: T.textDim, lineHeight: 1.5, marginTop: 6 }}>The sillier and more personal your picture, the better it sticks.</div>
+    </div>
+  );
+}
+
+// Visual + sound hook for a single letter (by glyph).
+function LetterMnemonicCard({ glyph }) {
+  const mn = LETTER_MN[glyph];
+  if (!mn) return null;
+  return (
+    <div style={{ background: `${T.gold}0c`, border: `1px solid ${T.gold}40`, borderRadius: 14, padding: "12px 14px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 5 }}>
+        <span style={{ fontSize: 16 }}>🧠</span>
+        <span style={{ fontSize: 12.5, fontWeight: 700, color: T.gold }}>Memory hook</span>
+      </div>
+      <div style={{ fontSize: 13, color: T.text, lineHeight: 1.6 }}><b style={{ color: T.gold }}>Looks like:</b> {mn.shape}</div>
+      <div style={{ fontSize: 13, color: T.text, lineHeight: 1.6, marginTop: 3 }}><b style={{ color: T.gold }}>Sounds like:</b> {mn.sound}</div>
+    </div>
+  );
+}
 
 // Row of tappable letter chips showing how a word is built, shape by shape.
 function LetterBreakdown({ ar, onTap }) {
@@ -2056,16 +2228,16 @@ function TypeTry({ item, compact }) {
         placeholder="try typing it…"
         dir="rtl"
         inputMode={showKb ? "none" : undefined}
-        style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `2px solid ${res === "ok" ? T.green : res === "no" ? T.red : T.line}`, background: res === "ok" ? `${T.green}10` : res === "no" ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 24, outline: "none", textAlign: "right" }}
+        style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `2px solid ${res === "ok" ? OK_GREEN : res === "no" ? BAD_RED : T.line}`, background: res === "ok" ? `${OK_GREEN}12` : res === "no" ? `${BAD_RED}12` : T.panel, color: T.text, fontFamily: arFont, fontSize: 24, outline: "none", textAlign: "right" }}
       />
       <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
         <button className="tap" onClick={() => setShowKb((s) => !s)} style={{ padding: "11px 14px", borderRadius: 12, border: `1px solid ${showKb ? T.gold : T.line}`, background: showKb ? `${T.gold}12` : T.panel, color: showKb ? T.gold : T.textDim, fontSize: 12.5, fontWeight: 600 }}>{showKb ? "⌨️ Hide keys" : "⌨️ Keys"}</button>
         <button className="tap" onClick={check} style={{ flex: 1, padding: "12px 16px", borderRadius: 12, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700, fontSize: 14 }}>Check</button>
       </div>
-      {res === "ok" && <div className="fade" style={{ marginTop: 10, textAlign: "center", color: T.green, fontWeight: 700, fontSize: 14 }}>✓ Perfect — that's it!</div>}
+      {res === "ok" && <div className="fade" style={{ marginTop: 10, textAlign: "center", color: OK_GREEN, fontWeight: 700, fontSize: 14 }}>✓ Perfect — that's it!</div>}
       {res === "no" && (
         <div className="fade" style={{ marginTop: 10, textAlign: "center" }}>
-          <div style={{ color: T.red, fontWeight: 700, fontSize: 13 }}>Not quite — the spelling is:</div>
+          <div style={{ color: BAD_RED, fontWeight: 700, fontSize: 13 }}>Not quite — the spelling is:</div>
           <div style={{ fontFamily: arFont, fontSize: 26, color: T.text, direction: "rtl", marginTop: 2 }}>{item.ar}</div>
         </div>
       )}
@@ -2152,6 +2324,9 @@ function ItemDetail({ item, onClose, autoPlay }) {
         <LetterBreakdown ar={item.ar} onTap={(part) => setPeek(part)} />
         <div style={{ fontSize: 11.5, color: T.textDim, marginTop: 10, lineHeight: 1.5, textAlign: "center" }}>Reads right → left. Each letter shows the shape it takes in this word — tap one for its trace guide and practice.</div>
 
+        <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "22px 2px 10px" }}>Remember it</div>
+        <MnemonicCard item={item} />
+
         {marksInWord(item.ar).length > 0 && (
           <>
             <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "22px 2px 10px" }}>Marks in this word</div>
@@ -2187,10 +2362,9 @@ function HarakatLessons({ harakat = {}, onSetMark }) {
 
   // SRS transitions for marks (stored in scriptState.harakat)
   const onLearn = (ch) => { if (onSetMark && !progOf(ch)) onSetMark(ch, learnItem(Date.now())); };
-  const onGrade = (ch, correct) => { if (onSetMark) onSetMark(ch, reviewSchedule(progOf(ch), correct, Date.now())); };
 
   if (phase === "learn") return <HarakatLearn marks={all} onDone={() => setPhase("menu")} onLearn={onLearn} />;
-  if (phase === "quiz") return <HarakatQuiz marks={quizMarks} harakat={harakat} onDone={() => setPhase("menu")} onGrade={onGrade} />;
+  if (phase === "quiz") return <HarakatQuiz marks={quizMarks} harakat={harakat} onDone={() => setPhase("menu")} onSet={onSetMark} />;
 
   return (
     <div className="fade" style={{ paddingTop: 4 }}>
@@ -2232,6 +2406,12 @@ function HarakatLearn({ marks, onDone, onLearn }) {
         </div>
         <div style={{ fontFamily: displayFont, fontSize: 22, color: T.text }}>{m.name} <span style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 17 }}>· {m.tr}</span></div>
         <div style={{ fontSize: 13, color: T.textDim, marginTop: 8, lineHeight: 1.6 }}>{m.info}</div>
+        {MARK_MN[m.ch] && (
+          <div style={{ background: `${T.gold}0c`, border: `1px solid ${T.gold}40`, borderRadius: 12, padding: "10px 12px", marginTop: 12, textAlign: "left" }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: T.gold, marginBottom: 3 }}>🧠 Memory hook</div>
+            <div style={{ fontSize: 12.5, color: T.text, lineHeight: 1.55 }}>{MARK_MN[m.ch]}</div>
+          </div>
+        )}
         {ex && (
           <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${T.line}` }}>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.8, color: T.goldSoft, marginBottom: 4 }}>Example</div>
@@ -2260,7 +2440,7 @@ function carrierSound(consonant, markCh) { const v = HARA_VOWEL[markCh]; return 
 function sukunNote(mk) { return mk && mk.ch === "\u0652" ? " (no vowel)" : ""; }
 
 // Quiz: match a marked letter to how it's pronounced, and vice-versa.
-function HarakatQuiz({ marks, onDone, onGrade }) {
+function HarakatQuiz({ marks, onDone, onSet, harakat = {} }) {
   const makeQ = (ans) => {
     const [g, c] = QUIZ_CARRIERS[Math.floor(Math.random() * QUIZ_CARRIERS.length)];
     const dir = Math.random() < 0.5 ? "read" : "write";
@@ -2285,10 +2465,16 @@ function HarakatQuiz({ marks, onDone, onGrade }) {
     setPick(opt);
     setFeedback(true);
     const ok = opt.mark.ch === cur.ch;
-    setStreak((s) => ({ ...s, [cur.ch]: ok ? (s[cur.ch] || 0) + 1 : 0 }));
+    const newStreak = ok ? (streak[cur.ch] || 0) + 1 : 0;
+    const everMissed = missed[cur.ch] || !ok;
+    setStreak((s) => ({ ...s, [cur.ch]: newStreak }));
     if (!ok) setMissed((m) => ({ ...m, [cur.ch]: true }));
-    // graduate (twice in a row) → grade into the SRS once, counting a miss if it ever slipped
-    if (ok && (streak[cur.ch] || 0) + 1 >= 2 && onGrade) onGrade(cur.ch, !missed[cur.ch]);
+    // Mastery run updates on every answer; the SRS is graded once, at graduation.
+    if (onSet) {
+      let np = bumpRun(markProg(harakat[cur.ch]) || learnItem(Date.now()), ok);
+      if (newStreak >= 2) np = reviewSchedule(np, !everMissed, Date.now());
+      onSet(cur.ch, np);
+    }
   };
   const next = () => {
     const st = streak[cur.ch] || 0;
@@ -2346,8 +2532,8 @@ function HarakatQuiz({ marks, onDone, onGrade }) {
         {q.options.map((opt, idx) => {
           let bg = T.panel, border = T.line, col = T.text;
           if (feedback) {
-            if (opt.mark.ch === cur.ch) { bg = `${T.green}1a`; border = T.green; col = T.gold; }
-            else if (pick && opt.mark.ch === pick.mark.ch) { bg = `${T.red}1a`; border = T.red; col = T.red; }
+            if (opt.mark.ch === cur.ch) { bg = `${OK_GREEN}1f`; border = OK_GREEN; col = OK_GREEN; }
+            else if (pick && opt.mark.ch === pick.mark.ch) { bg = `${BAD_RED}1a`; border = BAD_RED; col = BAD_RED; }
           }
           return (
             <button key={idx} className="tap" onClick={() => choose(opt)} disabled={feedback} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 14, padding: "16px 8px", cursor: feedback ? "default" : "pointer", minHeight: 62, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -2362,8 +2548,9 @@ function HarakatQuiz({ marks, onDone, onGrade }) {
       </div>
 
       {feedback && (
-        <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${correct ? T.green : T.red}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: correct ? T.green : T.red }}>{correct ? ((streak[cur.ch] || 0) >= 2 ? "Correct — cleared! ✓✓" : "Correct! Once more to clear it") : "Not quite — here's how it works:"}</div>
+        <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1.5px solid ${correct ? OK_GREEN : BAD_RED}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
+          <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: 0.5, color: correct ? OK_GREEN : BAD_RED }}>{correct ? "CORRECT ✓" : "NOT QUITE ✗"}</div>
+          <div style={{ fontSize: 11.5, fontWeight: 600, color: correct ? OK_GREEN : BAD_RED, marginTop: 1 }}>{correct ? ((streak[cur.ch] || 0) >= 2 ? "cleared! ✓✓" : "once more to clear it") : "here's how it works:"}</div>
           <div style={{ fontSize: 20, color: T.text, marginTop: 6 }}><span style={{ fontFamily: arFont, fontSize: 30 }}>{q.g + cur.ch}</span> &nbsp;=&nbsp; <b style={{ color: T.gold }}>{curSound}</b>{sukunNote(cur)}</div>
           <div style={{ fontSize: 12, color: T.textDim, marginTop: 6, lineHeight: 1.5 }}><b>{cur.name}</b> · {cur.info}</div>
         </div>
@@ -2637,11 +2824,11 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
         </div>
       )}
 
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 12px", margin: "2px 2px 8px", fontSize: 11 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 10px", margin: "2px 2px 8px", fontSize: 11 }}>
         <span style={{ color: T.textDim }}>Mastery:</span>
-        {[[T.green, "solid"], [T.amber, "improving"], [T.red, "needs work"]].map(([c, label]) => (
-          <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: T.textDim }}>
-            <span style={{ width: 9, height: 9, borderRadius: 3, background: c }} />{label}
+        {MASTERY_LEGEND.map((t) => (
+          <span key={t.label} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: T.textDim }}>
+            <span style={{ width: 9, height: 9, borderRadius: 3, background: t.color }} />{t.label}
           </span>
         ))}
         <span style={{ color: T.textDim, marginLeft: "auto" }}>★ adds to custom quiz</span>
@@ -2704,7 +2891,7 @@ function StatsView({ state, allItems, level, streak }) {
   const stageOf = (it) => prog[it.id]?.stage || 0;
 
   const learned = allItems.filter((it) => prog[it.id]).length;
-  const mastered = allItems.filter((it) => stageOf(it) >= 5).length;
+  const mastered = allItems.filter((it) => isMastered(prog[it.id])).length; // run ≥ 90%
   const burned = allItems.filter((it) => stageOf(it) >= 9).length;
   const due = allItems.filter((it) => { const p = prog[it.id]; return p && p.due !== Infinity && p.due <= now; }).length;
   const next24 = allItems.filter((it) => { const p = prog[it.id]; return p && p.due !== Infinity && p.due > now && p.due <= now + DAY; }).length;
@@ -2726,13 +2913,36 @@ function StatsView({ state, allItems, level, streak }) {
   const actSeries = days.map((ds) => state.history[ds] || 0);
   const newThisWeek = learnSeries.slice(-7).reduce((a, b) => a + b, 0);
 
-  // calendar heatmap — last 8 weeks (most recent week at bottom)
-  const calDays = [];
-  let cd = todayStr();
-  for (let k = 0; k < 56; k++) { calDays.unshift({ day: cd, n: state.history[cd] || 0 }); cd = shiftDay(cd, -1); }
-  const weeks = [];
-  for (let i = 0; i < calDays.length; i += 7) weeks.push(calDays.slice(i, i + 7));
-  const heat = (n) => (n === 0 ? T.line : n < 3 ? `${T.pink}` : n < 7 ? T.terra : T.gold);
+  // ---- Mastery breakdown across every started learnable (words, letter shapes, marks) ----
+  const allProgs = [];
+  allItems.forEach((it) => { const p = prog[it.id]; if (p) allProgs.push(p); });
+  const sp = (state.script && state.script.progress) || {};
+  SCRIPT_FORMS.forEach((t) => { const p = formProg(sp, t); if (p) allProgs.push(p); });
+  const hk = (state.script && state.script.harakat) || {};
+  Object.keys(hk).forEach((ch) => { const p = markProg(hk[ch]); if (p) allProgs.push(p); });
+  const tierCounts = { Learning: 0, Shaky: 0, Familiar: 0, Strong: 0, Mastered: 0 };
+  allProgs.forEach((p) => { tierCounts[masteryTier(masteryPct(p)).label]++; });
+  const totalStarted = allProgs.length;
+  const TIER_RANGE = { Learning: "0–19%", Shaky: "20–44%", Familiar: "45–69%", Strong: "70–89%", Mastered: "90–100%" };
+
+  // ---- Full-month activity calendar (navigable by month) ----
+  const today = todayStr();
+  const [calRef, setCalRef] = useState(() => { const t = new Date(); return { y: t.getUTCFullYear(), m: t.getUTCMonth() }; });
+  const nowMonth = (() => { const t = new Date(); return { y: t.getUTCFullYear(), m: t.getUTCMonth() }; })();
+  const atCurrentMonth = calRef.y === nowMonth.y && calRef.m === nowMonth.m;
+  const firstDow = new Date(Date.UTC(calRef.y, calRef.m, 1)).getUTCDay();
+  const daysInMonth = new Date(Date.UTC(calRef.y, calRef.m + 1, 0)).getUTCDate();
+  const monthLabel = new Date(Date.UTC(calRef.y, calRef.m, 1)).toLocaleString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  const calCells = [];
+  for (let i = 0; i < firstDow; i++) calCells.push(null);
+  for (let dd = 1; dd <= daysInMonth; dd++) {
+    const ds = `${calRef.y}-${String(calRef.m + 1).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+    calCells.push({ d: dd, ds, n: state.history[ds] || 0 });
+  }
+  const monthTotal = calCells.reduce((s, c) => s + (c ? c.n : 0), 0);
+  const monthActiveDays = calCells.filter((c) => c && c.n > 0).length;
+  const calHeat = (n) => (n === 0 ? T.line : n < 3 ? "#bfe6c8" : n < 7 ? "#7cc35a" : n < 15 ? "#39a85a" : "#1f7a3d");
+  const shiftMonth = (delta) => setCalRef((r) => { const d = new Date(Date.UTC(r.y, r.m + delta, 1)); return { y: d.getUTCFullYear(), m: d.getUTCMonth() }; });
 
   const Ring = ({ pct, label, sub }) => (
     <div style={{ flex: 1, background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 18, padding: "16px 14px", textAlign: "center" }}>
@@ -2748,7 +2958,7 @@ function StatsView({ state, allItems, level, streak }) {
       {/* completion rings */}
       <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
         <Ring pct={appPct} label="Whole app" sub={`${mastered} / ${totalApp} mastered`} />
-        <Ring pct={levelPct} label={`Level ${level}`} sub={`${levelGuru} / ${levelItems.length} mastered`} />
+        <Ring pct={levelPct} label={`Level ${level}`} sub={`${levelGuru} / ${levelItems.length} at Guru`} />
       </div>
 
       {/* key numbers */}
@@ -2766,6 +2976,34 @@ function StatsView({ state, allItems, level, streak }) {
         <Stat label="Next 7 days" value={next7} color={T.goldSoft} />
       </div>
 
+      {/* mastery breakdown by tier */}
+      <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px", marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+          <span style={{ fontSize: 13, color: T.textDim }}>Mastery breakdown</span>
+          <span style={{ fontSize: 11.5, color: T.goldSoft, fontWeight: 700 }}>{totalStarted} item{totalStarted === 1 ? "" : "s"} started</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+          {MASTERY_LEGEND.map((t) => {
+            const n = tierCounts[t.label];
+            const frac = totalStarted ? n / totalStarted : 0;
+            return (
+              <div key={t.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ width: 10, height: 10, borderRadius: 3, background: t.color, flexShrink: 0 }} />
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: T.text, minWidth: 66 }}>{t.label}</span>
+                <span style={{ fontSize: 10.5, color: T.textDim, minWidth: 52 }}>{TIER_RANGE[t.label]}</span>
+                <div style={{ flex: 1, height: 7, background: T.line, borderRadius: 7, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${frac * 100}%`, background: t.color, transition: "width .3s ease" }} />
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: T.text, minWidth: 26, textAlign: "right" }}>{n}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ fontSize: 11, color: T.textDim, lineHeight: 1.55, marginTop: 12, paddingTop: 10, borderTop: `1px dashed ${T.line}` }}>
+          Mastery is your current run of correct answers across every quiz type — each correct answer adds 1%, a miss resets it to 0. 100 in a row earns full mastery.
+        </div>
+      </div>
+
       {/* new words learned */}
       <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px 16px 12px", marginBottom: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
@@ -2781,22 +3019,35 @@ function StatsView({ state, allItems, level, streak }) {
         <MiniBars series={actSeries} unit="answers" />
       </div>
 
-      {/* calendar heatmap */}
+      {/* full-month activity calendar */}
       <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px", marginBottom: 14 }}>
-        <div style={{ fontSize: 13, color: T.textDim, marginBottom: 12 }}>Activity calendar — last 8 weeks</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {weeks.map((wk, wi) => (
-            <div key={wi} style={{ display: "flex", gap: 4 }}>
-              {wk.map((c) => (
-                <div key={c.day} title={`${c.day}: ${c.n}`} style={{ flex: 1, aspectRatio: "1 / 1", borderRadius: 4, background: heat(c.n) }} />
-              ))}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+          <button className="tap" onClick={() => shiftMonth(-1)} aria-label="Previous month" style={{ width: 30, height: 30, borderRadius: 9, border: `1px solid ${T.line}`, background: T.panelHi, color: T.gold, fontSize: 16, fontWeight: 700, lineHeight: 1 }}>‹</button>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: T.text }}>{monthLabel}</div>
+            <div style={{ fontSize: 11, color: T.textDim, marginTop: 1 }}>activity calendar</div>
+          </div>
+          <button className="tap" onClick={() => !atCurrentMonth && shiftMonth(1)} disabled={atCurrentMonth} aria-label="Next month" style={{ width: 30, height: 30, borderRadius: 9, border: `1px solid ${T.line}`, background: T.panelHi, color: atCurrentMonth ? T.line : T.gold, fontSize: 16, fontWeight: 700, lineHeight: 1, cursor: atCurrentMonth ? "default" : "pointer" }}>›</button>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginTop: 10 }}>
+          {["S", "M", "T", "W", "T", "F", "S"].map((wd, i) => (
+            <div key={i} style={{ textAlign: "center", fontSize: 10, fontWeight: 700, color: T.textDim, paddingBottom: 2 }}>{wd}</div>
+          ))}
+          {calCells.map((c, i) => c === null ? (
+            <div key={"e" + i} />
+          ) : (
+            <div key={c.ds} title={`${c.ds}: ${c.n} answer${c.n === 1 ? "" : "s"}`} style={{ aspectRatio: "1 / 1", borderRadius: 7, background: calHeat(c.n), border: c.ds === today ? `2px solid ${T.gold}` : `1px solid ${c.n === 0 ? T.line : "transparent"}`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: c.n >= 3 ? "#fff" : c.n > 0 ? "#1f7a3d" : T.textDim }}>{c.d}</span>
             </div>
           ))}
         </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 5, marginTop: 10, fontSize: 10.5, color: T.textDim }}>
-          less
-          {[T.line, T.pink, T.terra, T.gold].map((c, i) => (<span key={i} style={{ width: 11, height: 11, borderRadius: 3, background: c, display: "inline-block" }} />))}
-          more
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12 }}>
+          <span style={{ fontSize: 11, color: T.textDim }}>{monthActiveDays} active day{monthActiveDays === 1 ? "" : "s"} · {monthTotal} answers</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10.5, color: T.textDim }}>
+            less
+            {[T.line, "#bfe6c8", "#7cc35a", "#39a85a", "#1f7a3d"].map((c, i) => (<span key={i} style={{ width: 11, height: 11, borderRadius: 3, background: c, display: "inline-block" }} />))}
+            more
+          </span>
         </div>
       </div>
 
@@ -2965,6 +3216,15 @@ function App() {
     return leveled;
   }, [persist]);
 
+  // Every individual answer bumps a word's mastery run (consecutive correct), separate
+  // from the once-per-session SRS grade above. Correct +1 (cap 100), a miss resets to 0.
+  const bumpItemRun = useCallback((id, ok) => {
+    const s = stateRef.current;
+    const prog = s.progress[id];
+    if (!prog) return;
+    persist({ ...s, progress: { ...s.progress, [id]: bumpRun(prog, ok) } });
+  }, [persist]);
+
   const startPractice = useCallback((itemsOrLeech) => {
     const items = itemsOrLeech === "leeches" ? (derived ? derived.leechList : []) : itemsOrLeech;
     if (items && items.length) { setPracticeItems(items); setView("practice"); }
@@ -3113,7 +3373,7 @@ function App() {
           />
         )}
         {view === "lessons" && (
-          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
+          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}
         {view === "reviews" && (
           <ReviewsHub
@@ -3127,8 +3387,8 @@ function App() {
             onGotoScript={() => { setScriptAuto(false); setView("script"); }}
           />
         )}
-        {view === "reviewrun" && <TypedQuiz items={reviewRun} mode="srs" onGrade={grade} onExit={() => setView("reviews")} title="Reviews" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
-        {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onExit={() => setView("items")} title="Practice" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
+        {view === "reviewrun" && <TypedQuiz items={reviewRun} mode="srs" onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("reviews")} title="Reviews" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
+        {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("items")} title="Practice" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
         {view === "script" && <ScriptView scriptState={state.script} setScript={(next) => persist({ ...state, script: next })} autoReview={scriptAuto} onAutoConsumed={() => setScriptAuto(false)} customLetters={state.customLetters || []} onCustomLetters={onCustomLetters} />}
         {view === "items" && (
           <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onOpenDetail={setDetailItem} />
@@ -3252,7 +3512,7 @@ function letterMatch(typed, glyph) {
 function normLP(p) {
   if (!p) return null;
   if (typeof p.stage === "number") return p;
-  if (p.learned) return { stage: 1, due: 0, correct: p.correct || 0, wrong: p.wrong || 0, recentWrong: p.recentWrong || 0, learnedAt: p.learnedAt || Date.now() };
+  if (p.learned) return { stage: 1, due: 0, correct: p.correct || 0, wrong: p.wrong || 0, recentWrong: p.recentWrong || 0, run: p.run || 0, learnedAt: p.learnedAt || Date.now() };
   return null;
 }
 
@@ -3321,13 +3581,16 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
   const setBatch = (n) => setScript({ ...ss, batch: n });
   const setDir = (d) => setScript({ ...ss, quizDir: d });
 
-  // Grade a shape into the SRS exactly once (at graduation), reflecting whether it
-  // was ever missed this session — so a stumble still applies the 50% setback.
-  const gradeSRS = (tok, ok) => {
+  // Save a shape's progress: bump its mastery run on EVERY answer, and additionally
+  // grade it into the SRS once, at graduation (a stumble still applies the 50% setback).
+  const saveShape = (tok, ok, graduating, wasMissed) => {
     const cur = fpOf(tok) || learnItem(Date.now());
-    const np = quizSrs
-      ? reviewSchedule(cur, ok, Date.now())
-      : { ...cur, correct: cur.correct + (ok ? 1 : 0), wrong: cur.wrong + (ok ? 0 : 1), recentWrong: ok ? 0 : (cur.recentWrong || 0) + 1 };
+    let np = bumpRun(cur, ok);
+    if (graduating) {
+      np = quizSrs
+        ? reviewSchedule(np, !wasMissed, Date.now())
+        : { ...np, correct: np.correct + (!wasMissed ? 1 : 0), wrong: np.wrong + (!wasMissed ? 0 : 1), recentWrong: !wasMissed ? 0 : (np.recentWrong || 0) + 1 };
+    }
     saveProg(tok[5], np, sess.best);
   };
 
@@ -3370,8 +3633,10 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
     setSess((s) => { const ns = ok ? s.streak + 1 : 0; return { right: s.right + (ok ? 1 : 0), total: s.total + 1, streak: ns, best: Math.max(s.best, ns) }; });
     setSStreak((m) => ({ ...m, [key]: newStreak }));
     if (!ok) setSMissed((m) => ({ ...m, [key]: true }));
+    const graduating = newStreak >= 2;
+    saveShape(tok, ok, graduating, wasMissed); // run every answer; SRS once at graduation
     let nq;
-    if (newStreak >= 2) { gradeSRS(tok, !wasMissed); nq = quizSet.slice(1); }
+    if (graduating) { nq = quizSet.slice(1); }
     else { nq = [...quizSet.slice(1), tok]; }
     setPicked(null); setTyped(""); setFeedback(null); setTraceShown(false); setTraceKey((k) => k + 1); setStep((s) => s + 1);
     if (nq.length === 0) { setMode("done"); return; }
@@ -3586,7 +3851,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <Stat label="Mastered" value={`${masteredShapes}/${initialLen}`} color={T.gold} />
         <Stat label="Streak" value={`${sess.streak}🔥`} color={T.terra} />
-        <Stat label="This shape" value={curStreak >= 1 ? `${curStreak}/2 ✓` : "0/2"} color={curStreak >= 1 ? T.green : T.textDim} />
+        <Stat label="This shape" value={curStreak >= 1 ? `${curStreak}/2 ✓` : "0/2"} color={curStreak >= 1 ? OK_GREEN : T.textDim} />
       </div>
 
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
@@ -3621,7 +3886,7 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
             </button>
           ) : (
             <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <button className="tap" onClick={() => gradeTrace(false)} style={{ flex: 1, padding: 14, borderRadius: 13, border: `1.5px solid ${T.red}`, background: `${T.red}14`, color: T.text, fontSize: 14, fontWeight: 700 }}>Missed ✗</button>
+              <button className="tap" onClick={() => gradeTrace(false)} style={{ flex: 1, padding: 14, borderRadius: 13, border: `1.5px solid ${BAD_RED}`, background: `${BAD_RED}14`, color: T.text, fontSize: 14, fontWeight: 700 }}>Missed ✗</button>
               <button className="tap" onClick={() => gradeTrace(true)} style={{ flex: 1, padding: 14, borderRadius: 13, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 14, fontWeight: 700 }}>Got it ✓</button>
             </div>
           )}
@@ -3640,8 +3905,8 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
               if (picked) {
                 const isCorrect = opt[2] === ans[2];
                 const isPicked = opt[2] === picked[2];
-                if (isCorrect) { bg = `${T.green}1a`; border = T.green; col = T.gold; }
-                else if (isPicked) { bg = `${T.red}1a`; border = T.red; col = T.red; }
+                if (isCorrect) { bg = `${OK_GREEN}1f`; border = OK_GREEN; col = OK_GREEN; }
+                else if (isPicked) { bg = `${BAD_RED}1a`; border = BAD_RED; col = BAD_RED; }
               }
               return (
                 <button key={i} className="tap" onClick={() => choose(opt)} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 14, padding: "14px 8px", cursor: "pointer", minHeight: 58, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -3668,10 +3933,10 @@ function ScriptTrain({ scriptState, setScript, autoReview, onAutoConsumed, custo
             <div style={{ fontSize: 13, color: T.textDim, marginTop: 2 }}>{ans[1]} <span style={{ color: T.goldSoft }}>· {ans[6]} form</span></div>
             <div style={{ marginTop: 10 }}><Speaker text={ans[0]} size={18} color={T.terra} /></div>
           </div>
-          <input value={typed} onChange={(e) => !feedback && setTyped(e.target.value)} onKeyDown={(e) => e.key === "Enter" && checkType()} placeholder="الحرف…" dir="rtl" readOnly={!!feedback} inputMode={showKeys ? "none" : undefined} style={{ width: "100%", marginTop: 12, padding: "12px 16px", borderRadius: 14, border: `2px solid ${correct ? T.green : wrong ? T.red : T.line}`, background: correct ? `${T.green}10` : wrong ? `${T.red}10` : T.panel, color: T.text, fontFamily: arFont, fontSize: 34, outline: "none", textAlign: "center" }} />
+          <input value={typed} onChange={(e) => !feedback && setTyped(e.target.value)} onKeyDown={(e) => e.key === "Enter" && checkType()} placeholder="الحرف…" dir="rtl" readOnly={!!feedback} inputMode={showKeys ? "none" : undefined} style={{ width: "100%", marginTop: 12, padding: "12px 16px", borderRadius: 14, border: `2px solid ${correct ? OK_GREEN : wrong ? BAD_RED : T.line}`, background: correct ? `${OK_GREEN}12` : wrong ? `${BAD_RED}12` : T.panel, color: T.text, fontFamily: arFont, fontSize: 34, outline: "none", textAlign: "center" }} />
           {feedback && (
-            <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1px solid ${wrong ? T.red : T.green}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: wrong ? T.red : T.green }}>{correct ? "Correct!" : "Answer:"}</div>
+            <div className="fade" style={{ marginTop: 12, background: T.panel, border: `1.5px solid ${wrong ? BAD_RED : OK_GREEN}`, borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
+              <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 0.5, color: wrong ? BAD_RED : OK_GREEN }}>{correct ? "CORRECT ✓" : "ANSWER:"}</div>
               <div style={{ fontFamily: arFont, fontSize: 40, color: T.text, direction: "rtl", marginTop: 2 }}>{ans[0]}</div>
               <div style={{ color: T.text, fontSize: 14 }}>{ans[1]} <span style={{ color: T.goldSoft, fontStyle: "italic" }}>· {ans[2]}</span></div>
             </div>
@@ -3902,13 +4167,13 @@ function ScriptQuiz() {
             const isCorrect = opt[2] === q.answer[2];
             const isPicked = opt[2] === picked[2];
             if (isCorrect) {
-              bg = `${T.green}1a`;
-              border = T.green;
-              col = T.gold;
+              bg = `${OK_GREEN}1f`;
+              border = OK_GREEN;
+              col = OK_GREEN;
             } else if (isPicked) {
-              bg = `${T.red}1a`;
-              border = T.red;
-              col = T.red;
+              bg = `${BAD_RED}1a`;
+              border = BAD_RED;
+              col = BAD_RED;
             }
           }
           return (
@@ -4305,6 +4570,8 @@ function ScriptTrace({ initialIdx, onBack, initialForm }) {
         )}
       </div>
 
+      {showDetails && <div style={{ marginBottom: 14 }}><LetterMnemonicCard glyph={letter[0]} /></div>}
+
       {/* canvas + guide */}
       <div
         style={{
@@ -4493,12 +4760,15 @@ function ScriptLearn({ onTrace, prog = {} }) {
         exact shape</b> — so you can see which shapes still need work. Tap the big letter to{" "}
         <b style={{ color: T.gold }}>trace</b> it, or 🔊 to hear it.
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 12px", margin: "0 2px 12px", fontSize: 11 }}>
-        {[[T.green, "solid"], [T.amber, "improving"], [T.red, "needs work"], [T.line, "not started"]].map(([c, label]) => (
-          <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: T.textDim }}>
-            <span style={{ width: 9, height: 9, borderRadius: 3, background: c }} />{label}
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 10px", margin: "0 2px 12px", fontSize: 11 }}>
+        {MASTERY_LEGEND.map((t) => (
+          <span key={t.label} style={{ display: "inline-flex", alignItems: "center", gap: 5, color: T.textDim }}>
+            <span style={{ width: 9, height: 9, borderRadius: 3, background: t.color }} />{t.label}
           </span>
         ))}
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: T.textDim }}>
+          <span style={{ width: 9, height: 9, borderRadius: 3, background: T.line }} />not started
+        </span>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
@@ -4514,9 +4784,7 @@ function ScriptLearn({ onTrace, prog = {} }) {
           const letterColor = (() => {
             const ps = dist.map((ff) => normLP(prog[l + ":" + ff]) || normLP(prog[l]));
             if (ps.some((p) => !p)) return null;
-            if (ps.some((p) => (p.recentWrong || 0) >= 2)) return T.red;
-            if (ps.every((p) => (p.wrong || 0) === 0)) return T.green;
-            return T.amber;
+            return masteryTier(letterPct).color;
           })();
           return (
             <div
@@ -4561,6 +4829,11 @@ function ScriptLearn({ onTrace, prog = {} }) {
                   {STROKES[l] && (
                     <div style={{ fontSize: 12, color: T.gold, lineHeight: 1.5, marginTop: 3 }}>
                       ✍️ {STROKES[l][1]}
+                    </div>
+                  )}
+                  {LETTER_MN[l] && (
+                    <div style={{ fontSize: 11.5, color: T.textDim, lineHeight: 1.5, marginTop: 4 }}>
+                      🧠 {LETTER_MN[l].shape}
                     </div>
                   )}
                 </div>

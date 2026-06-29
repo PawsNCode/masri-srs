@@ -15,14 +15,23 @@ home screen.
 - **Level gating** — a level unlocks only after you reach **Guru** on 90% of the
   previous level, so you master each step before moving on.
 - **SRS stages** — every item climbs Apprentice → Guru → Master → Enlightened →
-  Burned, resurfacing right before you'd forget it.
-- **Half-back on a miss** — get a review wrong and the item loses **half its
-  progress** (e.g. correct three times then wrong once drops it from ~44% back to
-  ~22% mastery), then comes due again soon. Honest mistakes cost you, so you really
-  learn it.
-- **Mastery colors** — every word in the Items list shows its state at a glance:
-  **green = solid** (never missed), **amber = improving** (missed before, recovering),
-  **red = needs work** (missed twice), plus a live mastery % per item.
+  Burned, resurfacing right before you'd forget it. (Scheduling still drives *when*
+  things come back; **mastery %** is a separate, simpler score — see below.)
+- **Half-back on a miss** — get a review wrong and the item loses **half its SRS
+  progress** (the 50% setback), so its next due date pulls back in. Honest mistakes
+  cost you, so you really learn it.
+- **Mastery = your run of correct answers** — an item's mastery % is your **current
+  streak of correct answers across every quiz type** (typing, multiple choice,
+  tracing, marks, reviews — all of it). Each correct answer adds **1%**; a single miss
+  resets it to **0**. Answer it right **100 times in a row** and it's **100% mastered**.
+- **Five mastery tiers, color-coded** — every word, letter shape, and mark shows a
+  colored bar by tier: **Learning 0–19%** (red), **Shaky 20–44%** (orange),
+  **Familiar 45–69%** (yellow), **Strong 70–89%** (light green), **Mastered 90–100%**
+  (green), plus a live % per item.
+- **Greener, clearer answer feedback** — in **every** quiz and review, the moment you
+  answer the screen shows a bold **CORRECT ✓** in green (or **NOT QUITE ✗** in red),
+  the right choice is highlighted **green**, and a wrong pick is highlighted **red** —
+  so there's no mistaking how you did.
 - **Lessons hub** — the Lessons tab opens to a small menu: **learn a batch of new
   words** (3/5/7/10, your choice) and then quiz them to lock them in, **quiz all the
   words you've learned** in one shuffled drill, or **start a custom quiz** of words you
@@ -48,6 +57,15 @@ home screen.
   word — so you read it, hear it, see how it's built, type it, and physically write it
   before tapping **Learn it**. (Learning a new letter has its own "Now write it" trace
   pad in the same spot.)
+- **Universal mnemonics on everything you learn** — a 🧠 **Memory hook** appears
+  wherever you learn something, using proven memory techniques:
+  - **Letters** get a *looks-like* + *sounds-like* hook (e.g. ب is “a boat with one
+    dot below — B for Boat”; ح is “a hippo mid-yawn — a breathy H from the throat”),
+    shown in the alphabet reference and on every trace guide.
+  - **Marks (harakat)** get their own hook (e.g. kasra “sits low, like the i in *sit*”).
+  - **Words** get a keyword/link hook — the pronunciation broken into easy **beats**
+    plus a sound-alike English word to picture together with the meaning.
+  - **Phrases & sentences** get a chunk-and-story hook to chain the beats into one scene.
 - **Auto-play pronunciation** — a toggle in Home → settings speaks each word
   automatically as you learn it or when an answer is revealed. Turn it off for a quiet
   session.
@@ -86,10 +104,11 @@ home screen.
   (same half-back rule as words) and re-queues it so you retake it.
 - **Chart** — the full 28-letter reference with a pronunciation key and stroke-order
   guides. Every one of the four positional forms now shows **its own mastery % and a
-  color bar** (green = solid, amber = improving, red = needs work, grey = not started),
-  plus an overall % per letter — so you can see at a glance exactly which shapes still
-  need drilling. **Each form cell (iso / init / med / fin) is tappable** and opens the
-  trace guide right on that shape, so you can practice writing exactly the form you want.
+  color bar** in the same five tiers (red → green as your correct-answer run grows;
+  grey = not started), plus an overall % per letter — so you can see at a glance
+  exactly which shapes still need drilling. **Each form cell (iso / init / med / fin)
+  is tappable** and opens the trace guide right on that shape, so you can practice
+  writing exactly the form you want.
 - **Quiz** — match letters to sounds with live score, accuracy, and streaks.
 - **Trace** — finger-trace letters over a soft ghost glyph on a 2×2 grid, with
   written stroke-order steps, plus a write-from-memory quiz mode.
@@ -112,8 +131,11 @@ home screen.
 - **Items** is a searchable dictionary (English / transliteration / Arabic) with a
   count for every level.
 - **Stats** dashboard: % of the whole app and current level mastered, words
-  learned/mastered/burned, a review pipeline (due now / 24h / 7 days), a 14-day
-  "new words" graph, a 14-day activity graph, an 8-week activity calendar heatmap,
+  learned/mastered/burned, a review pipeline (due now / 24h / 7 days), a **mastery
+  breakdown** counting how many of everything you've started sit in each tier
+  (Learning / Shaky / Familiar / Strong / Mastered), a 14-day "new words" graph, a
+  14-day activity graph, a **full-month activity calendar** you can page through
+  month by month — each day shaded greener the more you studied, with today ringed —
   and per-level progress bars.
 - **Themes** — six color themes (Rose, Violet, Bubblegum, Mint, Dark, Midnight),
   chosen at the bottom of the Home screen.
@@ -148,4 +170,11 @@ home screen.
 
 ---
 
-*Last updated (v1.0.2 · 6/29/2026, 7:37 AM Manila): made the **"Try writing it" pad** much easier to trace — the faint word/script is now considerably larger (and the pad taller), and the tracing ink is thinner so it no longer overpowers the guide.*
+*Last updated (v1.1.0 · 6/30/2026, 2:15 PM Manila): **mastery is now your run of
+correct answers** — each correct answer across any quiz type adds 1%, a miss resets
+to 0, and 100 in a row earns full mastery; items are color-coded into five tiers
+(Learning / Shaky / Familiar / Strong / Mastered). Every quiz and review now shows a
+bold green **CORRECT** (and highlights the right answer green, wrong picks red).
+Stats gains a **mastery breakdown** and a navigable **full-month activity calendar**.
+And learning anything — letters, marks, words, phrases, sentences — now comes with a
+🧠 **Universal Memory hook** to make it stick.*
