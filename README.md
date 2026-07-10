@@ -12,8 +12,9 @@ home screen.
 ### Vocabulary (WaniKani-style)
 - **878 items across 79 levels** — words, phrases, and full sentences, grouped by
   theme and difficulty (greetings → grammar → daily life → dialogues → slang).
-- **Level gating** — a level unlocks only after you reach **Guru** on 90% of the
-  previous level, so you master each step before moving on.
+- **Instant level unlock** — the next level opens the moment you've **learned every
+  item** in your current level (no need to master them first). Learn the last word of
+  a level and its successor is immediately available in Lessons.
 - **SRS stages** — every item climbs Apprentice → Guru → Master → Enlightened →
   Burned, resurfacing right before you'd forget it. (Scheduling still drives *when*
   things come back; **mastery %** is a separate, simpler score — see below.)
@@ -85,7 +86,14 @@ home screen.
 - **Custom quiz** — tap the ★ on any word or letter to save it to a personal quiz
   you can run anytime; your picks persist across sessions. In Items the **Start custom
   quiz** button now sticks to the top of the list, so it's one tap away no matter how
-  far you've scrolled.
+  far you've scrolled. **Starring an item instantly unlocks it** — if you hadn't
+  learned it yet, it's added as learned right away so it's quizzable on the spot (no
+  more 🔒 on things you've hand-picked).
+- **Add to custom quiz by mastery level** — a panel in Items lets you pick one or
+  more **SRS levels** (Apprentice / Guru / Master / Enlightened / Burned) and drop
+  **every learned item at those levels** into your custom quiz in one tap. Want to
+  drill everything that's still Apprentice *and* everything at Guru? Select both and
+  add them all at once.
 
 ### Script / alphabet
 - **Train** — learn letters in batches with real **SRS scheduling**. Every letter is
@@ -170,11 +178,14 @@ home screen.
 
 ---
 
-*Last updated (v1.1.0 · 6/30/2026, 2:15 PM Manila): **mastery is now your run of
-correct answers** — each correct answer across any quiz type adds 1%, a miss resets
-to 0, and 100 in a row earns full mastery; items are color-coded into five tiers
-(Learning / Shaky / Familiar / Strong / Mastered). Every quiz and review now shows a
-bold green **CORRECT** (and highlights the right answer green, wrong picks red).
-Stats gains a **mastery breakdown** and a navigable **full-month activity calendar**.
-And learning anything — letters, marks, words, phrases, sentences — now comes with a
-🧠 **Universal Memory hook** to make it stick.*
+*Last updated (v1.2.0 · 6/30/2026, 6:40 PM Manila): **the next level now unlocks the
+instant you've learned every item in your current level** — no mastery gate. **Starring
+an item in a custom quiz instantly unlocks it** (it's added as learned and quizzable
+right away), and a new **"Add to custom quiz by mastery level"** panel lets you drop
+every learned Apprentice / Guru / Master / Enlightened / Burned item into your custom
+quiz in one tap.*
+
+*Earlier (v1.1.0): mastery became your run of consecutive correct answers (100 in a
+row = full mastery) with five color-coded tiers; every quiz shows a bold green
+**CORRECT**; Stats gained a mastery breakdown and a navigable full-month activity
+calendar; and learning anything now comes with a 🧠 Universal Memory hook.*

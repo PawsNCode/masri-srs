@@ -31,8 +31,8 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "1.1.0";
-const APP_UPDATED = "6/30/2026, 2:15:00 PM";
+const APP_VERSION = "1.2.0";
+const APP_UPDATED = "6/30/2026, 6:40:00 PM";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
 // makes the home-screen shortcut go stale). Progress lives in localStorage,
@@ -1546,6 +1546,17 @@ const ITEMS = RAW.map(([id, level, type, ar, tr, en, alts]) => ({
   custom: false,
 }));
 const MAX_LEVEL = Math.max(...ITEMS.map((i) => i.level));
+// A level is unlocked as soon as EVERY item in the current level has been learned
+// (has any progress). Climb as far as that holds so unlocking is always immediate.
+function nextUnlockedLevel(progress, cur) {
+  let lvl = cur;
+  while (lvl < MAX_LEVEL) {
+    const items = ITEMS.filter((it) => it.level === lvl);
+    if (items.length && items.every((it) => progress[it.id])) lvl += 1;
+    else break;
+  }
+  return lvl;
+}
 const LEVEL_TITLES = {
   1: "Greetings & Courtesy",
   2: "Pronouns & Questions",
@@ -2056,7 +2067,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
         {/* Learn new words — primary */}
         <button className="tap" onClick={() => canLearn && setPhase("teach")} disabled={!canLearn} style={{ width: "100%", padding: 16, borderRadius: 14, marginBottom: 10, textAlign: "left", background: canLearn ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.panel, color: canLearn ? "#fff" : T.textDim, border: canLearn ? "none" : `1px solid ${T.line}`, boxShadow: canLearn ? "0 8px 20px rgba(128,29,92,.18)" : "none" }}>
           <div style={{ fontSize: 15, fontWeight: 700 }}>{canLearn ? `Learn ${queue.length} new word${queue.length === 1 ? "" : "s"} →` : "No new words right now"}</div>
-          <div style={{ fontSize: 11.5, marginTop: 2, opacity: canLearn ? 0.9 : 1, color: canLearn ? "#fff" : T.textDim }}>{canLearn ? "Teach, then quiz them to lock them in" : "You've learned all that's unlocked — master your level in Reviews to unlock more"}</div>
+          <div style={{ fontSize: 11.5, marginTop: 2, opacity: canLearn ? 0.9 : 1, color: canLearn ? "#fff" : T.textDim }}>{canLearn ? "Teach, then quiz them to lock them in" : "You've learned everything unlocked so far — nice work!"}</div>
         </button>
 
         {/* Quiz / review everything learned */}
@@ -2569,6 +2580,9 @@ function HarakatQuiz({ marks, onDone, onSet, harakat = {} }) {
 
 /* ===================== HOME ===================== */
 function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCounts, streak, onGo, onTrouble, onSetting, onTheme, onImport, onReset }) {
+  const levelItemsAll = ITEMS.filter((it) => it.level === level);
+  const levelLearned = levelItemsAll.filter((it) => state.progress[it.id]).length;
+  const learnPct = levelItemsAll.length ? levelLearned / levelItemsAll.length : 0;
   const [confirm, setConfirm] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
   const [importText, setImportText] = useState("");
@@ -2616,9 +2630,9 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
           <div style={{ fontFamily: displayFont, fontSize: 26, color: T.gold }}>Level {level}</div>
           <div style={{ fontSize: 13, color: T.textDim }}>{LEVEL_TITLES[level] || ""}</div>
         </div>
-        <div style={{ margin: "12px 0 6px" }}><Bar pct={levelPct} /></div>
+        <div style={{ margin: "12px 0 6px" }}><Bar pct={learnPct} /></div>
         <div style={{ fontSize: 12, color: T.textDim }}>
-          {level >= MAX_LEVEL ? "Final level — master everything to finish!" : `${Math.round(levelPct * 100)}% mastered · reach 90% Guru to unlock Level ${level + 1}`}
+          {level >= MAX_LEVEL ? "Final level — master everything to finish!" : `${levelLearned}/${levelItemsAll.length} learned · learn them all to unlock Level ${level + 1}`}
         </div>
       </div>
 
@@ -2733,10 +2747,12 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
 }
 
 /* ===================== ITEMS (browse + select-to-quiz + add) ===================== */
-function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, customItems, onToggleCustom, onStartCustom, onClearCustom, onOpenDetail }) {
+function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, customItems, onToggleCustom, onStartCustom, onClearCustom, onAddByStage, onOpenDetail }) {
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [showAdd, setShowAdd] = useState(false);
+  const [showStage, setShowStage] = useState(false);
+  const [stageSel, setStageSel] = useState([]);
   const [ar, setAr] = useState("");
   const [tr, setTr] = useState("");
   const [en, setEn] = useState("");
@@ -2758,9 +2774,15 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
   const totalCount = allItems.length;
   const inCustom = (id) => customItems.includes(id);
 
+  // Learned items grouped by SRS mastery level, for "add to custom quiz by level".
+  const groupCounts = {};
+  allItems.forEach((it) => { const p = state.progress[it.id]; if (p) { const g = stageMeta(p.stage).group; groupCounts[g] = (groupCounts[g] || 0) + 1; } });
+  const stageIds = stageSel.length ? allItems.filter((it) => { const p = state.progress[it.id]; return p && stageSel.includes(stageMeta(p.stage).group); }).map((it) => it.id) : [];
+  const toggleStage = (g) => setStageSel((sel) => sel.includes(g) ? sel.filter((x) => x !== g) : [...sel, g]);
+
   const badge = (it) => {
-    const locked = it.level > level && !it.custom;
     const p = state.progress[it.id];
+    const locked = it.level > level && !it.custom && !p;
     if (locked) return { t: "🔒", c: T.textDim };
     if (!p) return { t: "new", c: T.pink };
     if (isLeech(p)) return { t: "⚠ " + stageMeta(p.stage).short, c: T.red };
@@ -2824,6 +2846,24 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
         </div>
       )}
 
+      <button className="tap" onClick={() => setShowStage((s) => !s)} style={{ width: "100%", marginBottom: 12, padding: 11, borderRadius: 12, border: `1px dashed ${T.gold}`, background: `${T.gold}0d`, color: T.gold, fontSize: 13, fontWeight: 600 }}>{showStage ? "Close" : "★ Add to custom quiz by mastery level"}</button>
+
+      {showStage && (
+        <div className="fade" style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 14, padding: 14, marginBottom: 14 }}>
+          <div style={{ fontSize: 12, color: T.textDim, lineHeight: 1.5, marginBottom: 10 }}>Pick one or more SRS mastery levels — every learned item at those levels gets added to your custom quiz.</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 12 }}>
+            {STAGE_GROUPS.map((g) => {
+              const n = groupCounts[g] || 0;
+              const on = stageSel.includes(g);
+              return (
+                <button key={g} className="tap" disabled={!n} onClick={() => toggleStage(g)} style={{ border: `1.5px solid ${on ? T.gold : T.line}`, background: on ? `${T.gold}1a` : "transparent", color: !n ? T.line : on ? T.gold : T.textDim, borderRadius: 20, padding: "7px 14px", fontSize: 12.5, fontWeight: 700, cursor: n ? "pointer" : "default" }}>{on ? "✓ " : ""}{g} ({n})</button>
+              );
+            })}
+          </div>
+          <button className="tap" disabled={!stageIds.length} onClick={() => { onAddByStage && onAddByStage(stageIds); setStageSel([]); setShowStage(false); }} style={{ width: "100%", padding: 12, borderRadius: 11, border: "none", background: stageIds.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: stageIds.length ? "#fff" : T.textDim, fontWeight: 700, fontSize: 14 }}>{stageIds.length ? `Add ${stageIds.length} item${stageIds.length === 1 ? "" : "s"} to custom quiz` : "Select a level above"}</button>
+        </div>
+      )}
+
       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 10px", margin: "2px 2px 8px", fontSize: 11 }}>
         <span style={{ color: T.textDim }}>Mastery:</span>
         {MASTERY_LEGEND.map((t) => (
@@ -2839,7 +2879,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
           const b = badge(it);
           const picked = inCustom(it.id);
           const p = state.progress[it.id];
-          const locked = it.level > level && !it.custom;
+          const locked = it.level > level && !it.custom && !p;
           const mc = !locked && p ? masteryColor(p) : null;
           const pct = !locked && p ? masteryPct(p) : null;
           return (
@@ -3137,6 +3177,8 @@ function App() {
       let s = loaded || DEFAULT_STATE;
       if (s.daily?.date !== todayStr()) s = { ...s, daily: { date: todayStr(), reviews: 0, lessons: 0 } };
       s = { ...DEFAULT_STATE, ...s, settings: { ...DEFAULT_STATE.settings, ...(s.settings || {}) } };
+      // Apply the "unlock when fully learned" rule to existing progress on load.
+      s = { ...s, currentLevel: nextUnlockedLevel(s.progress || {}, s.currentLevel || 1) };
       applyTheme(s.settings.theme || "rose");
       if (mounted) setState(s);
     })();
@@ -3180,7 +3222,9 @@ function App() {
     setState((s) => {
       const day = todayStr();
       const daily = s.daily.date === day ? s.daily : { date: day, reviews: 0, lessons: 0 };
-      const next = { ...s, progress: { ...s.progress, [id]: learnItem(Date.now()) }, daily: { ...daily, lessons: daily.lessons + 1 } };
+      const progress = { ...s.progress, [id]: learnItem(Date.now()) };
+      const currentLevel = nextUnlockedLevel(progress, s.currentLevel); // unlock immediately when a level is fully learned
+      const next = { ...s, progress, currentLevel, daily: { ...daily, lessons: daily.lessons + 1 } };
       saveState(next);
       return next;
     });
@@ -3199,9 +3243,8 @@ function App() {
     } else {
       np = reviewSchedule(prog, correct, now);
       const progress0 = { ...s.progress, [id]: np };
-      const levelItems = ITEMS.filter((it) => it.level === cur);
-      const guru = levelItems.filter((it) => (progress0[it.id]?.stage || 0) >= 5).length;
-      if (levelItems.length && guru / levelItems.length >= 0.9 && cur < MAX_LEVEL) { cur += 1; leveled = cur; }
+      const nl = nextUnlockedLevel(progress0, cur);
+      if (nl > cur) { cur = nl; leveled = cur; }
     }
     const day = todayStr();
     const daily = s.daily.date === day ? s.daily : { date: day, reviews: 0, lessons: 0 };
@@ -3239,8 +3282,24 @@ function App() {
   const onToggleCustom = useCallback((id) => {
     const s = stateRef.current;
     const cur = s.customItems || [];
-    const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
-    persist({ ...s, customItems: next });
+    const adding = !cur.includes(id);
+    const customItems = adding ? [...cur, id] : cur.filter((x) => x !== id);
+    const patch = { ...s, customItems };
+    // Starring an item immediately "unlocks" it: if it isn't learned yet, learn it now
+    // so it's quizzable straight away (learned items are never shown as 🔒).
+    if (adding && !s.progress[id]) {
+      patch.progress = { ...s.progress, [id]: learnItem(Date.now()) };
+    }
+    persist(patch);
+  }, [persist]);
+
+  // Add every learned item at the chosen SRS mastery levels to the custom quiz.
+  const onAddItemsToCustom = useCallback((ids) => {
+    if (!ids || !ids.length) return;
+    const s = stateRef.current;
+    const cur = s.customItems || [];
+    const customItems = Array.from(new Set([...cur, ...ids]));
+    persist({ ...s, customItems });
   }, [persist]);
 
   const onClearCustom = useCallback(() => {
@@ -3391,7 +3450,7 @@ function App() {
         {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("items")} title="Practice" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
         {view === "script" && <ScriptView scriptState={state.script} setScript={(next) => persist({ ...state, script: next })} autoReview={scriptAuto} onAutoConsumed={() => setScriptAuto(false)} customLetters={state.customLetters || []} onCustomLetters={onCustomLetters} />}
         {view === "items" && (
-          <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onOpenDetail={setDetailItem} />
+          <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onAddByStage={onAddItemsToCustom} onOpenDetail={setDetailItem} />
         )}
         {view === "stats" && <StatsView state={state} allItems={allItems} level={state.currentLevel} streak={streak} />}
       </div>
