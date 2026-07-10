@@ -178,7 +178,7 @@ home screen.
 
 ---
 
-*Last updated (v1.2.0 · 6/30/2026, 6:40 PM Manila): **the next level now unlocks the
+*Last updated (v1.2.0 · 7/10/2026, 8:20 PM Manila): **the next level now unlocks the
 instant you've learned every item in your current level** — no mastery gate. **Starring
 an item in a custom quiz instantly unlocks it** (it's added as learned and quizzable
 right away), and a new **"Add to custom quiz by mastery level"** panel lets you drop
