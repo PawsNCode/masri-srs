@@ -1,0 +1,7018 @@
+[
+ {
+  "id": "ahlan",
+  "level": 1,
+  "type": "word",
+  "ar": "أهلاً",
+  "tr": "ahlan",
+  "en": "Hello / hi"
+ },
+ {
+  "id": "salam",
+  "level": 1,
+  "type": "phrase",
+  "ar": "السلام عليكم",
+  "tr": "salaam ʿaleekum",
+  "en": "Peace be upon you (hello)"
+ },
+ {
+  "id": "sabah",
+  "level": 1,
+  "type": "phrase",
+  "ar": "صباح الخير",
+  "tr": "sabaah el-kheer",
+  "en": "Good morning"
+ },
+ {
+  "id": "masa",
+  "level": 1,
+  "type": "phrase",
+  "ar": "مساء الخير",
+  "tr": "masaa el-kheer",
+  "en": "Good evening"
+ },
+ {
+  "id": "ezzayak",
+  "level": 1,
+  "type": "phrase",
+  "ar": "إزيك",
+  "tr": "ezzayak",
+  "en": "How are you? (to a man)"
+ },
+ {
+  "id": "kollotamam",
+  "level": 1,
+  "type": "phrase",
+  "ar": "كله تمام",
+  "tr": "kollo tamaam",
+  "en": "All good"
+ },
+ {
+  "id": "shokran",
+  "level": 1,
+  "type": "word",
+  "ar": "شكراً",
+  "tr": "shokran",
+  "en": "Thank you"
+ },
+ {
+  "id": "afwan",
+  "level": 1,
+  "type": "word",
+  "ar": "عفواً",
+  "tr": "afwan",
+  "en": "You're welcome / excuse me"
+ },
+ {
+  "id": "minfadlak",
+  "level": 1,
+  "type": "phrase",
+  "ar": "من فضلك",
+  "tr": "min fadlak",
+  "en": "Please (to a man)"
+ },
+ {
+  "id": "maasalama",
+  "level": 1,
+  "type": "phrase",
+  "ar": "مع السلامة",
+  "tr": "maʿa s-salaama",
+  "en": "Goodbye"
+ },
+ {
+  "id": "aywa",
+  "level": 1,
+  "type": "word",
+  "ar": "أيوة",
+  "tr": "aywa",
+  "en": "Yes"
+ },
+ {
+  "id": "laa",
+  "level": 1,
+  "type": "word",
+  "ar": "لأ",
+  "tr": "laʾ",
+  "en": "No"
+ },
+ {
+  "id": "aasif",
+  "level": 1,
+  "type": "word",
+  "ar": "آسف",
+  "tr": "aasif",
+  "en": "Sorry (said by a man)"
+ },
+ {
+  "id": "lawsamaht",
+  "level": 1,
+  "type": "phrase",
+  "ar": "لو سمحت",
+  "tr": "law samaht",
+  "en": "Excuse me"
+ },
+ {
+  "id": "mabrook",
+  "level": 1,
+  "type": "word",
+  "ar": "مبروك",
+  "tr": "mabrook",
+  "en": "Congratulations"
+ },
+ {
+  "id": "ana",
+  "level": 2,
+  "type": "word",
+  "ar": "أنا",
+  "tr": "ana",
+  "en": "I"
+ },
+ {
+  "id": "entam",
+  "level": 2,
+  "type": "word",
+  "ar": "إنت",
+  "tr": "enta",
+  "en": "You (to a man)"
+ },
+ {
+  "id": "entif",
+  "level": 2,
+  "type": "word",
+  "ar": "إنتي",
+  "tr": "enti",
+  "en": "You (to a woman)"
+ },
+ {
+  "id": "huwwa",
+  "level": 2,
+  "type": "word",
+  "ar": "هو",
+  "tr": "huwwa",
+  "en": "He"
+ },
+ {
+  "id": "hiyya",
+  "level": 2,
+  "type": "word",
+  "ar": "هي",
+  "tr": "hiyya",
+  "en": "She"
+ },
+ {
+  "id": "ehna",
+  "level": 2,
+  "type": "word",
+  "ar": "إحنا",
+  "tr": "ehna",
+  "en": "We"
+ },
+ {
+  "id": "humma",
+  "level": 2,
+  "type": "word",
+  "ar": "هم",
+  "tr": "humma",
+  "en": "They"
+ },
+ {
+  "id": "eh",
+  "level": 2,
+  "type": "word",
+  "ar": "إيه",
+  "tr": "eh",
+  "en": "What"
+ },
+ {
+  "id": "miin",
+  "level": 2,
+  "type": "word",
+  "ar": "مين",
+  "tr": "miin",
+  "en": "Who"
+ },
+ {
+  "id": "feen",
+  "level": 2,
+  "type": "word",
+  "ar": "فين",
+  "tr": "feen",
+  "en": "Where"
+ },
+ {
+  "id": "emta",
+  "level": 2,
+  "type": "word",
+  "ar": "إمتى",
+  "tr": "emta",
+  "en": "When"
+ },
+ {
+  "id": "ezzay",
+  "level": 2,
+  "type": "word",
+  "ar": "إزاي",
+  "tr": "ezzaay",
+  "en": "How"
+ },
+ {
+  "id": "leeh",
+  "level": 2,
+  "type": "word",
+  "ar": "ليه",
+  "tr": "leeh",
+  "en": "Why"
+ },
+ {
+  "id": "kaam",
+  "level": 2,
+  "type": "word",
+  "ar": "كام",
+  "tr": "kaam",
+  "en": "How many"
+ },
+ {
+  "id": "anhu",
+  "level": 2,
+  "type": "word",
+  "ar": "أنهو",
+  "tr": "anhu",
+  "en": "Which (m)"
+ },
+ {
+  "id": "wahid",
+  "level": 3,
+  "type": "word",
+  "ar": "واحد",
+  "tr": "waahid",
+  "en": "One"
+ },
+ {
+  "id": "etnein",
+  "level": 3,
+  "type": "word",
+  "ar": "اتنين",
+  "tr": "etneen",
+  "en": "Two"
+ },
+ {
+  "id": "talata",
+  "level": 3,
+  "type": "word",
+  "ar": "تلاتة",
+  "tr": "talaata",
+  "en": "Three"
+ },
+ {
+  "id": "arbaa",
+  "level": 3,
+  "type": "word",
+  "ar": "أربعة",
+  "tr": "arbaʿa",
+  "en": "Four"
+ },
+ {
+  "id": "khamsa",
+  "level": 3,
+  "type": "word",
+  "ar": "خمسة",
+  "tr": "khamsa",
+  "en": "Five"
+ },
+ {
+  "id": "setta",
+  "level": 3,
+  "type": "word",
+  "ar": "ستة",
+  "tr": "setta",
+  "en": "Six"
+ },
+ {
+  "id": "sabaa",
+  "level": 3,
+  "type": "word",
+  "ar": "سبعة",
+  "tr": "sabʿa",
+  "en": "Seven"
+ },
+ {
+  "id": "tamanya",
+  "level": 3,
+  "type": "word",
+  "ar": "تمانية",
+  "tr": "tamanya",
+  "en": "Eight"
+ },
+ {
+  "id": "tesaa",
+  "level": 3,
+  "type": "word",
+  "ar": "تسعة",
+  "tr": "tesʿa",
+  "en": "Nine"
+ },
+ {
+  "id": "ashara",
+  "level": 3,
+  "type": "word",
+  "ar": "عشرة",
+  "tr": "ʿashara",
+  "en": "Ten"
+ },
+ {
+  "id": "kwayyes",
+  "level": 3,
+  "type": "word",
+  "ar": "كويس",
+  "tr": "kwayyes",
+  "en": "Good"
+ },
+ {
+  "id": "wehesh",
+  "level": 3,
+  "type": "word",
+  "ar": "وحش",
+  "tr": "weHesh",
+  "en": "Bad"
+ },
+ {
+  "id": "kebiir",
+  "level": 3,
+  "type": "word",
+  "ar": "كبير",
+  "tr": "kebiir",
+  "en": "Big"
+ },
+ {
+  "id": "soghayyar",
+  "level": 3,
+  "type": "word",
+  "ar": "صغير",
+  "tr": "soghayyar",
+  "en": "Small"
+ },
+ {
+  "id": "gediid",
+  "level": 3,
+  "type": "word",
+  "ar": "جديد",
+  "tr": "gediid",
+  "en": "New"
+ },
+ {
+  "id": "helw",
+  "level": 3,
+  "type": "word",
+  "ar": "حلو",
+  "tr": "Helw",
+  "en": "Nice / sweet"
+ },
+ {
+  "id": "taweel",
+  "level": 3,
+  "type": "word",
+  "ar": "طويل",
+  "tr": "Taweel",
+  "en": "Tall / long"
+ },
+ {
+  "id": "oreyyeb",
+  "level": 3,
+  "type": "word",
+  "ar": "قريب",
+  "tr": "ʾoreyyeb",
+  "en": "Near / close"
+ },
+ {
+  "id": "beeid",
+  "level": 3,
+  "type": "word",
+  "ar": "بعيد",
+  "tr": "beʿiid",
+  "en": "Far"
+ },
+ {
+  "id": "ketiir",
+  "level": 3,
+  "type": "word",
+  "ar": "كتير",
+  "tr": "ketiir",
+  "en": "A lot / many"
+ },
+ {
+  "id": "shwayya",
+  "level": 3,
+  "type": "word",
+  "ar": "شوية",
+  "tr": "shwayya",
+  "en": "A little"
+ },
+ {
+  "id": "aayezm",
+  "level": 4,
+  "type": "word",
+  "ar": "عايز",
+  "tr": "ʿaayez",
+  "en": "I want (said by a man)"
+ },
+ {
+  "id": "aayezf",
+  "level": 4,
+  "type": "word",
+  "ar": "عايزة",
+  "tr": "ʿayza",
+  "en": "I want (said by a woman)"
+ },
+ {
+  "id": "barooh",
+  "level": 4,
+  "type": "word",
+  "ar": "بروح",
+  "tr": "barooH",
+  "en": "I go"
+ },
+ {
+  "id": "baakol",
+  "level": 4,
+  "type": "word",
+  "ar": "باكل",
+  "tr": "baakol",
+  "en": "I eat"
+ },
+ {
+  "id": "bashrab",
+  "level": 4,
+  "type": "word",
+  "ar": "بشرب",
+  "tr": "bashrab",
+  "en": "I drink"
+ },
+ {
+  "id": "baamel",
+  "level": 4,
+  "type": "word",
+  "ar": "بعمل",
+  "tr": "baʿmel",
+  "en": "I do / make"
+ },
+ {
+  "id": "bahebb",
+  "level": 4,
+  "type": "word",
+  "ar": "بحب",
+  "tr": "baHebb",
+  "en": "I like / love"
+ },
+ {
+  "id": "bashoof",
+  "level": 4,
+  "type": "word",
+  "ar": "بشوف",
+  "tr": "bashoof",
+  "en": "I see"
+ },
+ {
+  "id": "baool",
+  "level": 4,
+  "type": "word",
+  "ar": "بقول",
+  "tr": "baʾool",
+  "en": "I say"
+ },
+ {
+  "id": "faahim",
+  "level": 4,
+  "type": "word",
+  "ar": "فاهم",
+  "tr": "faahim",
+  "en": "I understand (man)"
+ },
+ {
+  "id": "aarif",
+  "level": 4,
+  "type": "word",
+  "ar": "عارف",
+  "tr": "ʿaarif",
+  "en": "I know (man)"
+ },
+ {
+  "id": "andi",
+  "level": 4,
+  "type": "word",
+  "ar": "عندي",
+  "tr": "ʿandi",
+  "en": "I have"
+ },
+ {
+  "id": "andak",
+  "level": 4,
+  "type": "word",
+  "ar": "عندك",
+  "tr": "ʿandak",
+  "en": "Do you have (to a man)"
+ },
+ {
+  "id": "mesh",
+  "level": 4,
+  "type": "word",
+  "ar": "مش",
+  "tr": "mesh",
+  "en": "Not"
+ },
+ {
+  "id": "fiih",
+  "level": 4,
+  "type": "word",
+  "ar": "فيه",
+  "tr": "fiih",
+  "en": "There is"
+ },
+ {
+  "id": "mumkin",
+  "level": 4,
+  "type": "word",
+  "ar": "ممكن",
+  "tr": "mumkin",
+  "en": "Can / maybe"
+ },
+ {
+  "id": "laazim",
+  "level": 4,
+  "type": "word",
+  "ar": "لازم",
+  "tr": "laazim",
+  "en": "Must / have to"
+ },
+ {
+  "id": "mayya",
+  "level": 5,
+  "type": "word",
+  "ar": "مية",
+  "tr": "mayya",
+  "en": "Water"
+ },
+ {
+  "id": "akl",
+  "level": 5,
+  "type": "word",
+  "ar": "أكل",
+  "tr": "akl",
+  "en": "Food"
+ },
+ {
+  "id": "eesh",
+  "level": 5,
+  "type": "word",
+  "ar": "عيش",
+  "tr": "ʿeesh",
+  "en": "Bread"
+ },
+ {
+  "id": "shaay",
+  "level": 5,
+  "type": "word",
+  "ar": "شاي",
+  "tr": "shaay",
+  "en": "Tea"
+ },
+ {
+  "id": "ahwa",
+  "level": 5,
+  "type": "word",
+  "ar": "قهوة",
+  "tr": "ʾahwa",
+  "en": "Coffee"
+ },
+ {
+  "id": "sokkar",
+  "level": 5,
+  "type": "word",
+  "ar": "سكر",
+  "tr": "sokkar",
+  "en": "Sugar"
+ },
+ {
+  "id": "laban",
+  "level": 5,
+  "type": "word",
+  "ar": "لبن",
+  "tr": "laban",
+  "en": "Milk"
+ },
+ {
+  "id": "beed",
+  "level": 5,
+  "type": "word",
+  "ar": "بيض",
+  "tr": "beed",
+  "en": "Eggs"
+ },
+ {
+  "id": "gibna",
+  "level": 5,
+  "type": "word",
+  "ar": "جبنة",
+  "tr": "gibna",
+  "en": "Cheese"
+ },
+ {
+  "id": "fitaar",
+  "level": 5,
+  "type": "word",
+  "ar": "فطار",
+  "tr": "fitaar",
+  "en": "Breakfast"
+ },
+ {
+  "id": "laziiz",
+  "level": 5,
+  "type": "word",
+  "ar": "لذيذ",
+  "tr": "laziiz",
+  "en": "Delicious"
+ },
+ {
+  "id": "hesab",
+  "level": 5,
+  "type": "phrase",
+  "ar": "الحساب",
+  "tr": "el-Hesaab",
+  "en": "The bill / check"
+ },
+ {
+  "id": "menyu",
+  "level": 5,
+  "type": "phrase",
+  "ar": "المنيو",
+  "tr": "el-menyu",
+  "en": "The menu"
+ },
+ {
+  "id": "aktar",
+  "level": 5,
+  "type": "word",
+  "ar": "أكتر",
+  "tr": "aktar",
+  "en": "More"
+ },
+ {
+  "id": "anaayezakl",
+  "level": 5,
+  "type": "sentence",
+  "ar": "أنا عايز أكل",
+  "tr": "ana ʿaayez akl",
+  "en": "I want food (man)"
+ },
+ {
+  "id": "mumkinhesab",
+  "level": 5,
+  "type": "phrase",
+  "ar": "ممكن الحساب",
+  "tr": "mumkin el-Hesaab",
+  "en": "Can I have the bill?"
+ },
+ {
+  "id": "dalaziiz",
+  "level": 5,
+  "type": "sentence",
+  "ar": "ده لذيذ",
+  "tr": "da laziiz",
+  "en": "This is delicious"
+ },
+ {
+  "id": "delwaati",
+  "level": 6,
+  "type": "word",
+  "ar": "دلوقتي",
+  "tr": "delwaʾti",
+  "en": "Now"
+ },
+ {
+  "id": "naharda",
+  "level": 6,
+  "type": "word",
+  "ar": "النهاردة",
+  "tr": "en-naharda",
+  "en": "Today"
+ },
+ {
+  "id": "bokra",
+  "level": 6,
+  "type": "word",
+  "ar": "بكرة",
+  "tr": "bokra",
+  "en": "Tomorrow"
+ },
+ {
+  "id": "embareh",
+  "level": 6,
+  "type": "word",
+  "ar": "إمبارح",
+  "tr": "embaareh",
+  "en": "Yesterday"
+ },
+ {
+  "id": "elleila",
+  "level": 6,
+  "type": "word",
+  "ar": "الليلة",
+  "tr": "el-leila",
+  "en": "Tonight"
+ },
+ {
+  "id": "sobh",
+  "level": 6,
+  "type": "word",
+  "ar": "الصبح",
+  "tr": "es-sobH",
+  "en": "The morning"
+ },
+ {
+  "id": "billeil",
+  "level": 6,
+  "type": "phrase",
+  "ar": "بالليل",
+  "tr": "bil-leil",
+  "en": "At night"
+ },
+ {
+  "id": "badein",
+  "level": 6,
+  "type": "word",
+  "ar": "بعدين",
+  "tr": "baʿdein",
+  "en": "Later"
+ },
+ {
+  "id": "lissa",
+  "level": 6,
+  "type": "word",
+  "ar": "لسه",
+  "tr": "lissa",
+  "en": "Still / not yet"
+ },
+ {
+  "id": "dayman",
+  "level": 6,
+  "type": "word",
+  "ar": "دايماً",
+  "tr": "dayman",
+  "en": "Always"
+ },
+ {
+  "id": "saa",
+  "level": 6,
+  "type": "word",
+  "ar": "ساعة",
+  "tr": "saaʿa",
+  "en": "Hour / clock"
+ },
+ {
+  "id": "yom",
+  "level": 6,
+  "type": "word",
+  "ar": "يوم",
+  "tr": "yom",
+  "en": "Day"
+ },
+ {
+  "id": "osboo",
+  "level": 6,
+  "type": "word",
+  "ar": "أسبوع",
+  "tr": "osbooʿ",
+  "en": "Week"
+ },
+ {
+  "id": "shahr",
+  "level": 6,
+  "type": "word",
+  "ar": "شهر",
+  "tr": "shahr",
+  "en": "Month"
+ },
+ {
+  "id": "essaakaam",
+  "level": 6,
+  "type": "sentence",
+  "ar": "الساعة كام",
+  "tr": "es-saaʿa kaam",
+  "en": "What time is it?"
+ },
+ {
+  "id": "ashoofakbokra",
+  "level": 6,
+  "type": "sentence",
+  "ar": "أشوفك بكرة",
+  "tr": "ashoofak bokra",
+  "en": "See you tomorrow"
+ },
+ {
+  "id": "yemiin",
+  "level": 7,
+  "type": "word",
+  "ar": "يمين",
+  "tr": "yemiin",
+  "en": "Right (direction)"
+ },
+ {
+  "id": "shimaal",
+  "level": 7,
+  "type": "word",
+  "ar": "شمال",
+  "tr": "shimaal",
+  "en": "Left (direction)"
+ },
+ {
+  "id": "alatool",
+  "level": 7,
+  "type": "phrase",
+  "ar": "على طول",
+  "tr": "ʿala tool",
+  "en": "Straight ahead"
+ },
+ {
+  "id": "hena",
+  "level": 7,
+  "type": "word",
+  "ar": "هنا",
+  "tr": "hena",
+  "en": "Here"
+ },
+ {
+  "id": "henaak",
+  "level": 7,
+  "type": "word",
+  "ar": "هناك",
+  "tr": "henaak",
+  "en": "There"
+ },
+ {
+  "id": "share",
+  "level": 7,
+  "type": "word",
+  "ar": "شارع",
+  "tr": "shaareʿ",
+  "en": "Street"
+ },
+ {
+  "id": "arabiyya",
+  "level": 7,
+  "type": "word",
+  "ar": "عربية",
+  "tr": "ʿarabiyya",
+  "en": "Car"
+ },
+ {
+  "id": "otobiis",
+  "level": 7,
+  "type": "word",
+  "ar": "أوتوبيس",
+  "tr": "otobiis",
+  "en": "Bus"
+ },
+ {
+  "id": "taxi",
+  "level": 7,
+  "type": "word",
+  "ar": "تاكسي",
+  "tr": "taksi",
+  "en": "Taxi"
+ },
+ {
+  "id": "metro",
+  "level": 7,
+  "type": "word",
+  "ar": "مترو",
+  "tr": "metro",
+  "en": "Metro"
+ },
+ {
+  "id": "mahatta",
+  "level": 7,
+  "type": "word",
+  "ar": "محطة",
+  "tr": "maHatta",
+  "en": "Station"
+ },
+ {
+  "id": "matar",
+  "level": 7,
+  "type": "word",
+  "ar": "مطار",
+  "tr": "maTaar",
+  "en": "Airport"
+ },
+ {
+  "id": "feenmahatta",
+  "level": 7,
+  "type": "sentence",
+  "ar": "فين المحطة",
+  "tr": "feen el-maHatta",
+  "en": "Where's the station?"
+ },
+ {
+  "id": "anaayezarooh",
+  "level": 7,
+  "type": "sentence",
+  "ar": "أنا عايز أروح هنا",
+  "tr": "ana ʿaayez arooH hena",
+  "en": "I want to go here (man)"
+ },
+ {
+  "id": "bekaam",
+  "level": 8,
+  "type": "word",
+  "ar": "بكام",
+  "tr": "bekaam",
+  "en": "How much (price)"
+ },
+ {
+  "id": "ghaali",
+  "level": 8,
+  "type": "word",
+  "ar": "غالي",
+  "tr": "ghaali",
+  "en": "Expensive"
+ },
+ {
+  "id": "rekhiis",
+  "level": 8,
+  "type": "word",
+  "ar": "رخيص",
+  "tr": "rekhiis",
+  "en": "Cheap"
+ },
+ {
+  "id": "feloos",
+  "level": 8,
+  "type": "word",
+  "ar": "فلوس",
+  "tr": "feloos",
+  "en": "Money"
+ },
+ {
+  "id": "da",
+  "level": 8,
+  "type": "word",
+  "ar": "ده",
+  "tr": "da",
+  "en": "This (m)"
+ },
+ {
+  "id": "kis",
+  "level": 8,
+  "type": "word",
+  "ar": "كيس",
+  "tr": "kiis",
+  "en": "Bag"
+ },
+ {
+  "id": "baai",
+  "level": 8,
+  "type": "phrase",
+  "ar": "الباقي",
+  "tr": "el-baaʾi",
+  "en": "The change"
+ },
+ {
+  "id": "edeeni",
+  "level": 8,
+  "type": "word",
+  "ar": "اديني",
+  "tr": "edeeni",
+  "en": "Give me"
+ },
+ {
+  "id": "dabekaam",
+  "level": 8,
+  "type": "sentence",
+  "ar": "ده بكام",
+  "tr": "da bekaam",
+  "en": "How much is this?"
+ },
+ {
+  "id": "ghaaliawi",
+  "level": 8,
+  "type": "phrase",
+  "ar": "غالي أوي",
+  "tr": "ghaali awi",
+  "en": "Very expensive"
+ },
+ {
+  "id": "mumkintakhfiid",
+  "level": 8,
+  "type": "phrase",
+  "ar": "ممكن تخفيض",
+  "tr": "mumkin takhfiid",
+  "en": "Can you give a discount?"
+ },
+ {
+  "id": "anaayezashteri",
+  "level": 8,
+  "type": "sentence",
+  "ar": "أنا عايز أشتري ده",
+  "tr": "ana ʿaayez ashteri da",
+  "en": "I want to buy this (man)"
+ },
+ {
+  "id": "esmakeh",
+  "level": 9,
+  "type": "sentence",
+  "ar": "اسمك إيه",
+  "tr": "esmak eh",
+  "en": "What's your name? (man)"
+ },
+ {
+  "id": "esmi",
+  "level": 9,
+  "type": "phrase",
+  "ar": "اسمي",
+  "tr": "esmi",
+  "en": "My name is"
+ },
+ {
+  "id": "anamen",
+  "level": 9,
+  "type": "phrase",
+  "ar": "أنا من",
+  "tr": "ana men",
+  "en": "I'm from"
+ },
+ {
+  "id": "entamenein",
+  "level": 9,
+  "type": "sentence",
+  "ar": "إنت منين",
+  "tr": "enta menein",
+  "en": "Where are you from? (man)"
+ },
+ {
+  "id": "mabsoot",
+  "level": 9,
+  "type": "word",
+  "ar": "مبسوط",
+  "tr": "mabsoot",
+  "en": "Happy (man)"
+ },
+ {
+  "id": "taabaan",
+  "level": 9,
+  "type": "word",
+  "ar": "تعبان",
+  "tr": "taʿbaan",
+  "en": "Tired (man)"
+ },
+ {
+  "id": "hamdulillah",
+  "level": 9,
+  "type": "phrase",
+  "ar": "الحمد لله",
+  "tr": "el-Hamdu lillah",
+  "en": "Thank God / I'm fine"
+ },
+ {
+  "id": "meshaarif",
+  "level": 9,
+  "type": "phrase",
+  "ar": "مش عارف",
+  "tr": "mesh ʿaarif",
+  "en": "I don't know (man)"
+ },
+ {
+  "id": "batkallemarabi",
+  "level": 9,
+  "type": "sentence",
+  "ar": "أنا بتكلم شوية عربي",
+  "tr": "ana batkallem shwayya ʿarabi",
+  "en": "I speak a little Arabic"
+ },
+ {
+  "id": "taaniminfadlak",
+  "level": 9,
+  "type": "sentence",
+  "ar": "تاني من فضلك",
+  "tr": "taani min fadlak",
+  "en": "Again, please"
+ },
+ {
+  "id": "ezzayaknaharda",
+  "level": 10,
+  "type": "sentence",
+  "ar": "إزيك النهاردة",
+  "tr": "ezzayak en-naharda",
+  "en": "How are you today? (man)"
+ },
+ {
+  "id": "ahwaminfadlak",
+  "level": 10,
+  "type": "sentence",
+  "ar": "أنا عايز قهوة من فضلك",
+  "tr": "ana ʿaayez ʾahwa min fadlak",
+  "en": "I want coffee, please (man)"
+ },
+ {
+  "id": "feenhammam",
+  "level": 10,
+  "type": "sentence",
+  "ar": "فين الحمام لو سمحت",
+  "tr": "feen el-Hammaam law samaht",
+  "en": "Where's the bathroom, please?"
+ },
+ {
+  "id": "elaklazlaziiz",
+  "level": 10,
+  "type": "sentence",
+  "ar": "الأكل ده لذيذ أوي",
+  "tr": "el-akl da laziiz awi",
+  "en": "This food is very delicious"
+ },
+ {
+  "id": "tetkallembirraaha",
+  "level": 10,
+  "type": "sentence",
+  "ar": "ممكن تتكلم بالراحة",
+  "tr": "mumkin tetkallem bir-raaHa",
+  "en": "Can you speak slowly?"
+ },
+ {
+  "id": "meshfaahim",
+  "level": 10,
+  "type": "sentence",
+  "ar": "أنا مش فاهم",
+  "tr": "ana mesh faahim",
+  "en": "I don't understand (man)"
+ },
+ {
+  "id": "tesaaedni",
+  "level": 10,
+  "type": "sentence",
+  "ar": "ممكن تساعدني",
+  "tr": "mumkin tesaaʿedni",
+  "en": "Can you help me?"
+ },
+ {
+  "id": "ashoofakinshaallah",
+  "level": 10,
+  "type": "sentence",
+  "ar": "أشوفك بكرة إن شاء الله",
+  "tr": "ashoofak bokra in shaaʾ allah",
+  "en": "See you tomorrow, God willing"
+ },
+ {
+  "id": "eila",
+  "level": 11,
+  "type": "word",
+  "ar": "عيلة",
+  "tr": "ʿeila",
+  "en": "Family"
+ },
+ {
+  "id": "om",
+  "level": 11,
+  "type": "word",
+  "ar": "أم",
+  "tr": "om",
+  "en": "Mother"
+ },
+ {
+  "id": "ab",
+  "level": 11,
+  "type": "word",
+  "ar": "أب",
+  "tr": "ab",
+  "en": "Father"
+ },
+ {
+  "id": "akh",
+  "level": 11,
+  "type": "word",
+  "ar": "أخ",
+  "tr": "akh",
+  "en": "Brother"
+ },
+ {
+  "id": "okht",
+  "level": 11,
+  "type": "word",
+  "ar": "أخت",
+  "tr": "okht",
+  "en": "Sister"
+ },
+ {
+  "id": "ebn",
+  "level": 11,
+  "type": "word",
+  "ar": "ابن",
+  "tr": "ebn",
+  "en": "Son"
+ },
+ {
+  "id": "bent",
+  "level": 11,
+  "type": "word",
+  "ar": "بنت",
+  "tr": "bent",
+  "en": "Daughter / girl"
+ },
+ {
+  "id": "gooz",
+  "level": 11,
+  "type": "word",
+  "ar": "جوز",
+  "tr": "gooz",
+  "en": "Husband"
+ },
+ {
+  "id": "zawga",
+  "level": 11,
+  "type": "word",
+  "ar": "زوجة",
+  "tr": "zawga",
+  "en": "Wife"
+ },
+ {
+  "id": "sahbi",
+  "level": 11,
+  "type": "word",
+  "ar": "صاحبي",
+  "tr": "saHbi",
+  "en": "My friend (m)"
+ },
+ {
+  "id": "beet",
+  "level": 12,
+  "type": "word",
+  "ar": "بيت",
+  "tr": "beet",
+  "en": "House"
+ },
+ {
+  "id": "shoghl",
+  "level": 12,
+  "type": "word",
+  "ar": "شغل",
+  "tr": "shoghl",
+  "en": "Work"
+ },
+ {
+  "id": "madrasa",
+  "level": 12,
+  "type": "word",
+  "ar": "مدرسة",
+  "tr": "madrasa",
+  "en": "School"
+ },
+ {
+  "id": "gamaa",
+  "level": 12,
+  "type": "word",
+  "ar": "جامعة",
+  "tr": "gamʿa",
+  "en": "University"
+ },
+ {
+  "id": "mostashfa",
+  "level": 12,
+  "type": "word",
+  "ar": "مستشفى",
+  "tr": "mostashfa",
+  "en": "Hospital"
+ },
+ {
+  "id": "soo",
+  "level": 12,
+  "type": "word",
+  "ar": "سوق",
+  "tr": "sooʾ",
+  "en": "Market"
+ },
+ {
+  "id": "matam",
+  "level": 12,
+  "type": "word",
+  "ar": "مطعم",
+  "tr": "matʿam",
+  "en": "Restaurant"
+ },
+ {
+  "id": "bank",
+  "level": 12,
+  "type": "word",
+  "ar": "بنك",
+  "tr": "bank",
+  "en": "Bank"
+ },
+ {
+  "id": "masgid",
+  "level": 12,
+  "type": "word",
+  "ar": "مسجد",
+  "tr": "masgid",
+  "en": "Mosque"
+ },
+ {
+  "id": "kniisa",
+  "level": 12,
+  "type": "word",
+  "ar": "كنيسة",
+  "tr": "kniisa",
+  "en": "Church"
+ },
+ {
+  "id": "farhaan",
+  "level": 13,
+  "type": "word",
+  "ar": "فرحان",
+  "tr": "farHaan",
+  "en": "Happy (man)"
+ },
+ {
+  "id": "zalaan",
+  "level": 13,
+  "type": "word",
+  "ar": "زعلان",
+  "tr": "zaʿlaan",
+  "en": "Upset (man)"
+ },
+ {
+  "id": "gaaan",
+  "level": 13,
+  "type": "word",
+  "ar": "جعان",
+  "tr": "gaʿaan",
+  "en": "Hungry (man)"
+ },
+ {
+  "id": "atshaan",
+  "level": 13,
+  "type": "word",
+  "ar": "عطشان",
+  "tr": "ʿaTshaan",
+  "en": "Thirsty (man)"
+ },
+ {
+  "id": "khaayef",
+  "level": 13,
+  "type": "word",
+  "ar": "خايف",
+  "tr": "khaayef",
+  "en": "Afraid (man)"
+ },
+ {
+  "id": "zahaan",
+  "level": 13,
+  "type": "word",
+  "ar": "زهقان",
+  "tr": "zahʾaan",
+  "en": "Bored (man)"
+ },
+ {
+  "id": "ayyaan",
+  "level": 13,
+  "type": "word",
+  "ar": "عيان",
+  "tr": "ʿayyaan",
+  "en": "Sick (man)"
+ },
+ {
+  "id": "mashghool",
+  "level": 13,
+  "type": "word",
+  "ar": "مشغول",
+  "tr": "mashghool",
+  "en": "Busy (man)"
+ },
+ {
+  "id": "rooh",
+  "level": 14,
+  "type": "word",
+  "ar": "روح",
+  "tr": "rooH",
+  "en": "Go! (to a man)"
+ },
+ {
+  "id": "taaala",
+  "level": 14,
+  "type": "word",
+  "ar": "تعالى",
+  "tr": "taʿaala",
+  "en": "Come! (to a man)"
+ },
+ {
+  "id": "estanna",
+  "level": 14,
+  "type": "word",
+  "ar": "استنى",
+  "tr": "estanna",
+  "en": "Wait"
+ },
+ {
+  "id": "yalla",
+  "level": 14,
+  "type": "word",
+  "ar": "يلا",
+  "tr": "yalla",
+  "en": "Let's go / come on"
+ },
+ {
+  "id": "khalas",
+  "level": 14,
+  "type": "word",
+  "ar": "خلاص",
+  "tr": "khalaas",
+  "en": "Done / enough"
+ },
+ {
+  "id": "maalesh",
+  "level": 14,
+  "type": "word",
+  "ar": "معلش",
+  "tr": "maʿlesh",
+  "en": "Never mind / it's okay"
+ },
+ {
+  "id": "teeji",
+  "level": 14,
+  "type": "phrase",
+  "ar": "عايز تيجي",
+  "tr": "ʿaayez teegi",
+  "en": "Do you want to come? (m)"
+ },
+ {
+  "id": "teeraf",
+  "level": 14,
+  "type": "phrase",
+  "ar": "إنت تعرف",
+  "tr": "enta teʿraf",
+  "en": "Do you know? (m)"
+ },
+ {
+  "id": "saaken",
+  "level": 15,
+  "type": "sentence",
+  "ar": "أنا ساكن في مصر",
+  "tr": "ana saaken fi maSr",
+  "en": "I live in Egypt (man)"
+ },
+ {
+  "id": "elgaww",
+  "level": 15,
+  "type": "sentence",
+  "ar": "الجو حر النهاردة",
+  "tr": "el-gaww Harr en-naharda",
+  "en": "The weather is hot today"
+ },
+ {
+  "id": "baheb maSri",
+  "level": 15,
+  "type": "sentence",
+  "ar": "أنا بحب الأكل المصري",
+  "tr": "ana baHebb el-akl el-maSri",
+  "en": "I love Egyptian food"
+ },
+ {
+  "id": "aorab",
+  "level": 15,
+  "type": "sentence",
+  "ar": "فين أقرب محطة",
+  "tr": "feen aʾrab maHatta",
+  "en": "Where's the nearest station?"
+ },
+ {
+  "id": "atallemarabi",
+  "level": 15,
+  "type": "sentence",
+  "ar": "أنا عايز أتعلم عربي",
+  "tr": "ana ʿaayez atʿallem ʿarabi",
+  "en": "I want to learn Arabic (man)"
+ },
+ {
+  "id": "hesabminfadlak",
+  "level": 15,
+  "type": "sentence",
+  "ar": "الحساب من فضلك",
+  "tr": "el-Hesaab min fadlak",
+  "en": "The bill, please (man)"
+ },
+ {
+  "id": "n11",
+  "level": 16,
+  "type": "word",
+  "ar": "حداشر",
+  "tr": "Hedaashar",
+  "en": "Eleven"
+ },
+ {
+  "id": "n12",
+  "level": 16,
+  "type": "word",
+  "ar": "اتناشر",
+  "tr": "etnaashar",
+  "en": "Twelve"
+ },
+ {
+  "id": "n13",
+  "level": 16,
+  "type": "word",
+  "ar": "تلاتاشر",
+  "tr": "talataashar",
+  "en": "Thirteen"
+ },
+ {
+  "id": "n15",
+  "level": 16,
+  "type": "word",
+  "ar": "خمستاشر",
+  "tr": "khamastaashar",
+  "en": "Fifteen"
+ },
+ {
+  "id": "n20",
+  "level": 16,
+  "type": "word",
+  "ar": "عشرين",
+  "tr": "ʿeshriin",
+  "en": "Twenty"
+ },
+ {
+  "id": "n30",
+  "level": 16,
+  "type": "word",
+  "ar": "تلاتين",
+  "tr": "talatiin",
+  "en": "Thirty"
+ },
+ {
+  "id": "n40",
+  "level": 16,
+  "type": "word",
+  "ar": "أربعين",
+  "tr": "arbeʿiin",
+  "en": "Forty"
+ },
+ {
+  "id": "n50",
+  "level": 16,
+  "type": "word",
+  "ar": "خمسين",
+  "tr": "khamsiin",
+  "en": "Fifty"
+ },
+ {
+  "id": "n60",
+  "level": 16,
+  "type": "word",
+  "ar": "ستين",
+  "tr": "settiin",
+  "en": "Sixty"
+ },
+ {
+  "id": "n70",
+  "level": 16,
+  "type": "word",
+  "ar": "سبعين",
+  "tr": "sabʿiin",
+  "en": "Seventy"
+ },
+ {
+  "id": "n80",
+  "level": 16,
+  "type": "word",
+  "ar": "تمانين",
+  "tr": "tamaniin",
+  "en": "Eighty"
+ },
+ {
+  "id": "n90",
+  "level": 16,
+  "type": "word",
+  "ar": "تسعين",
+  "tr": "tesʿiin",
+  "en": "Ninety"
+ },
+ {
+  "id": "n1000",
+  "level": 16,
+  "type": "word",
+  "ar": "ألف",
+  "tr": "alf",
+  "en": "One thousand"
+ },
+ {
+  "id": "d_goma",
+  "level": 17,
+  "type": "word",
+  "ar": "الجمعة",
+  "tr": "el-gomʿa",
+  "en": "Friday"
+ },
+ {
+  "id": "d_sabt",
+  "level": 17,
+  "type": "word",
+  "ar": "السبت",
+  "tr": "es-sabt",
+  "en": "Saturday"
+ },
+ {
+  "id": "d_had",
+  "level": 17,
+  "type": "word",
+  "ar": "الحد",
+  "tr": "el-Hadd",
+  "en": "Sunday"
+ },
+ {
+  "id": "d_etnein",
+  "level": 17,
+  "type": "word",
+  "ar": "الإتنين",
+  "tr": "el-etneen",
+  "en": "Monday"
+ },
+ {
+  "id": "d_talat",
+  "level": 17,
+  "type": "word",
+  "ar": "التلات",
+  "tr": "et-talaat",
+  "en": "Tuesday"
+ },
+ {
+  "id": "d_arba",
+  "level": 17,
+  "type": "word",
+  "ar": "الأربع",
+  "tr": "el-arbaʿ",
+  "en": "Wednesday"
+ },
+ {
+  "id": "d_khamiis",
+  "level": 17,
+  "type": "word",
+  "ar": "الخميس",
+  "tr": "el-khamiis",
+  "en": "Thursday"
+ },
+ {
+  "id": "t_deʾiʾa",
+  "level": 17,
+  "type": "word",
+  "ar": "دقيقة",
+  "tr": "deʾiiʾa",
+  "en": "Minute"
+ },
+ {
+  "id": "t_noss",
+  "level": 17,
+  "type": "phrase",
+  "ar": "نص ساعة",
+  "tr": "noss saaʿa",
+  "en": "Half an hour"
+ },
+ {
+  "id": "t_reb",
+  "level": 17,
+  "type": "phrase",
+  "ar": "ربع ساعة",
+  "tr": "rebʿ saaʿa",
+  "en": "Quarter of an hour"
+ },
+ {
+  "id": "t_badri",
+  "level": 17,
+  "type": "word",
+  "ar": "بدري",
+  "tr": "badri",
+  "en": "Early"
+ },
+ {
+  "id": "t_metaakhar",
+  "level": 17,
+  "type": "word",
+  "ar": "متأخر",
+  "tr": "metʾakhar",
+  "en": "Late"
+ },
+ {
+  "id": "v_write",
+  "level": 18,
+  "type": "word",
+  "ar": "بكتب",
+  "tr": "baktib",
+  "en": "I write"
+ },
+ {
+  "id": "v_read",
+  "level": 18,
+  "type": "word",
+  "ar": "باقرا",
+  "tr": "baʾra",
+  "en": "I read"
+ },
+ {
+  "id": "v_work",
+  "level": 18,
+  "type": "word",
+  "ar": "باشتغل",
+  "tr": "bashtaghal",
+  "en": "I work"
+ },
+ {
+  "id": "v_sleep",
+  "level": 18,
+  "type": "word",
+  "ar": "بانام",
+  "tr": "banaam",
+  "en": "I sleep"
+ },
+ {
+  "id": "v_wake",
+  "level": 18,
+  "type": "word",
+  "ar": "باصحى",
+  "tr": "baSHa",
+  "en": "I wake up"
+ },
+ {
+  "id": "v_sit",
+  "level": 18,
+  "type": "word",
+  "ar": "باقعد",
+  "tr": "baʾʿod",
+  "en": "I sit / stay"
+ },
+ {
+  "id": "v_open",
+  "level": 18,
+  "type": "word",
+  "ar": "بافتح",
+  "tr": "baftaH",
+  "en": "I open"
+ },
+ {
+  "id": "v_close",
+  "level": 18,
+  "type": "word",
+  "ar": "باقفل",
+  "tr": "baʾfel",
+  "en": "I close"
+ },
+ {
+  "id": "v_pay",
+  "level": 18,
+  "type": "word",
+  "ar": "بادفع",
+  "tr": "badfaʿ",
+  "en": "I pay"
+ },
+ {
+  "id": "v_help",
+  "level": 18,
+  "type": "word",
+  "ar": "باساعد",
+  "tr": "basaaʿed",
+  "en": "I help"
+ },
+ {
+  "id": "v_ask",
+  "level": 18,
+  "type": "word",
+  "ar": "باسأل",
+  "tr": "basʾal",
+  "en": "I ask"
+ },
+ {
+  "id": "v_listen",
+  "level": 18,
+  "type": "word",
+  "ar": "باسمع",
+  "tr": "basmaʿ",
+  "en": "I listen / hear"
+ },
+ {
+  "id": "v_wait",
+  "level": 19,
+  "type": "word",
+  "ar": "باستنى",
+  "tr": "bastanna",
+  "en": "I wait"
+ },
+ {
+  "id": "v_find",
+  "level": 19,
+  "type": "word",
+  "ar": "بالاقي",
+  "tr": "balaaʾi",
+  "en": "I find"
+ },
+ {
+  "id": "v_take",
+  "level": 19,
+  "type": "word",
+  "ar": "باخد",
+  "tr": "baakhod",
+  "en": "I take"
+ },
+ {
+  "id": "v_bring",
+  "level": 19,
+  "type": "word",
+  "ar": "باجيب",
+  "tr": "bagiib",
+  "en": "I bring"
+ },
+ {
+  "id": "v_understand",
+  "level": 19,
+  "type": "word",
+  "ar": "بافهم",
+  "tr": "bafham",
+  "en": "I understand"
+ },
+ {
+  "id": "v_forget",
+  "level": 19,
+  "type": "word",
+  "ar": "بانسى",
+  "tr": "bansa",
+  "en": "I forget"
+ },
+ {
+  "id": "v_think",
+  "level": 19,
+  "type": "word",
+  "ar": "بافكر",
+  "tr": "bafakkar",
+  "en": "I think"
+ },
+ {
+  "id": "p_doingwhat",
+  "level": 19,
+  "type": "sentence",
+  "ar": "بتعمل إيه",
+  "tr": "betiʿmel eh",
+  "en": "What are you doing? (m)"
+ },
+ {
+  "id": "p_canhelp",
+  "level": 19,
+  "type": "sentence",
+  "ar": "ممكن أساعدك",
+  "tr": "mumkin asaʿdak",
+  "en": "Can I help you? (m)"
+ },
+ {
+  "id": "p_whatlike",
+  "level": 19,
+  "type": "sentence",
+  "ar": "تحب إيه",
+  "tr": "teHebb eh",
+  "en": "What would you like? (m)"
+ },
+ {
+  "id": "pr_in",
+  "level": 20,
+  "type": "word",
+  "ar": "في",
+  "tr": "fi",
+  "en": "In"
+ },
+ {
+  "id": "pr_on",
+  "level": 20,
+  "type": "word",
+  "ar": "على",
+  "tr": "ʿala",
+  "en": "On"
+ },
+ {
+  "id": "pr_under",
+  "level": 20,
+  "type": "word",
+  "ar": "تحت",
+  "tr": "taHt",
+  "en": "Under"
+ },
+ {
+  "id": "pr_above",
+  "level": 20,
+  "type": "word",
+  "ar": "فوق",
+  "tr": "foʾ",
+  "en": "Above / up"
+ },
+ {
+  "id": "pr_next",
+  "level": 20,
+  "type": "word",
+  "ar": "جمب",
+  "tr": "gamb",
+  "en": "Next to"
+ },
+ {
+  "id": "pr_behind",
+  "level": 20,
+  "type": "word",
+  "ar": "ورا",
+  "tr": "wara",
+  "en": "Behind"
+ },
+ {
+  "id": "pr_front",
+  "level": 20,
+  "type": "word",
+  "ar": "قدام",
+  "tr": "oddaam",
+  "en": "In front of"
+ },
+ {
+  "id": "pr_between",
+  "level": 20,
+  "type": "word",
+  "ar": "بين",
+  "tr": "been",
+  "en": "Between"
+ },
+ {
+  "id": "pr_with",
+  "level": 20,
+  "type": "word",
+  "ar": "مع",
+  "tr": "maʿa",
+  "en": "With"
+ },
+ {
+  "id": "pr_without",
+  "level": 20,
+  "type": "phrase",
+  "ar": "من غير",
+  "tr": "men gheer",
+  "en": "Without"
+ },
+ {
+  "id": "pr_to",
+  "level": 20,
+  "type": "word",
+  "ar": "لـ",
+  "tr": "le",
+  "en": "To / for"
+ },
+ {
+  "id": "pr_inside",
+  "level": 20,
+  "type": "word",
+  "ar": "جوه",
+  "tr": "gowwa",
+  "en": "Inside"
+ },
+ {
+  "id": "pr_outside",
+  "level": 20,
+  "type": "word",
+  "ar": "بره",
+  "tr": "barra",
+  "en": "Outside"
+ },
+ {
+  "id": "c_and",
+  "level": 21,
+  "type": "word",
+  "ar": "و",
+  "tr": "we",
+  "en": "And"
+ },
+ {
+  "id": "c_but",
+  "level": 21,
+  "type": "word",
+  "ar": "بس",
+  "tr": "bas",
+  "en": "But / only"
+ },
+ {
+  "id": "c_because",
+  "level": 21,
+  "type": "word",
+  "ar": "عشان",
+  "tr": "ʿashaan",
+  "en": "Because"
+ },
+ {
+  "id": "c_if",
+  "level": 21,
+  "type": "word",
+  "ar": "لو",
+  "tr": "law",
+  "en": "If"
+ },
+ {
+  "id": "c_or",
+  "level": 21,
+  "type": "word",
+  "ar": "ولا",
+  "tr": "walla",
+  "en": "Or"
+ },
+ {
+  "id": "c_also",
+  "level": 21,
+  "type": "word",
+  "ar": "كمان",
+  "tr": "kamaan",
+  "en": "Also / too"
+ },
+ {
+  "id": "c_sothat",
+  "level": 21,
+  "type": "phrase",
+  "ar": "عشان كده",
+  "tr": "ʿashaan keda",
+  "en": "That's why / so"
+ },
+ {
+  "id": "c_imean",
+  "level": 21,
+  "type": "word",
+  "ar": "يعني",
+  "tr": "yaʿni",
+  "en": "I mean / like"
+ },
+ {
+  "id": "c_okthen",
+  "level": 21,
+  "type": "word",
+  "ar": "طب",
+  "tr": "Tab",
+  "en": "Okay then / so"
+ },
+ {
+  "id": "c_whatsup",
+  "level": 21,
+  "type": "sentence",
+  "ar": "فيه إيه",
+  "tr": "fiih eh",
+  "en": "What's the matter?"
+ },
+ {
+  "id": "col_white",
+  "level": 22,
+  "type": "word",
+  "ar": "أبيض",
+  "tr": "abyaD",
+  "en": "White"
+ },
+ {
+  "id": "col_black",
+  "level": 22,
+  "type": "word",
+  "ar": "إسود",
+  "tr": "eswed",
+  "en": "Black"
+ },
+ {
+  "id": "col_red",
+  "level": 22,
+  "type": "word",
+  "ar": "أحمر",
+  "tr": "aHmar",
+  "en": "Red"
+ },
+ {
+  "id": "col_blue",
+  "level": 22,
+  "type": "word",
+  "ar": "أزرق",
+  "tr": "azraʾ",
+  "en": "Blue"
+ },
+ {
+  "id": "col_green",
+  "level": 22,
+  "type": "word",
+  "ar": "أخضر",
+  "tr": "akhDar",
+  "en": "Green"
+ },
+ {
+  "id": "col_yellow",
+  "level": 22,
+  "type": "word",
+  "ar": "أصفر",
+  "tr": "aSfar",
+  "en": "Yellow"
+ },
+ {
+  "id": "col_brown",
+  "level": 22,
+  "type": "word",
+  "ar": "بني",
+  "tr": "bonni",
+  "en": "Brown"
+ },
+ {
+  "id": "col_gray",
+  "level": 22,
+  "type": "word",
+  "ar": "رمادي",
+  "tr": "romaadi",
+  "en": "Gray"
+ },
+ {
+  "id": "col_orange",
+  "level": 22,
+  "type": "word",
+  "ar": "برتقاني",
+  "tr": "bortoʾaani",
+  "en": "Orange"
+ },
+ {
+  "id": "col_color",
+  "level": 22,
+  "type": "word",
+  "ar": "لون",
+  "tr": "loon",
+  "en": "Color"
+ },
+ {
+  "id": "a_hotw",
+  "level": 23,
+  "type": "word",
+  "ar": "حر",
+  "tr": "Harr",
+  "en": "Hot (weather)"
+ },
+ {
+  "id": "a_cold",
+  "level": 23,
+  "type": "word",
+  "ar": "بارد",
+  "tr": "baared",
+  "en": "Cold"
+ },
+ {
+  "id": "a_hotobj",
+  "level": 23,
+  "type": "word",
+  "ar": "سخن",
+  "tr": "sokhn",
+  "en": "Hot (object)"
+ },
+ {
+  "id": "a_fast",
+  "level": 23,
+  "type": "word",
+  "ar": "سريع",
+  "tr": "sariiʿ",
+  "en": "Fast"
+ },
+ {
+  "id": "a_slow",
+  "level": 23,
+  "type": "word",
+  "ar": "بطيء",
+  "tr": "baTiiʾ",
+  "en": "Slow"
+ },
+ {
+  "id": "a_easy",
+  "level": 23,
+  "type": "word",
+  "ar": "سهل",
+  "tr": "sahl",
+  "en": "Easy"
+ },
+ {
+  "id": "a_hard",
+  "level": 23,
+  "type": "word",
+  "ar": "صعب",
+  "tr": "saʿb",
+  "en": "Hard / difficult"
+ },
+ {
+  "id": "a_clean",
+  "level": 23,
+  "type": "word",
+  "ar": "نضيف",
+  "tr": "naDiif",
+  "en": "Clean"
+ },
+ {
+  "id": "a_dirty",
+  "level": 23,
+  "type": "word",
+  "ar": "وسخ",
+  "tr": "wesekh",
+  "en": "Dirty"
+ },
+ {
+  "id": "a_full",
+  "level": 23,
+  "type": "word",
+  "ar": "مليان",
+  "tr": "malyaan",
+  "en": "Full"
+ },
+ {
+  "id": "a_empty",
+  "level": 23,
+  "type": "word",
+  "ar": "فاضي",
+  "tr": "faaDi",
+  "en": "Empty / free"
+ },
+ {
+  "id": "a_rich",
+  "level": 23,
+  "type": "word",
+  "ar": "غني",
+  "tr": "ghani",
+  "en": "Rich"
+ },
+ {
+  "id": "a_poor",
+  "level": 23,
+  "type": "word",
+  "ar": "فقير",
+  "tr": "faʾiir",
+  "en": "Poor"
+ },
+ {
+  "id": "b_head",
+  "level": 24,
+  "type": "word",
+  "ar": "راس",
+  "tr": "raas",
+  "en": "Head"
+ },
+ {
+  "id": "b_eye",
+  "level": 24,
+  "type": "word",
+  "ar": "عين",
+  "tr": "ʿein",
+  "en": "Eye"
+ },
+ {
+  "id": "b_hand",
+  "level": 24,
+  "type": "word",
+  "ar": "إيد",
+  "tr": "iid",
+  "en": "Hand"
+ },
+ {
+  "id": "b_leg",
+  "level": 24,
+  "type": "word",
+  "ar": "رجل",
+  "tr": "regl",
+  "en": "Leg / foot"
+ },
+ {
+  "id": "b_stomach",
+  "level": 24,
+  "type": "word",
+  "ar": "بطن",
+  "tr": "baTn",
+  "en": "Stomach"
+ },
+ {
+  "id": "b_tooth",
+  "level": 24,
+  "type": "word",
+  "ar": "ضرس",
+  "tr": "Ders",
+  "en": "Tooth"
+ },
+ {
+  "id": "b_heart",
+  "level": 24,
+  "type": "word",
+  "ar": "قلب",
+  "tr": "ʾalb",
+  "en": "Heart"
+ },
+ {
+  "id": "b_doctor",
+  "level": 24,
+  "type": "word",
+  "ar": "دكتور",
+  "tr": "doktoor",
+  "en": "Doctor"
+ },
+ {
+  "id": "b_medicine",
+  "level": 24,
+  "type": "word",
+  "ar": "دوا",
+  "tr": "dawa",
+  "en": "Medicine"
+ },
+ {
+  "id": "b_pain",
+  "level": 24,
+  "type": "word",
+  "ar": "وجع",
+  "tr": "wagaʿ",
+  "en": "Pain / ache"
+ },
+ {
+  "id": "b_headache",
+  "level": 24,
+  "type": "word",
+  "ar": "صداع",
+  "tr": "Sodaaʿ",
+  "en": "Headache"
+ },
+ {
+  "id": "b_haveheadache",
+  "level": 24,
+  "type": "sentence",
+  "ar": "عندي صداع",
+  "tr": "ʿandi Sodaaʿ",
+  "en": "I have a headache"
+ },
+ {
+  "id": "h_room",
+  "level": 25,
+  "type": "word",
+  "ar": "أوضة",
+  "tr": "oDa",
+  "en": "Room"
+ },
+ {
+  "id": "h_kitchen",
+  "level": 25,
+  "type": "word",
+  "ar": "مطبخ",
+  "tr": "maTbakh",
+  "en": "Kitchen"
+ },
+ {
+  "id": "h_bathroom",
+  "level": 25,
+  "type": "word",
+  "ar": "حمام",
+  "tr": "Hammaam",
+  "en": "Bathroom"
+ },
+ {
+  "id": "h_bed",
+  "level": 25,
+  "type": "word",
+  "ar": "سرير",
+  "tr": "sariir",
+  "en": "Bed"
+ },
+ {
+  "id": "h_table",
+  "level": 25,
+  "type": "word",
+  "ar": "ترابيزة",
+  "tr": "tarabeeza",
+  "en": "Table"
+ },
+ {
+  "id": "h_chair",
+  "level": 25,
+  "type": "word",
+  "ar": "كرسي",
+  "tr": "korsi",
+  "en": "Chair"
+ },
+ {
+  "id": "h_door",
+  "level": 25,
+  "type": "word",
+  "ar": "باب",
+  "tr": "baab",
+  "en": "Door"
+ },
+ {
+  "id": "h_window",
+  "level": 25,
+  "type": "word",
+  "ar": "شباك",
+  "tr": "shebbaak",
+  "en": "Window"
+ },
+ {
+  "id": "h_key",
+  "level": 25,
+  "type": "word",
+  "ar": "مفتاح",
+  "tr": "moftaaH",
+  "en": "Key"
+ },
+ {
+  "id": "h_light",
+  "level": 25,
+  "type": "word",
+  "ar": "نور",
+  "tr": "noor",
+  "en": "Light"
+ },
+ {
+  "id": "h_fridge",
+  "level": 25,
+  "type": "word",
+  "ar": "تلاجة",
+  "tr": "talaaga",
+  "en": "Fridge"
+ },
+ {
+  "id": "cl_clothes",
+  "level": 26,
+  "type": "word",
+  "ar": "هدوم",
+  "tr": "hedoom",
+  "en": "Clothes"
+ },
+ {
+  "id": "cl_shirt",
+  "level": 26,
+  "type": "word",
+  "ar": "قميص",
+  "tr": "ʾamiiS",
+  "en": "Shirt"
+ },
+ {
+  "id": "cl_trousers",
+  "level": 26,
+  "type": "word",
+  "ar": "بنطلون",
+  "tr": "banTaloon",
+  "en": "Trousers"
+ },
+ {
+  "id": "cl_shoes",
+  "level": 26,
+  "type": "word",
+  "ar": "جزمة",
+  "tr": "gazma",
+  "en": "Shoes"
+ },
+ {
+  "id": "cl_dress",
+  "level": 26,
+  "type": "word",
+  "ar": "فستان",
+  "tr": "fostaan",
+  "en": "Dress"
+ },
+ {
+  "id": "cl_glasses",
+  "level": 26,
+  "type": "word",
+  "ar": "نضارة",
+  "tr": "naDDaara",
+  "en": "Glasses"
+ },
+ {
+  "id": "cl_wallet",
+  "level": 26,
+  "type": "word",
+  "ar": "محفظة",
+  "tr": "maHfaZa",
+  "en": "Wallet"
+ },
+ {
+  "id": "cl_phone",
+  "level": 26,
+  "type": "word",
+  "ar": "موبايل",
+  "tr": "mobaayl",
+  "en": "Mobile phone"
+ },
+ {
+  "id": "w_office",
+  "level": 27,
+  "type": "word",
+  "ar": "مكتب",
+  "tr": "maktab",
+  "en": "Office / desk"
+ },
+ {
+  "id": "w_teacher",
+  "level": 27,
+  "type": "word",
+  "ar": "مدرس",
+  "tr": "modarres",
+  "en": "Teacher (m)"
+ },
+ {
+  "id": "w_student",
+  "level": 27,
+  "type": "word",
+  "ar": "طالب",
+  "tr": "Taaleb",
+  "en": "Student (m)"
+ },
+ {
+  "id": "w_degree",
+  "level": 27,
+  "type": "word",
+  "ar": "شهادة",
+  "tr": "shahaada",
+  "en": "Certificate / degree"
+ },
+ {
+  "id": "w_meeting",
+  "level": 27,
+  "type": "word",
+  "ar": "اجتماع",
+  "tr": "egtemaaʿ",
+  "en": "Meeting"
+ },
+ {
+  "id": "w_appt",
+  "level": 27,
+  "type": "word",
+  "ar": "موعد",
+  "tr": "mawʿed",
+  "en": "Appointment"
+ },
+ {
+  "id": "w_study",
+  "level": 27,
+  "type": "word",
+  "ar": "بادرس",
+  "tr": "badris",
+  "en": "I study"
+ },
+ {
+  "id": "w_whatjob",
+  "level": 27,
+  "type": "sentence",
+  "ar": "بتشتغل إيه",
+  "tr": "beteshtaghal eh",
+  "en": "What do you do for work? (m)"
+ },
+ {
+  "id": "w_iateacher",
+  "level": 27,
+  "type": "sentence",
+  "ar": "أنا مدرس",
+  "tr": "ana modarres",
+  "en": "I'm a teacher (m)"
+ },
+ {
+  "id": "ph_phone",
+  "level": 28,
+  "type": "word",
+  "ar": "تليفون",
+  "tr": "telifoon",
+  "en": "Telephone"
+ },
+ {
+  "id": "ph_call",
+  "level": 28,
+  "type": "word",
+  "ar": "اتصال",
+  "tr": "etesaal",
+  "en": "A call"
+ },
+ {
+  "id": "ph_message",
+  "level": 28,
+  "type": "word",
+  "ar": "رسالة",
+  "tr": "resaala",
+  "en": "Message"
+ },
+ {
+  "id": "ph_email",
+  "level": 28,
+  "type": "word",
+  "ar": "إيميل",
+  "tr": "iimeel",
+  "en": "Email"
+ },
+ {
+  "id": "ph_internet",
+  "level": 28,
+  "type": "word",
+  "ar": "إنترنت",
+  "tr": "internet",
+  "en": "Internet"
+ },
+ {
+  "id": "ph_whatsapp",
+  "level": 28,
+  "type": "word",
+  "ar": "واتساب",
+  "tr": "watsaab",
+  "en": "WhatsApp"
+ },
+ {
+  "id": "ph_number",
+  "level": 28,
+  "type": "word",
+  "ar": "رقم",
+  "tr": "raʾam",
+  "en": "Number"
+ },
+ {
+  "id": "ph_available",
+  "level": 28,
+  "type": "word",
+  "ar": "موجود",
+  "tr": "mawgood",
+  "en": "Available / present (m)"
+ },
+ {
+  "id": "ph_callme",
+  "level": 28,
+  "type": "sentence",
+  "ar": "كلمني",
+  "tr": "kallemni",
+  "en": "Call me (m)"
+ },
+ {
+  "id": "ph_sendme",
+  "level": 28,
+  "type": "sentence",
+  "ar": "ابعتلي",
+  "tr": "ebʿatli",
+  "en": "Send me (m)"
+ },
+ {
+  "id": "m_pound",
+  "level": 29,
+  "type": "word",
+  "ar": "جنيه",
+  "tr": "gneeh",
+  "en": "Pound (currency)"
+ },
+ {
+  "id": "m_coins",
+  "level": 29,
+  "type": "word",
+  "ar": "فكة",
+  "tr": "fakka",
+  "en": "Change (coins)"
+ },
+ {
+  "id": "m_card",
+  "level": 29,
+  "type": "word",
+  "ar": "كارت",
+  "tr": "kart",
+  "en": "Card"
+ },
+ {
+  "id": "m_cash",
+  "level": 29,
+  "type": "word",
+  "ar": "كاش",
+  "tr": "kaash",
+  "en": "Cash"
+ },
+ {
+  "id": "m_total",
+  "level": 29,
+  "type": "word",
+  "ar": "الإجمالي",
+  "tr": "el-egmaali",
+  "en": "The total"
+ },
+ {
+  "id": "m_havechange",
+  "level": 29,
+  "type": "sentence",
+  "ar": "عندك فكة",
+  "tr": "ʿandak fakka",
+  "en": "Do you have change? (m)"
+ },
+ {
+  "id": "m_perkilo",
+  "level": 29,
+  "type": "sentence",
+  "ar": "ده بكام الكيلو",
+  "tr": "da bekaam el-kilo",
+  "en": "How much per kilo?"
+ },
+ {
+  "id": "we_weather",
+  "level": 30,
+  "type": "word",
+  "ar": "جو",
+  "tr": "gaww",
+  "en": "Weather"
+ },
+ {
+  "id": "we_sun",
+  "level": 30,
+  "type": "word",
+  "ar": "شمس",
+  "tr": "shams",
+  "en": "Sun"
+ },
+ {
+  "id": "we_rain",
+  "level": 30,
+  "type": "word",
+  "ar": "مطر",
+  "tr": "maTar",
+  "en": "Rain"
+ },
+ {
+  "id": "we_wind",
+  "level": 30,
+  "type": "word",
+  "ar": "ريح",
+  "tr": "riiH",
+  "en": "Wind"
+ },
+ {
+  "id": "we_cold",
+  "level": 30,
+  "type": "word",
+  "ar": "برد",
+  "tr": "bard",
+  "en": "Cold (the cold)"
+ },
+ {
+  "id": "we_clouds",
+  "level": 30,
+  "type": "word",
+  "ar": "سحاب",
+  "tr": "saHaab",
+  "en": "Clouds"
+ },
+ {
+  "id": "we_summer",
+  "level": 30,
+  "type": "word",
+  "ar": "صيف",
+  "tr": "Seif",
+  "en": "Summer"
+ },
+ {
+  "id": "we_winter",
+  "level": 30,
+  "type": "word",
+  "ar": "شتا",
+  "tr": "sheta",
+  "en": "Winter"
+ },
+ {
+  "id": "tr_ticket",
+  "level": 31,
+  "type": "word",
+  "ar": "تذكرة",
+  "tr": "tazkara",
+  "en": "Ticket"
+ },
+ {
+  "id": "tr_hotel",
+  "level": 31,
+  "type": "word",
+  "ar": "فندق",
+  "tr": "fondoʾ",
+  "en": "Hotel"
+ },
+ {
+  "id": "tr_booking",
+  "level": 31,
+  "type": "word",
+  "ar": "حجز",
+  "tr": "Hagz",
+  "en": "Reservation"
+ },
+ {
+  "id": "tr_passport",
+  "level": 31,
+  "type": "word",
+  "ar": "باسبور",
+  "tr": "basboor",
+  "en": "Passport"
+ },
+ {
+  "id": "tr_trip",
+  "level": 31,
+  "type": "word",
+  "ar": "رحلة",
+  "tr": "reHla",
+  "en": "Trip / flight"
+ },
+ {
+  "id": "tr_wherehotel",
+  "level": 31,
+  "type": "sentence",
+  "ar": "فين الفندق",
+  "tr": "feen el-fondoʾ",
+  "en": "Where's the hotel?"
+ },
+ {
+  "id": "tr_havebooking",
+  "level": 31,
+  "type": "sentence",
+  "ar": "عندي حجز",
+  "tr": "ʿandi Hagz",
+  "en": "I have a reservation"
+ },
+ {
+  "id": "r_order",
+  "level": 32,
+  "type": "sentence",
+  "ar": "أنا عايز أطلب",
+  "tr": "ana ʿaayez aTlob",
+  "en": "I want to order (m)"
+ },
+ {
+  "id": "r_cup",
+  "level": 32,
+  "type": "word",
+  "ar": "كوباية",
+  "tr": "kobaaya",
+  "en": "Cup / glass"
+ },
+ {
+  "id": "r_bottle",
+  "level": 32,
+  "type": "word",
+  "ar": "أزازة",
+  "tr": "azaaza",
+  "en": "Bottle"
+ },
+ {
+  "id": "r_coldserved",
+  "level": 32,
+  "type": "word",
+  "ar": "ساقع",
+  "tr": "saʾʿa",
+  "en": "Cold (served cold)"
+ },
+ {
+  "id": "r_full",
+  "level": 32,
+  "type": "sentence",
+  "ar": "أنا شبعان",
+  "tr": "ana shabʿaan",
+  "en": "I'm full (m)"
+ },
+ {
+  "id": "r_billplease",
+  "level": 32,
+  "type": "sentence",
+  "ar": "الحساب لو سمحت",
+  "tr": "el-Hesaab law samaHt",
+  "en": "The bill, please"
+ },
+ {
+  "id": "o_think",
+  "level": 33,
+  "type": "phrase",
+  "ar": "في رأيي",
+  "tr": "fi raʾyi",
+  "en": "In my opinion"
+ },
+ {
+  "id": "o_agree",
+  "level": 33,
+  "type": "word",
+  "ar": "موافق",
+  "tr": "mowaafeʾ",
+  "en": "I agree (m)"
+ },
+ {
+  "id": "o_prefer",
+  "level": 33,
+  "type": "word",
+  "ar": "بافضل",
+  "tr": "bafaDDal",
+  "en": "I prefer"
+ },
+ {
+  "id": "o_really",
+  "level": 33,
+  "type": "word",
+  "ar": "بجد",
+  "tr": "begadd",
+  "en": "Really?"
+ },
+ {
+  "id": "o_ofcourse",
+  "level": 33,
+  "type": "word",
+  "ar": "طبعاً",
+  "tr": "TabʿAn",
+  "en": "Of course"
+ },
+ {
+  "id": "o_maybe",
+  "level": 33,
+  "type": "word",
+  "ar": "يمكن",
+  "tr": "yemken",
+  "en": "Maybe"
+ },
+ {
+  "id": "o_notsure",
+  "level": 33,
+  "type": "phrase",
+  "ar": "مش متأكد",
+  "tr": "mesh metʾakked",
+  "en": "Not sure (m)"
+ },
+ {
+  "id": "o_great",
+  "level": 33,
+  "type": "word",
+  "ar": "عظيم",
+  "tr": "ʿaZiim",
+  "en": "Great"
+ },
+ {
+  "id": "o_sure",
+  "level": 33,
+  "type": "word",
+  "ar": "أكيد",
+  "tr": "akiid",
+  "en": "Sure / definitely"
+ },
+ {
+  "id": "o_nice",
+  "level": 33,
+  "type": "word",
+  "ar": "جميل",
+  "tr": "gamiil",
+  "en": "Lovely / nice"
+ },
+ {
+  "id": "s_askq",
+  "level": 34,
+  "type": "sentence",
+  "ar": "ممكن أسألك سؤال",
+  "tr": "mumkin asʾalak suʾaal",
+  "en": "Can I ask you a question? (m)"
+ },
+ {
+  "id": "s_english",
+  "level": 34,
+  "type": "sentence",
+  "ar": "إنت بتتكلم إنجليزي",
+  "tr": "enta betetkallem engliizi",
+  "en": "Do you speak English? (m)"
+ },
+ {
+  "id": "s_notfromhere",
+  "level": 34,
+  "type": "sentence",
+  "ar": "أنا مش من هنا",
+  "tr": "ana mesh men hena",
+  "en": "I'm not from here"
+ },
+ {
+  "id": "s_helpplease",
+  "level": 34,
+  "type": "sentence",
+  "ar": "ممكن تساعدني لو سمحت",
+  "tr": "mumkin tesaaʿedni law samaHt",
+  "en": "Can you help me, please?"
+ },
+ {
+  "id": "s_lost",
+  "level": 34,
+  "type": "sentence",
+  "ar": "أنا تايه",
+  "tr": "ana taayeh",
+  "en": "I'm lost (m)"
+ },
+ {
+  "id": "s_waitmoment",
+  "level": 34,
+  "type": "sentence",
+  "ar": "استنى لحظة",
+  "tr": "estanna laHZa",
+  "en": "Wait a moment"
+ },
+ {
+  "id": "s_doesntmatter",
+  "level": 34,
+  "type": "sentence",
+  "ar": "مش مهم",
+  "tr": "mesh mohem",
+  "en": "It doesn't matter"
+ },
+ {
+  "id": "s_asyoulike",
+  "level": 34,
+  "type": "sentence",
+  "ar": "براحتك",
+  "tr": "be-raaHtak",
+  "en": "As you like (m)"
+ },
+ {
+  "id": "s_nicemeet",
+  "level": 35,
+  "type": "sentence",
+  "ar": "سعيد بمعرفتك",
+  "tr": "saʿiid be-maʿreftak",
+  "en": "Nice to meet you (m)"
+ },
+ {
+  "id": "s_meetagain",
+  "level": 35,
+  "type": "sentence",
+  "ar": "إن شاء الله نتقابل تاني",
+  "tr": "in shaaʾ allah netʾaabel taani",
+  "en": "Hopefully we'll meet again"
+ },
+ {
+  "id": "s_callifneed",
+  "level": 35,
+  "type": "sentence",
+  "ar": "اتصل بيا لو محتاج حاجة",
+  "tr": "etesel biya law meHtaag Haaga",
+  "en": "Call me if you need anything (m)"
+ },
+ {
+  "id": "s_loveegypt",
+  "level": 35,
+  "type": "sentence",
+  "ar": "أنا بحب مصر أوي",
+  "tr": "ana baHebb maSr awi",
+  "en": "I love Egypt a lot"
+ },
+ {
+  "id": "s_talklater",
+  "level": 35,
+  "type": "sentence",
+  "ar": "ممكن نتكلم بعدين",
+  "tr": "mumkin netkallem baʿdein",
+  "en": "Can we talk later?"
+ },
+ {
+  "id": "s_letsgo",
+  "level": 35,
+  "type": "sentence",
+  "ar": "يلا بينا",
+  "tr": "yalla biina",
+  "en": "Let's go (come on)"
+ },
+ {
+  "id": "s_takecare",
+  "level": 35,
+  "type": "sentence",
+  "ar": "خد بالك",
+  "tr": "khod baalak",
+  "en": "Take care (m)"
+ },
+ {
+  "id": "vc_yougo",
+  "level": 36,
+  "type": "word",
+  "ar": "بتروح",
+  "tr": "betrooH",
+  "en": "You go (m) / she goes"
+ },
+ {
+  "id": "vc_yougof",
+  "level": 36,
+  "type": "word",
+  "ar": "بتروحي",
+  "tr": "betrooHi",
+  "en": "You go (f)"
+ },
+ {
+  "id": "vc_hego",
+  "level": 36,
+  "type": "word",
+  "ar": "بيروح",
+  "tr": "biyrooH",
+  "en": "He goes"
+ },
+ {
+  "id": "vc_wego",
+  "level": 36,
+  "type": "word",
+  "ar": "بنروح",
+  "tr": "benrooH",
+  "en": "We go"
+ },
+ {
+  "id": "vc_theygo",
+  "level": 36,
+  "type": "word",
+  "ar": "بيروحوا",
+  "tr": "biyrooHu",
+  "en": "They go"
+ },
+ {
+  "id": "vc_youeat",
+  "level": 36,
+  "type": "word",
+  "ar": "بتاكل",
+  "tr": "betaakol",
+  "en": "You eat (m) / she eats"
+ },
+ {
+  "id": "vc_heeat",
+  "level": 36,
+  "type": "word",
+  "ar": "بياكل",
+  "tr": "biyaakol",
+  "en": "He eats"
+ },
+ {
+  "id": "vc_weeat",
+  "level": 36,
+  "type": "word",
+  "ar": "بناكل",
+  "tr": "benaakol",
+  "en": "We eat"
+ },
+ {
+  "id": "vc_youdo",
+  "level": 36,
+  "type": "word",
+  "ar": "بتعمل",
+  "tr": "betiʿmel",
+  "en": "You do (m) / she does"
+ },
+ {
+  "id": "vc_hedo",
+  "level": 36,
+  "type": "word",
+  "ar": "بيعمل",
+  "tr": "biyiʿmel",
+  "en": "He does"
+ },
+ {
+  "id": "vc_wedo",
+  "level": 36,
+  "type": "word",
+  "ar": "بنعمل",
+  "tr": "benʿmel",
+  "en": "We do"
+ },
+ {
+  "id": "pf_iwent",
+  "level": 37,
+  "type": "word",
+  "ar": "رحت",
+  "tr": "roHt",
+  "en": "I went"
+ },
+ {
+  "id": "pf_hewent",
+  "level": 37,
+  "type": "word",
+  "ar": "راح",
+  "tr": "raaH",
+  "en": "He went"
+ },
+ {
+  "id": "pf_shewent",
+  "level": 37,
+  "type": "word",
+  "ar": "راحت",
+  "tr": "raaHet",
+  "en": "She went"
+ },
+ {
+  "id": "pf_wewent",
+  "level": 37,
+  "type": "word",
+  "ar": "رحنا",
+  "tr": "roHna",
+  "en": "We went"
+ },
+ {
+  "id": "pf_iate",
+  "level": 37,
+  "type": "word",
+  "ar": "أكلت",
+  "tr": "akalt",
+  "en": "I ate"
+ },
+ {
+  "id": "pf_idid",
+  "level": 37,
+  "type": "word",
+  "ar": "عملت",
+  "tr": "ʿamalt",
+  "en": "I did"
+ },
+ {
+  "id": "pf_iwillgo",
+  "level": 37,
+  "type": "word",
+  "ar": "هروح",
+  "tr": "harooH",
+  "en": "I will go"
+ },
+ {
+  "id": "pf_hewillgo",
+  "level": 37,
+  "type": "word",
+  "ar": "هيروح",
+  "tr": "hayrooH",
+  "en": "He will go"
+ },
+ {
+  "id": "pf_iwilleat",
+  "level": 37,
+  "type": "word",
+  "ar": "هاكل",
+  "tr": "haakol",
+  "en": "I will eat"
+ },
+ {
+  "id": "pf_didntgo",
+  "level": 37,
+  "type": "word",
+  "ar": "ماروحتش",
+  "tr": "maroHtesh",
+  "en": "I didn't go"
+ },
+ {
+  "id": "pf_didnteat",
+  "level": 37,
+  "type": "word",
+  "ar": "ماكلتش",
+  "tr": "makaltesh",
+  "en": "I didn't eat"
+ },
+ {
+  "id": "pf_wontgo",
+  "level": 37,
+  "type": "phrase",
+  "ar": "مش هروح",
+  "tr": "mesh harooH",
+  "en": "I won't go"
+ },
+ {
+  "id": "tx_driver",
+  "level": 38,
+  "type": "phrase",
+  "ar": "يا أسطى",
+  "tr": "ya osTa",
+  "en": "Hey, driver! (calling a cab)"
+ },
+ {
+  "id": "tx_takeme",
+  "level": 38,
+  "type": "phrase",
+  "ar": "وديني",
+  "tr": "waddiini",
+  "en": "Take me (to)"
+ },
+ {
+  "id": "tx_meter",
+  "level": 38,
+  "type": "sentence",
+  "ar": "شغل العداد",
+  "tr": "shaghghal el-ʿaddaad",
+  "en": "Turn on the meter"
+ },
+ {
+  "id": "tx_fare",
+  "level": 38,
+  "type": "sentence",
+  "ar": "الأجرة بكام",
+  "tr": "el-ogra bekaam",
+  "en": "How much is the fare?"
+ },
+ {
+  "id": "tx_stophere",
+  "level": 38,
+  "type": "sentence",
+  "ar": "وقف هنا",
+  "tr": "waʾʾaf hena",
+  "en": "Stop here"
+ },
+ {
+  "id": "tx_right",
+  "level": 38,
+  "type": "sentence",
+  "ar": "على اليمين لو سمحت",
+  "tr": "ʿala el-yemiin law samaHt",
+  "en": "To the right, please"
+ },
+ {
+  "id": "tx_hurry",
+  "level": 38,
+  "type": "sentence",
+  "ar": "أنا مستعجل",
+  "tr": "ana mestaʿgel",
+  "en": "I'm in a hurry (m)"
+ },
+ {
+  "id": "tx_toomuch",
+  "level": 38,
+  "type": "sentence",
+  "ar": "ده كتير",
+  "tr": "da ketiir",
+  "en": "That's too much"
+ },
+ {
+  "id": "tx_havechange",
+  "level": 38,
+  "type": "sentence",
+  "ar": "معايا فكة",
+  "tr": "maʿaaya fakka",
+  "en": "I have change"
+ },
+ {
+  "id": "tx_keepchange",
+  "level": 38,
+  "type": "sentence",
+  "ar": "الباقي معاك",
+  "tr": "el-baaʾi maʿaak",
+  "en": "Keep the change"
+ },
+ {
+  "id": "rx_pharmacy",
+  "level": 39,
+  "type": "word",
+  "ar": "صيدلية",
+  "tr": "Saydaleyya",
+  "en": "Pharmacy"
+ },
+ {
+  "id": "rx_cold",
+  "level": 39,
+  "type": "sentence",
+  "ar": "عندي برد",
+  "tr": "ʿandi bard",
+  "en": "I have a cold"
+ },
+ {
+  "id": "rx_fever",
+  "level": 39,
+  "type": "sentence",
+  "ar": "عندي سخونية",
+  "tr": "ʿandi sokhneyya",
+  "en": "I have a fever"
+ },
+ {
+  "id": "rx_cough",
+  "level": 39,
+  "type": "sentence",
+  "ar": "عندي كحة",
+  "tr": "ʿandi koHHa",
+  "en": "I have a cough"
+ },
+ {
+  "id": "rx_stomach",
+  "level": 39,
+  "type": "sentence",
+  "ar": "عندي مغص",
+  "tr": "ʿandi maghaS",
+  "en": "I have a stomach ache"
+ },
+ {
+  "id": "rx_painkiller",
+  "level": 39,
+  "type": "word",
+  "ar": "مسكن",
+  "tr": "mosakken",
+  "en": "Painkiller"
+ },
+ {
+  "id": "rx_wantmed",
+  "level": 39,
+  "type": "sentence",
+  "ar": "عايز دوا",
+  "tr": "ʿaayez dawa",
+  "en": "I want medicine (m)"
+ },
+ {
+  "id": "rx_howmuchmed",
+  "level": 39,
+  "type": "sentence",
+  "ar": "الدوا ده بكام",
+  "tr": "el-dawa da bekaam",
+  "en": "How much is this medicine?"
+ },
+ {
+  "id": "rx_howoften",
+  "level": 39,
+  "type": "sentence",
+  "ar": "مرة كام في اليوم",
+  "tr": "marra kaam fil yom",
+  "en": "How many times a day?"
+ },
+ {
+  "id": "rx_nearby",
+  "level": 39,
+  "type": "sentence",
+  "ar": "فيه صيدلية قريبة",
+  "tr": "fiih Saydaleyya ʾoreyyeba",
+  "en": "Is there a pharmacy nearby?"
+ },
+ {
+  "id": "mt_pleased",
+  "level": 40,
+  "type": "phrase",
+  "ar": "اتشرفنا",
+  "tr": "etsharrafna",
+  "en": "Pleased to meet you"
+ },
+ {
+  "id": "mt_wherelive",
+  "level": 40,
+  "type": "sentence",
+  "ar": "إنت ساكن فين",
+  "tr": "enta saaken fein",
+  "en": "Where do you live? (m)"
+ },
+ {
+  "id": "mt_age",
+  "level": 40,
+  "type": "sentence",
+  "ar": "عندك كام سنة",
+  "tr": "ʿandak kaam sana",
+  "en": "How old are you? (m)"
+ },
+ {
+  "id": "mt_coffee",
+  "level": 40,
+  "type": "sentence",
+  "ar": "ممكن ناخد قهوة",
+  "tr": "mumkin naakhod ʾahwa",
+  "en": "Shall we grab a coffee?"
+ },
+ {
+  "id": "mt_number",
+  "level": 40,
+  "type": "sentence",
+  "ar": "ممكن رقمك",
+  "tr": "mumkin raʾamak",
+  "en": "Can I get your number? (m)"
+ },
+ {
+  "id": "mt_gladmet",
+  "level": 40,
+  "type": "sentence",
+  "ar": "أنا سعيد إني قابلتك",
+  "tr": "ana saʿiid eni ʾabeltak",
+  "en": "I'm glad I met you (m)"
+ },
+ {
+  "id": "mt_nice",
+  "level": 40,
+  "type": "sentence",
+  "ar": "إنت لطيف",
+  "tr": "enta laTiif",
+  "en": "You're nice (m)"
+ },
+ {
+  "id": "mt_sit",
+  "level": 40,
+  "type": "sentence",
+  "ar": "تعالى نقعد",
+  "tr": "taʿaala neʾʿod",
+  "en": "Come, let's sit down"
+ },
+ {
+  "id": "mt_talkagain",
+  "level": 40,
+  "type": "sentence",
+  "ar": "نتكلم تاني",
+  "tr": "netkallem taani",
+  "en": "Let's talk again"
+ },
+ {
+  "id": "dr_clinic",
+  "level": 41,
+  "type": "word",
+  "ar": "عيادة",
+  "tr": "ʿeyaada",
+  "en": "Clinic"
+ },
+ {
+  "id": "dr_unwell",
+  "level": 41,
+  "type": "sentence",
+  "ar": "أنا تعبان أوي",
+  "tr": "ana taʿbaan awi",
+  "en": "I feel really unwell (m)"
+ },
+ {
+  "id": "dr_temp",
+  "level": 41,
+  "type": "sentence",
+  "ar": "عندي حرارة",
+  "tr": "ʿandi Haraara",
+  "en": "I have a temperature"
+ },
+ {
+  "id": "dr_hurtshere",
+  "level": 41,
+  "type": "sentence",
+  "ar": "بيوجعني هنا",
+  "tr": "beyewgaʿni hena",
+  "en": "It hurts here"
+ },
+ {
+  "id": "dr_dizzy",
+  "level": 41,
+  "type": "sentence",
+  "ar": "حاسس بدوخة",
+  "tr": "Haases be-dookha",
+  "en": "I feel dizzy (m)"
+ },
+ {
+  "id": "dr_sincewhen",
+  "level": 41,
+  "type": "phrase",
+  "ar": "من إمتى",
+  "tr": "men emta",
+  "en": "Since when?"
+ },
+ {
+  "id": "dr_needrest",
+  "level": 41,
+  "type": "sentence",
+  "ar": "محتاج راحة",
+  "tr": "meHtaag raaHa",
+  "en": "I need rest (m)"
+ },
+ {
+  "id": "dr_allergy",
+  "level": 41,
+  "type": "sentence",
+  "ar": "عندي حساسية",
+  "tr": "ʿandi Hasaseyya",
+  "en": "I have an allergy"
+ },
+ {
+  "id": "dr_bloodtest",
+  "level": 41,
+  "type": "phrase",
+  "ar": "تحليل دم",
+  "tr": "taHliil damm",
+  "en": "Blood test"
+ },
+ {
+  "id": "dr_prescription",
+  "level": 41,
+  "type": "word",
+  "ar": "روشتة",
+  "tr": "roshetta",
+  "en": "Prescription"
+ },
+ {
+  "id": "dr_examine",
+  "level": 41,
+  "type": "sentence",
+  "ar": "ممكن تكشف عليا",
+  "tr": "mumkin tekshif ʿalayya",
+  "en": "Can you examine me?"
+ },
+ {
+  "id": "rent_apartment",
+  "level": 42,
+  "type": "word",
+  "ar": "شقة",
+  "tr": "shaʾʾa",
+  "en": "Apartment"
+ },
+ {
+  "id": "rent_rent",
+  "level": 42,
+  "type": "word",
+  "ar": "إيجار",
+  "tr": "iigaar",
+  "en": "Rent"
+ },
+ {
+  "id": "rent_howmuch",
+  "level": 42,
+  "type": "sentence",
+  "ar": "بكام الإيجار",
+  "tr": "bekaam el-iigaar",
+  "en": "How much is the rent?"
+ },
+ {
+  "id": "rent_want",
+  "level": 42,
+  "type": "sentence",
+  "ar": "عايز أأجر شقة",
+  "tr": "ʿaayez aʾaggar shaʾʾa",
+  "en": "I want to rent an apartment (m)"
+ },
+ {
+  "id": "rent_rooms",
+  "level": 42,
+  "type": "sentence",
+  "ar": "كام أوضة",
+  "tr": "kaam oDa",
+  "en": "How many rooms?"
+ },
+ {
+  "id": "rent_furnished",
+  "level": 42,
+  "type": "word",
+  "ar": "مفروشة",
+  "tr": "mafroosha",
+  "en": "Furnished (apartment)"
+ },
+ {
+  "id": "rent_vacant",
+  "level": 42,
+  "type": "word",
+  "ar": "فاضية",
+  "tr": "faaDya",
+  "en": "Vacant / available (apartment)"
+ },
+ {
+  "id": "rent_deposit",
+  "level": 42,
+  "type": "word",
+  "ar": "تأمين",
+  "tr": "taʾmiin",
+  "en": "Deposit"
+ },
+ {
+  "id": "rent_contract",
+  "level": 42,
+  "type": "word",
+  "ar": "عقد",
+  "tr": "ʿaʾd",
+  "en": "Contract"
+ },
+ {
+  "id": "rent_utilities",
+  "level": 42,
+  "type": "phrase",
+  "ar": "الكهربا والمية",
+  "tr": "el-kahraba wel-mayya",
+  "en": "Electricity and water"
+ },
+ {
+  "id": "rent_seeit",
+  "level": 42,
+  "type": "sentence",
+  "ar": "ممكن أشوف الشقة",
+  "tr": "mumkin ashoof el-shaʾʾa",
+  "en": "Can I see the apartment?"
+ },
+ {
+  "id": "fr_loveyou",
+  "level": 43,
+  "type": "sentence",
+  "ar": "بحبك",
+  "tr": "baHebbak",
+  "en": "I love you (to a man)"
+ },
+ {
+  "id": "fr_missyou",
+  "level": 43,
+  "type": "sentence",
+  "ar": "وحشتني",
+  "tr": "weHeshtni",
+  "en": "I miss you"
+ },
+ {
+  "id": "fr_thinkofyou",
+  "level": 43,
+  "type": "sentence",
+  "ar": "بفتكرك",
+  "tr": "baftekrak",
+  "en": "I think about you (to a man)"
+ },
+ {
+  "id": "fr_upsetwith",
+  "level": 43,
+  "type": "sentence",
+  "ar": "أنا زعلان منك",
+  "tr": "ana zaʿlaan mennak",
+  "en": "I'm upset with you (m→m)"
+ },
+ {
+  "id": "fr_annoyed",
+  "level": 43,
+  "type": "word",
+  "ar": "متضايق",
+  "tr": "metDaayeʾ",
+  "en": "Annoyed / upset (m)"
+ },
+ {
+  "id": "fr_happywith",
+  "level": 43,
+  "type": "sentence",
+  "ar": "مبسوط معاك",
+  "tr": "mabsoot maʿaak",
+  "en": "I'm happy with you (m)"
+ },
+ {
+  "id": "fr_worried",
+  "level": 43,
+  "type": "sentence",
+  "ar": "خايف عليك",
+  "tr": "khaayef ʿaleek",
+  "en": "I'm worried about you (m)"
+ },
+ {
+  "id": "fr_important",
+  "level": 43,
+  "type": "sentence",
+  "ar": "إنت مهم بالنسبة لي",
+  "tr": "enta mohem belnesbaali",
+  "en": "You're important to me (m)"
+ },
+ {
+  "id": "fr_relationship",
+  "level": 43,
+  "type": "word",
+  "ar": "علاقة",
+  "tr": "ʿelaaʾa",
+  "en": "Relationship"
+ },
+ {
+  "id": "fr_friendship",
+  "level": 43,
+  "type": "word",
+  "ar": "صداقة",
+  "tr": "Sadaaʾa",
+  "en": "Friendship"
+ },
+ {
+  "id": "fr_forgiveme",
+  "level": 43,
+  "type": "sentence",
+  "ar": "سامحني",
+  "tr": "saamHni",
+  "en": "Forgive me (to a man)"
+ },
+ {
+  "id": "fr_thankseverything",
+  "level": 43,
+  "type": "sentence",
+  "ar": "متشكر على كل حاجة",
+  "tr": "meteshakker ʿala kollo Haaga",
+  "en": "Thanks for everything (m)"
+ },
+ {
+  "id": "fam_grandpa",
+  "level": 44,
+  "type": "word",
+  "ar": "جدو",
+  "tr": "geddo",
+  "en": "Grandpa"
+ },
+ {
+  "id": "fam_grandma",
+  "level": 44,
+  "type": "word",
+  "ar": "تيتا",
+  "tr": "teta",
+  "en": "Grandma"
+ },
+ {
+  "id": "fam_uncle_p",
+  "level": 44,
+  "type": "word",
+  "ar": "عمو",
+  "tr": "ʿammo",
+  "en": "Uncle (paternal)"
+ },
+ {
+  "id": "fam_uncle_m",
+  "level": 44,
+  "type": "word",
+  "ar": "خالو",
+  "tr": "khaalo",
+  "en": "Uncle (maternal)"
+ },
+ {
+  "id": "fam_aunt_p",
+  "level": 44,
+  "type": "word",
+  "ar": "عمة",
+  "tr": "ʿamma",
+  "en": "Aunt (paternal)"
+ },
+ {
+  "id": "fam_aunt_m",
+  "level": 44,
+  "type": "word",
+  "ar": "خالة",
+  "tr": "khaala",
+  "en": "Aunt (maternal)"
+ },
+ {
+  "id": "fam_cousin_m",
+  "level": 44,
+  "type": "phrase",
+  "ar": "ابن عم",
+  "tr": "ebn ʿamm",
+  "en": "Cousin (m, paternal)"
+ },
+ {
+  "id": "fam_cousin_f",
+  "level": 44,
+  "type": "phrase",
+  "ar": "بنت عم",
+  "tr": "bent ʿamm",
+  "en": "Cousin (f, paternal)"
+ },
+ {
+  "id": "fam_mydad",
+  "level": 44,
+  "type": "word",
+  "ar": "أبويا",
+  "tr": "aboya",
+  "en": "My dad"
+ },
+ {
+  "id": "fam_mymom",
+  "level": 44,
+  "type": "word",
+  "ar": "أمي",
+  "tr": "ommi",
+  "en": "My mom"
+ },
+ {
+  "id": "fam_relatives",
+  "level": 44,
+  "type": "word",
+  "ar": "أقارب",
+  "tr": "aʾaareb",
+  "en": "Relatives"
+ },
+ {
+  "id": "fam_neighbor",
+  "level": 44,
+  "type": "word",
+  "ar": "جار",
+  "tr": "gaar",
+  "en": "Neighbor"
+ },
+ {
+  "id": "an_cat",
+  "level": 45,
+  "type": "word",
+  "ar": "قطة",
+  "tr": "ʾoTTa",
+  "en": "Cat"
+ },
+ {
+  "id": "an_dog",
+  "level": 45,
+  "type": "word",
+  "ar": "كلب",
+  "tr": "kalb",
+  "en": "Dog"
+ },
+ {
+  "id": "an_bird",
+  "level": 45,
+  "type": "word",
+  "ar": "عصفور",
+  "tr": "ʿaSfoor",
+  "en": "Bird"
+ },
+ {
+  "id": "an_horse",
+  "level": 45,
+  "type": "word",
+  "ar": "حصان",
+  "tr": "HoSaan",
+  "en": "Horse"
+ },
+ {
+  "id": "an_donkey",
+  "level": 45,
+  "type": "word",
+  "ar": "حمار",
+  "tr": "Homaar",
+  "en": "Donkey"
+ },
+ {
+  "id": "an_camel",
+  "level": 45,
+  "type": "word",
+  "ar": "جمل",
+  "tr": "gamal",
+  "en": "Camel"
+ },
+ {
+  "id": "an_lion",
+  "level": 45,
+  "type": "word",
+  "ar": "أسد",
+  "tr": "asad",
+  "en": "Lion"
+ },
+ {
+  "id": "an_elephant",
+  "level": 45,
+  "type": "word",
+  "ar": "فيل",
+  "tr": "fiil",
+  "en": "Elephant"
+ },
+ {
+  "id": "an_fish",
+  "level": 45,
+  "type": "word",
+  "ar": "سمكة",
+  "tr": "samaka",
+  "en": "Fish (animal)"
+ },
+ {
+  "id": "an_chicken",
+  "level": 45,
+  "type": "word",
+  "ar": "فرخة",
+  "tr": "farkha",
+  "en": "Chicken (live)"
+ },
+ {
+  "id": "an_cow",
+  "level": 45,
+  "type": "word",
+  "ar": "بقرة",
+  "tr": "baʾara",
+  "en": "Cow"
+ },
+ {
+  "id": "an_mouse",
+  "level": 45,
+  "type": "word",
+  "ar": "فار",
+  "tr": "faar",
+  "en": "Mouse / rat"
+ },
+ {
+  "id": "fv_apple",
+  "level": 46,
+  "type": "word",
+  "ar": "تفاح",
+  "tr": "toffaaH",
+  "en": "Apple"
+ },
+ {
+  "id": "fv_banana",
+  "level": 46,
+  "type": "word",
+  "ar": "موز",
+  "tr": "mooz",
+  "en": "Banana"
+ },
+ {
+  "id": "fv_orange",
+  "level": 46,
+  "type": "word",
+  "ar": "برتقان",
+  "tr": "bortoʾaan",
+  "en": "Orange (fruit)"
+ },
+ {
+  "id": "fv_grapes",
+  "level": 46,
+  "type": "word",
+  "ar": "عنب",
+  "tr": "ʿenab",
+  "en": "Grapes"
+ },
+ {
+  "id": "fv_watermelon",
+  "level": 46,
+  "type": "word",
+  "ar": "بطيخ",
+  "tr": "baTTiikh",
+  "en": "Watermelon"
+ },
+ {
+  "id": "fv_mango",
+  "level": 46,
+  "type": "word",
+  "ar": "مانجة",
+  "tr": "manga",
+  "en": "Mango"
+ },
+ {
+  "id": "fv_tomato",
+  "level": 46,
+  "type": "word",
+  "ar": "طماطم",
+  "tr": "TamaaTem",
+  "en": "Tomatoes"
+ },
+ {
+  "id": "fv_potato",
+  "level": 46,
+  "type": "word",
+  "ar": "بطاطس",
+  "tr": "baTaaTes",
+  "en": "Potatoes"
+ },
+ {
+  "id": "fv_onion",
+  "level": 46,
+  "type": "word",
+  "ar": "بصل",
+  "tr": "baSal",
+  "en": "Onions"
+ },
+ {
+  "id": "fv_carrot",
+  "level": 46,
+  "type": "word",
+  "ar": "جزر",
+  "tr": "gazar",
+  "en": "Carrots"
+ },
+ {
+  "id": "fv_lettuce",
+  "level": 46,
+  "type": "word",
+  "ar": "خس",
+  "tr": "khass",
+  "en": "Lettuce"
+ },
+ {
+  "id": "fv_cucumber",
+  "level": 46,
+  "type": "word",
+  "ar": "خيار",
+  "tr": "khyaar",
+  "en": "Cucumber"
+ },
+ {
+  "id": "ef_koshari",
+  "level": 47,
+  "type": "word",
+  "ar": "كشري",
+  "tr": "koshari",
+  "en": "Koshary"
+ },
+ {
+  "id": "ef_ful",
+  "level": 47,
+  "type": "word",
+  "ar": "فول",
+  "tr": "fool",
+  "en": "Fava beans (ful)"
+ },
+ {
+  "id": "ef_taameya",
+  "level": 47,
+  "type": "word",
+  "ar": "طعمية",
+  "tr": "taʿmeyya",
+  "en": "Falafel (taameya)"
+ },
+ {
+  "id": "ef_molokhia",
+  "level": 47,
+  "type": "word",
+  "ar": "ملوخية",
+  "tr": "molokheyya",
+  "en": "Molokhia"
+ },
+ {
+  "id": "ef_rice",
+  "level": 47,
+  "type": "word",
+  "ar": "رز",
+  "tr": "roz",
+  "en": "Rice"
+ },
+ {
+  "id": "ef_pasta",
+  "level": 47,
+  "type": "word",
+  "ar": "مكرونة",
+  "tr": "makarona",
+  "en": "Pasta"
+ },
+ {
+  "id": "ef_chickenfood",
+  "level": 47,
+  "type": "word",
+  "ar": "فراخ",
+  "tr": "feraakh",
+  "en": "Chicken (food)"
+ },
+ {
+  "id": "ef_meat",
+  "level": 47,
+  "type": "word",
+  "ar": "لحمة",
+  "tr": "laHma",
+  "en": "Meat"
+ },
+ {
+  "id": "ef_fishfood",
+  "level": 47,
+  "type": "word",
+  "ar": "سمك",
+  "tr": "samak",
+  "en": "Fish (food)"
+ },
+ {
+  "id": "ef_salad",
+  "level": 47,
+  "type": "word",
+  "ar": "سلطة",
+  "tr": "salaTa",
+  "en": "Salad"
+ },
+ {
+  "id": "ef_soup",
+  "level": 47,
+  "type": "word",
+  "ar": "شوربة",
+  "tr": "shorba",
+  "en": "Soup"
+ },
+ {
+  "id": "ef_sweets",
+  "level": 47,
+  "type": "word",
+  "ar": "حلويات",
+  "tr": "Halawiyyaat",
+  "en": "Sweets / desserts"
+ },
+ {
+  "id": "sch_book",
+  "level": 48,
+  "type": "word",
+  "ar": "كتاب",
+  "tr": "ketaab",
+  "en": "Book"
+ },
+ {
+  "id": "sch_pen",
+  "level": 48,
+  "type": "word",
+  "ar": "قلم",
+  "tr": "ʾalam",
+  "en": "Pen"
+ },
+ {
+  "id": "sch_lesson",
+  "level": 48,
+  "type": "word",
+  "ar": "درس",
+  "tr": "dars",
+  "en": "Lesson"
+ },
+ {
+  "id": "sch_exam",
+  "level": 48,
+  "type": "word",
+  "ar": "امتحان",
+  "tr": "emteHaan",
+  "en": "Exam"
+ },
+ {
+  "id": "sch_homework",
+  "level": 48,
+  "type": "word",
+  "ar": "واجب",
+  "tr": "waagib",
+  "en": "Homework"
+ },
+ {
+  "id": "sch_grade",
+  "level": 48,
+  "type": "word",
+  "ar": "علامة",
+  "tr": "ʿalaama",
+  "en": "Grade / mark"
+ },
+ {
+  "id": "sch_subject",
+  "level": 48,
+  "type": "word",
+  "ar": "مادة",
+  "tr": "maada",
+  "en": "Subject"
+ },
+ {
+  "id": "sch_library",
+  "level": 48,
+  "type": "word",
+  "ar": "مكتبة",
+  "tr": "maktaba",
+  "en": "Library"
+ },
+ {
+  "id": "sch_class",
+  "level": 48,
+  "type": "word",
+  "ar": "فصل",
+  "tr": "fasl",
+  "en": "Classroom"
+ },
+ {
+  "id": "sch_math",
+  "level": 48,
+  "type": "word",
+  "ar": "رياضيات",
+  "tr": "reyaaDeyyaat",
+  "en": "Math"
+ },
+ {
+  "id": "sch_education",
+  "level": 48,
+  "type": "word",
+  "ar": "تعليم",
+  "tr": "taʿliim",
+  "en": "Education"
+ },
+ {
+  "id": "job_engineer",
+  "level": 49,
+  "type": "word",
+  "ar": "مهندس",
+  "tr": "mohandes",
+  "en": "Engineer"
+ },
+ {
+  "id": "job_lawyer",
+  "level": 49,
+  "type": "word",
+  "ar": "محامي",
+  "tr": "moHaami",
+  "en": "Lawyer"
+ },
+ {
+  "id": "job_chef",
+  "level": 49,
+  "type": "word",
+  "ar": "طباخ",
+  "tr": "Tabbaakh",
+  "en": "Chef / cook"
+ },
+ {
+  "id": "job_driver",
+  "level": 49,
+  "type": "word",
+  "ar": "سايق",
+  "tr": "saayeʾ",
+  "en": "Driver"
+ },
+ {
+  "id": "job_pharmacist",
+  "level": 49,
+  "type": "word",
+  "ar": "صيدلي",
+  "tr": "Saydali",
+  "en": "Pharmacist"
+ },
+ {
+  "id": "job_employee",
+  "level": 49,
+  "type": "word",
+  "ar": "موظف",
+  "tr": "mowaZZaf",
+  "en": "Employee"
+ },
+ {
+  "id": "job_farmer",
+  "level": 49,
+  "type": "word",
+  "ar": "فلاح",
+  "tr": "fallaaH",
+  "en": "Farmer"
+ },
+ {
+  "id": "job_seller",
+  "level": 49,
+  "type": "word",
+  "ar": "بياع",
+  "tr": "bayyaaʿ",
+  "en": "Salesman"
+ },
+ {
+  "id": "job_nurse",
+  "level": 49,
+  "type": "word",
+  "ar": "ممرض",
+  "tr": "momareD",
+  "en": "Nurse"
+ },
+ {
+  "id": "job_police",
+  "level": 49,
+  "type": "word",
+  "ar": "شرطي",
+  "tr": "shorTi",
+  "en": "Police officer"
+ },
+ {
+  "id": "job_journalist",
+  "level": 49,
+  "type": "word",
+  "ar": "صحفي",
+  "tr": "SaHafi",
+  "en": "Journalist"
+ },
+ {
+  "id": "job_manager",
+  "level": 49,
+  "type": "word",
+  "ar": "مدير",
+  "tr": "modiir",
+  "en": "Manager / boss"
+ },
+ {
+  "id": "sp_ball",
+  "level": 50,
+  "type": "word",
+  "ar": "كورة",
+  "tr": "koora",
+  "en": "Ball / football"
+ },
+ {
+  "id": "sp_sport",
+  "level": 50,
+  "type": "word",
+  "ar": "رياضة",
+  "tr": "reyaaDa",
+  "en": "Sport"
+ },
+ {
+  "id": "sp_swim",
+  "level": 50,
+  "type": "word",
+  "ar": "عوم",
+  "tr": "ʿawm",
+  "en": "Swimming"
+ },
+ {
+  "id": "sp_run",
+  "level": 50,
+  "type": "word",
+  "ar": "جري",
+  "tr": "gari",
+  "en": "Running"
+ },
+ {
+  "id": "sp_music",
+  "level": 50,
+  "type": "word",
+  "ar": "مزيكا",
+  "tr": "maziika",
+  "en": "Music"
+ },
+ {
+  "id": "sp_dance",
+  "level": 50,
+  "type": "word",
+  "ar": "رقص",
+  "tr": "raʾS",
+  "en": "Dancing"
+ },
+ {
+  "id": "sp_game",
+  "level": 50,
+  "type": "word",
+  "ar": "لعبة",
+  "tr": "leʿba",
+  "en": "Game"
+ },
+ {
+  "id": "sp_tv",
+  "level": 50,
+  "type": "word",
+  "ar": "تلفزيون",
+  "tr": "talfezyoon",
+  "en": "Television"
+ },
+ {
+  "id": "sp_cinema",
+  "level": 50,
+  "type": "word",
+  "ar": "سينما",
+  "tr": "sinma",
+  "en": "Cinema"
+ },
+ {
+  "id": "sp_photo",
+  "level": 50,
+  "type": "word",
+  "ar": "صورة",
+  "tr": "Soora",
+  "en": "Photo"
+ },
+ {
+  "id": "sp_reading",
+  "level": 50,
+  "type": "word",
+  "ar": "قراية",
+  "tr": "ʾeraaya",
+  "en": "Reading"
+ },
+ {
+  "id": "sp_hobby",
+  "level": 50,
+  "type": "word",
+  "ar": "هواية",
+  "tr": "hewaaya",
+  "en": "Hobby"
+ },
+ {
+  "id": "tec_computer",
+  "level": 51,
+  "type": "word",
+  "ar": "كمبيوتر",
+  "tr": "kombyuter",
+  "en": "Computer"
+ },
+ {
+  "id": "tec_laptop",
+  "level": 51,
+  "type": "word",
+  "ar": "لابتوب",
+  "tr": "laptop",
+  "en": "Laptop"
+ },
+ {
+  "id": "tec_screen",
+  "level": 51,
+  "type": "word",
+  "ar": "شاشة",
+  "tr": "shaasha",
+  "en": "Screen"
+ },
+ {
+  "id": "tec_app",
+  "level": 51,
+  "type": "word",
+  "ar": "تطبيق",
+  "tr": "tatbiiʾ",
+  "en": "App"
+ },
+ {
+  "id": "tec_facebook",
+  "level": 51,
+  "type": "word",
+  "ar": "فيسبوك",
+  "tr": "feesbook",
+  "en": "Facebook"
+ },
+ {
+  "id": "tec_video",
+  "level": 51,
+  "type": "word",
+  "ar": "فيديو",
+  "tr": "video",
+  "en": "Video"
+ },
+ {
+  "id": "tec_charge",
+  "level": 51,
+  "type": "word",
+  "ar": "شحن",
+  "tr": "shaHn",
+  "en": "Charging"
+ },
+ {
+  "id": "tec_battery",
+  "level": 51,
+  "type": "word",
+  "ar": "بطارية",
+  "tr": "baTTareyya",
+  "en": "Battery"
+ },
+ {
+  "id": "tec_wifi",
+  "level": 51,
+  "type": "word",
+  "ar": "واي فاي",
+  "tr": "waay faay",
+  "en": "Wi-Fi"
+ },
+ {
+  "id": "tec_signal",
+  "level": 51,
+  "type": "word",
+  "ar": "شبكة",
+  "tr": "shabaka",
+  "en": "Network / signal"
+ },
+ {
+  "id": "tec_camera",
+  "level": 51,
+  "type": "word",
+  "ar": "كاميرا",
+  "tr": "kamira",
+  "en": "Camera"
+ },
+ {
+  "id": "mo_jan",
+  "level": 52,
+  "type": "word",
+  "ar": "يناير",
+  "tr": "yanaayer",
+  "en": "January"
+ },
+ {
+  "id": "mo_feb",
+  "level": 52,
+  "type": "word",
+  "ar": "فبراير",
+  "tr": "febraayer",
+  "en": "February"
+ },
+ {
+  "id": "mo_mar",
+  "level": 52,
+  "type": "word",
+  "ar": "مارس",
+  "tr": "maares",
+  "en": "March"
+ },
+ {
+  "id": "mo_apr",
+  "level": 52,
+  "type": "word",
+  "ar": "أبريل",
+  "tr": "abriil",
+  "en": "April"
+ },
+ {
+  "id": "mo_may",
+  "level": 52,
+  "type": "word",
+  "ar": "مايو",
+  "tr": "maayo",
+  "en": "May"
+ },
+ {
+  "id": "mo_jun",
+  "level": 52,
+  "type": "word",
+  "ar": "يونيو",
+  "tr": "yonyo",
+  "en": "June"
+ },
+ {
+  "id": "mo_jul",
+  "level": 52,
+  "type": "word",
+  "ar": "يوليو",
+  "tr": "yolyo",
+  "en": "July"
+ },
+ {
+  "id": "mo_aug",
+  "level": 52,
+  "type": "word",
+  "ar": "أغسطس",
+  "tr": "aghosTos",
+  "en": "August"
+ },
+ {
+  "id": "mo_sep",
+  "level": 52,
+  "type": "word",
+  "ar": "سبتمبر",
+  "tr": "september",
+  "en": "September"
+ },
+ {
+  "id": "mo_oct",
+  "level": 52,
+  "type": "word",
+  "ar": "أكتوبر",
+  "tr": "oktoober",
+  "en": "October"
+ },
+ {
+  "id": "mo_nov",
+  "level": 52,
+  "type": "word",
+  "ar": "نوفمبر",
+  "tr": "november",
+  "en": "November"
+ },
+ {
+  "id": "mo_dec",
+  "level": 52,
+  "type": "word",
+  "ar": "ديسمبر",
+  "tr": "december",
+  "en": "December"
+ },
+ {
+  "id": "mo_spring",
+  "level": 52,
+  "type": "word",
+  "ar": "الربيع",
+  "tr": "er-rabiiʿ",
+  "en": "Spring"
+ },
+ {
+  "id": "mo_autumn",
+  "level": 52,
+  "type": "word",
+  "ar": "الخريف",
+  "tr": "el-khariif",
+  "en": "Autumn"
+ },
+ {
+  "id": "nat_sea",
+  "level": 53,
+  "type": "word",
+  "ar": "بحر",
+  "tr": "baHr",
+  "en": "Sea"
+ },
+ {
+  "id": "nat_nile",
+  "level": 53,
+  "type": "word",
+  "ar": "النيل",
+  "tr": "en-niil",
+  "en": "The Nile"
+ },
+ {
+  "id": "nat_river",
+  "level": 53,
+  "type": "word",
+  "ar": "نهر",
+  "tr": "nahr",
+  "en": "River"
+ },
+ {
+  "id": "nat_mountain",
+  "level": 53,
+  "type": "word",
+  "ar": "جبل",
+  "tr": "gabal",
+  "en": "Mountain"
+ },
+ {
+  "id": "nat_desert",
+  "level": 53,
+  "type": "word",
+  "ar": "صحرا",
+  "tr": "SaHra",
+  "en": "Desert"
+ },
+ {
+  "id": "nat_tree",
+  "level": 53,
+  "type": "word",
+  "ar": "شجرة",
+  "tr": "shagara",
+  "en": "Tree"
+ },
+ {
+  "id": "nat_flower",
+  "level": 53,
+  "type": "word",
+  "ar": "زهرة",
+  "tr": "zahra",
+  "en": "Flower"
+ },
+ {
+  "id": "nat_sky",
+  "level": 53,
+  "type": "word",
+  "ar": "سما",
+  "tr": "sama",
+  "en": "Sky"
+ },
+ {
+  "id": "nat_moon",
+  "level": 53,
+  "type": "word",
+  "ar": "قمر",
+  "tr": "ʾamar",
+  "en": "Moon"
+ },
+ {
+  "id": "nat_star",
+  "level": 53,
+  "type": "word",
+  "ar": "نجمة",
+  "tr": "negma",
+  "en": "Star"
+ },
+ {
+  "id": "nat_garden",
+  "level": 53,
+  "type": "word",
+  "ar": "حديقة",
+  "tr": "Hadiiʾa",
+  "en": "Garden / park"
+ },
+ {
+  "id": "nat_beach",
+  "level": 53,
+  "type": "word",
+  "ar": "شاطئ",
+  "tr": "shaTeʾ",
+  "en": "Beach"
+ },
+ {
+  "id": "vb_play",
+  "level": 54,
+  "type": "word",
+  "ar": "بالعب",
+  "tr": "baleʿab",
+  "en": "I play"
+ },
+ {
+  "id": "vb_cook",
+  "level": 54,
+  "type": "word",
+  "ar": "باطبخ",
+  "tr": "baTbokh",
+  "en": "I cook"
+ },
+ {
+  "id": "vb_wash",
+  "level": 54,
+  "type": "word",
+  "ar": "باغسل",
+  "tr": "baghsel",
+  "en": "I wash"
+ },
+ {
+  "id": "vb_clean",
+  "level": 54,
+  "type": "word",
+  "ar": "بانضف",
+  "tr": "banaDDaf",
+  "en": "I clean"
+ },
+ {
+  "id": "vb_buy",
+  "level": 54,
+  "type": "word",
+  "ar": "باشتري",
+  "tr": "bashteri",
+  "en": "I buy"
+ },
+ {
+  "id": "vb_sell",
+  "level": 54,
+  "type": "word",
+  "ar": "بابيع",
+  "tr": "babiiʿ",
+  "en": "I sell"
+ },
+ {
+  "id": "vb_learn",
+  "level": 54,
+  "type": "word",
+  "ar": "باتعلم",
+  "tr": "batʿallem",
+  "en": "I learn"
+ },
+ {
+  "id": "vb_travel",
+  "level": 54,
+  "type": "word",
+  "ar": "باسافر",
+  "tr": "basaafer",
+  "en": "I travel"
+ },
+ {
+  "id": "vb_try",
+  "level": 54,
+  "type": "word",
+  "ar": "باحاول",
+  "tr": "baHaawel",
+  "en": "I try"
+ },
+ {
+  "id": "vb_look",
+  "level": 54,
+  "type": "word",
+  "ar": "بابص",
+  "tr": "baboss",
+  "en": "I look"
+ },
+ {
+  "id": "vb_sing",
+  "level": 54,
+  "type": "word",
+  "ar": "باغني",
+  "tr": "baghanni",
+  "en": "I sing"
+ },
+ {
+  "id": "vb_laugh",
+  "level": 54,
+  "type": "word",
+  "ar": "باضحك",
+  "tr": "baDHak",
+  "en": "I laugh"
+ },
+ {
+  "id": "adj_short",
+  "level": 55,
+  "type": "word",
+  "ar": "قصير",
+  "tr": "ʾoSayyar",
+  "en": "Short"
+ },
+ {
+  "id": "adj_old",
+  "level": 55,
+  "type": "word",
+  "ar": "قديم",
+  "tr": "ʾadiim",
+  "en": "Old (thing)"
+ },
+ {
+  "id": "adj_dry",
+  "level": 55,
+  "type": "word",
+  "ar": "ناشف",
+  "tr": "naashef",
+  "en": "Dry"
+ },
+ {
+  "id": "adj_wet",
+  "level": 55,
+  "type": "word",
+  "ar": "مبلول",
+  "tr": "mablool",
+  "en": "Wet"
+ },
+ {
+  "id": "adj_warm",
+  "level": 55,
+  "type": "word",
+  "ar": "دافي",
+  "tr": "daafi",
+  "en": "Warm"
+ },
+ {
+  "id": "adj_important",
+  "level": 55,
+  "type": "word",
+  "ar": "مهم",
+  "tr": "mohem",
+  "en": "Important"
+ },
+ {
+  "id": "adj_clever",
+  "level": 55,
+  "type": "word",
+  "ar": "شاطر",
+  "tr": "shaaTer",
+  "en": "Clever / good at"
+ },
+ {
+  "id": "adj_high",
+  "level": 55,
+  "type": "word",
+  "ar": "عالي",
+  "tr": "ʿaali",
+  "en": "High / loud"
+ },
+ {
+  "id": "adj_low",
+  "level": 55,
+  "type": "word",
+  "ar": "واطي",
+  "tr": "waaTi",
+  "en": "Low"
+ },
+ {
+  "id": "adj_right",
+  "level": 55,
+  "type": "word",
+  "ar": "صح",
+  "tr": "SaH",
+  "en": "Correct / right"
+ },
+ {
+  "id": "adj_wrong",
+  "level": 55,
+  "type": "word",
+  "ar": "غلط",
+  "tr": "ghalaT",
+  "en": "Wrong"
+ },
+ {
+  "id": "adj_light",
+  "level": 55,
+  "type": "word",
+  "ar": "خفيف",
+  "tr": "khafiif",
+  "en": "Light (not heavy)"
+ },
+ {
+  "id": "hol_feast",
+  "level": 56,
+  "type": "word",
+  "ar": "عيد",
+  "tr": "ʿiid",
+  "en": "Feast / holiday"
+ },
+ {
+  "id": "hol_birthday",
+  "level": 56,
+  "type": "phrase",
+  "ar": "عيد ميلاد",
+  "tr": "ʿiid milaad",
+  "en": "Birthday"
+ },
+ {
+  "id": "hol_ramadan",
+  "level": 56,
+  "type": "word",
+  "ar": "رمضان",
+  "tr": "ramaDaan",
+  "en": "Ramadan"
+ },
+ {
+  "id": "hol_eidfitr",
+  "level": 56,
+  "type": "phrase",
+  "ar": "عيد الفطر",
+  "tr": "ʿiid el-fiTr",
+  "en": "Eid al-Fitr"
+ },
+ {
+  "id": "hol_gift",
+  "level": 56,
+  "type": "word",
+  "ar": "هدية",
+  "tr": "hadeyya",
+  "en": "Gift"
+ },
+ {
+  "id": "hol_party",
+  "level": 56,
+  "type": "word",
+  "ar": "حفلة",
+  "tr": "Hafla",
+  "en": "Party"
+ },
+ {
+  "id": "hol_wedding",
+  "level": 56,
+  "type": "word",
+  "ar": "فرح",
+  "tr": "faraH",
+  "en": "Wedding"
+ },
+ {
+  "id": "hol_cake",
+  "level": 56,
+  "type": "word",
+  "ar": "تورتة",
+  "tr": "torta",
+  "en": "Cake"
+ },
+ {
+  "id": "hol_candle",
+  "level": 56,
+  "type": "word",
+  "ar": "شمعة",
+  "tr": "shamʿa",
+  "en": "Candle"
+ },
+ {
+  "id": "hol_vacation",
+  "level": 56,
+  "type": "word",
+  "ar": "أجازة",
+  "tr": "agaaza",
+  "en": "Vacation / day off"
+ },
+ {
+  "id": "hol_manyhappy",
+  "level": 56,
+  "type": "sentence",
+  "ar": "كل سنة وإنت طيب",
+  "tr": "koll sana wenta Tayyeb",
+  "en": "Happy holidays! (to a man)"
+ },
+ {
+  "id": "sl_normal",
+  "level": 57,
+  "type": "word",
+  "ar": "عادي",
+  "tr": "ʿaadi",
+  "en": "It's normal / no big deal"
+ },
+ {
+  "id": "sl_cool",
+  "level": 57,
+  "type": "word",
+  "ar": "جامد",
+  "tr": "gaamed",
+  "en": "Cool / awesome (slang)"
+ },
+ {
+  "id": "sl_hey",
+  "level": 57,
+  "type": "phrase",
+  "ar": "يا باشا",
+  "tr": "ya baasha",
+  "en": "Hey, man! (friendly)"
+ },
+ {
+  "id": "sl_whatmean",
+  "level": 57,
+  "type": "sentence",
+  "ar": "قصدك إيه",
+  "tr": "ʾaSdak eh",
+  "en": "What do you mean? (m)"
+ },
+ {
+  "id": "sl_honestly",
+  "level": 57,
+  "type": "word",
+  "ar": "والله",
+  "tr": "wallaahi",
+  "en": "Honestly / I swear"
+ },
+ {
+  "id": "sl_noproblem",
+  "level": 57,
+  "type": "phrase",
+  "ar": "مفيش مشكلة",
+  "tr": "mafiish moshkela",
+  "en": "No problem"
+ },
+ {
+  "id": "sl_btw",
+  "level": 57,
+  "type": "phrase",
+  "ar": "على فكرة",
+  "tr": "ʿala fekra",
+  "en": "By the way"
+ },
+ {
+  "id": "sl_howsitgoing",
+  "level": 57,
+  "type": "sentence",
+  "ar": "إزاي الأحوال",
+  "tr": "ezzaay el-aHwaal",
+  "en": "How's it going?"
+ },
+ {
+  "id": "sl_willdo",
+  "level": 57,
+  "type": "word",
+  "ar": "حاضر",
+  "tr": "HaaDer",
+  "en": "Okay / will do"
+ },
+ {
+  "id": "sl_youreright",
+  "level": 57,
+  "type": "sentence",
+  "ar": "معاك حق",
+  "tr": "maʿaak Haʾʾ",
+  "en": "You're right (m)"
+ },
+ {
+  "id": "sl_ihope",
+  "level": 57,
+  "type": "phrase",
+  "ar": "يا رب",
+  "tr": "ya rabb",
+  "en": "I hope / please God"
+ },
+ {
+  "id": "kit_pot",
+  "level": 58,
+  "type": "word",
+  "ar": "حلة",
+  "tr": "Hala",
+  "en": "Pot"
+ },
+ {
+  "id": "kit_pan",
+  "level": 58,
+  "type": "word",
+  "ar": "طاسة",
+  "tr": "Taasa",
+  "en": "Frying pan"
+ },
+ {
+  "id": "kit_knife",
+  "level": 58,
+  "type": "word",
+  "ar": "سكينة",
+  "tr": "sekkiina",
+  "en": "Knife"
+ },
+ {
+  "id": "kit_spoon",
+  "level": 58,
+  "type": "word",
+  "ar": "معلقة",
+  "tr": "maʿlaʾa",
+  "en": "Spoon"
+ },
+ {
+  "id": "kit_fork",
+  "level": 58,
+  "type": "word",
+  "ar": "شوكة",
+  "tr": "shoka",
+  "en": "Fork"
+ },
+ {
+  "id": "kit_plate",
+  "level": 58,
+  "type": "word",
+  "ar": "طبق",
+  "tr": "Tabaʾ",
+  "en": "Plate"
+ },
+ {
+  "id": "kit_dish",
+  "level": 58,
+  "type": "word",
+  "ar": "صحن",
+  "tr": "SaHn",
+  "en": "Dish"
+ },
+ {
+  "id": "kit_oven",
+  "level": 58,
+  "type": "word",
+  "ar": "فرن",
+  "tr": "forn",
+  "en": "Oven"
+ },
+ {
+  "id": "kit_oil",
+  "level": 58,
+  "type": "word",
+  "ar": "زيت",
+  "tr": "zeit",
+  "en": "Oil"
+ },
+ {
+  "id": "kit_salt",
+  "level": 58,
+  "type": "word",
+  "ar": "ملح",
+  "tr": "melH",
+  "en": "Salt"
+ },
+ {
+  "id": "kit_pepper",
+  "level": 58,
+  "type": "word",
+  "ar": "فلفل",
+  "tr": "felfel",
+  "en": "Pepper"
+ },
+ {
+  "id": "kit_stove",
+  "level": 58,
+  "type": "word",
+  "ar": "بوتاجاز",
+  "tr": "botagaaz",
+  "en": "Stove / cooker"
+ },
+ {
+  "id": "per_kind",
+  "level": 59,
+  "type": "word",
+  "ar": "طيب",
+  "tr": "Tayyeb",
+  "en": "Kind (m)"
+ },
+ {
+  "id": "per_generous",
+  "level": 59,
+  "type": "word",
+  "ar": "كريم",
+  "tr": "kariim",
+  "en": "Generous (m)"
+ },
+ {
+  "id": "per_stingy",
+  "level": 59,
+  "type": "word",
+  "ar": "بخيل",
+  "tr": "bakhiil",
+  "en": "Stingy (m)"
+ },
+ {
+  "id": "per_patient",
+  "level": 59,
+  "type": "word",
+  "ar": "صبور",
+  "tr": "Saboor",
+  "en": "Patient (m)"
+ },
+ {
+  "id": "per_temper",
+  "level": 59,
+  "type": "word",
+  "ar": "عصبي",
+  "tr": "ʿaSabi",
+  "en": "Short-tempered (m)"
+ },
+ {
+  "id": "per_calm",
+  "level": 59,
+  "type": "word",
+  "ar": "هادي",
+  "tr": "haadi",
+  "en": "Calm (m)"
+ },
+ {
+  "id": "per_honest",
+  "level": 59,
+  "type": "word",
+  "ar": "أمين",
+  "tr": "amiin",
+  "en": "Honest (m)"
+ },
+ {
+  "id": "per_brave",
+  "level": 59,
+  "type": "word",
+  "ar": "شجاع",
+  "tr": "shogaaʿ",
+  "en": "Brave (m)"
+ },
+ {
+  "id": "per_shy",
+  "level": 59,
+  "type": "word",
+  "ar": "خجول",
+  "tr": "khagool",
+  "en": "Shy (m)"
+ },
+ {
+  "id": "per_stubborn",
+  "level": 59,
+  "type": "word",
+  "ar": "عنيد",
+  "tr": "ʿaniid",
+  "en": "Stubborn (m)"
+ },
+ {
+  "id": "per_smart",
+  "level": 59,
+  "type": "word",
+  "ar": "ذكي",
+  "tr": "zaki",
+  "en": "Smart (m)"
+ },
+ {
+  "id": "per_funny",
+  "level": 59,
+  "type": "word",
+  "ar": "ظريف",
+  "tr": "ZariiF",
+  "en": "Funny / pleasant (m)"
+ },
+ {
+  "id": "emo_happy",
+  "level": 60,
+  "type": "word",
+  "ar": "سعيد",
+  "tr": "saʿiid",
+  "en": "Happy (m)"
+ },
+ {
+  "id": "emo_sad",
+  "level": 60,
+  "type": "word",
+  "ar": "حزين",
+  "tr": "Haziin",
+  "en": "Sad (m)"
+ },
+ {
+  "id": "emo_angry",
+  "level": 60,
+  "type": "word",
+  "ar": "غضبان",
+  "tr": "ghaDbaan",
+  "en": "Angry (m)"
+ },
+ {
+  "id": "emo_worried",
+  "level": 60,
+  "type": "word",
+  "ar": "قلقان",
+  "tr": "ʾalʾaan",
+  "en": "Worried (m)"
+ },
+ {
+  "id": "emo_proud",
+  "level": 60,
+  "type": "word",
+  "ar": "فخور",
+  "tr": "fakhoor",
+  "en": "Proud (m)"
+ },
+ {
+  "id": "emo_jealous",
+  "level": 60,
+  "type": "word",
+  "ar": "غيران",
+  "tr": "gheraan",
+  "en": "Jealous (m)"
+ },
+ {
+  "id": "emo_surprised",
+  "level": 60,
+  "type": "word",
+  "ar": "مستغرب",
+  "tr": "mestaghreb",
+  "en": "Surprised (m)"
+ },
+ {
+  "id": "emo_lonely",
+  "level": 60,
+  "type": "word",
+  "ar": "وحيد",
+  "tr": "waHiid",
+  "en": "Lonely (m)"
+ },
+ {
+  "id": "emo_excited",
+  "level": 60,
+  "type": "word",
+  "ar": "متحمس",
+  "tr": "motHammes",
+  "en": "Excited (m)"
+ },
+ {
+  "id": "emo_relaxed",
+  "level": 60,
+  "type": "word",
+  "ar": "مرتاح",
+  "tr": "mortaaH",
+  "en": "Relaxed / comfortable (m)"
+ },
+ {
+  "id": "emo_embarrassed",
+  "level": 60,
+  "type": "word",
+  "ar": "خجلان",
+  "tr": "khaglaan",
+  "en": "Embarrassed (m)"
+ },
+ {
+  "id": "emo_optimistic",
+  "level": 60,
+  "type": "word",
+  "ar": "متفائل",
+  "tr": "motafaael",
+  "en": "Optimistic (m)"
+ },
+ {
+  "id": "bank_account",
+  "level": 61,
+  "type": "phrase",
+  "ar": "حساب بنكي",
+  "tr": "Hesaab banki",
+  "en": "Bank account"
+ },
+ {
+  "id": "bank_money",
+  "level": 61,
+  "type": "word",
+  "ar": "مصاري",
+  "tr": "maSaari",
+  "en": "Money (slang)"
+ },
+ {
+  "id": "bank_salary",
+  "level": 61,
+  "type": "word",
+  "ar": "مرتب",
+  "tr": "marattab",
+  "en": "Salary"
+ },
+ {
+  "id": "bank_invoice",
+  "level": 61,
+  "type": "word",
+  "ar": "فاتورة",
+  "tr": "faatoora",
+  "en": "Bill / invoice"
+ },
+ {
+  "id": "bank_receipt",
+  "level": 61,
+  "type": "word",
+  "ar": "وصل",
+  "tr": "waSl",
+  "en": "Receipt"
+ },
+ {
+  "id": "bank_transfer",
+  "level": 61,
+  "type": "word",
+  "ar": "تحويل",
+  "tr": "taHwiil",
+  "en": "Transfer"
+ },
+ {
+  "id": "bank_loan",
+  "level": 61,
+  "type": "word",
+  "ar": "قرض",
+  "tr": "ʾarD",
+  "en": "Loan"
+ },
+ {
+  "id": "bank_payment",
+  "level": 61,
+  "type": "word",
+  "ar": "دفع",
+  "tr": "defʿ",
+  "en": "Payment"
+ },
+ {
+  "id": "bank_atm",
+  "level": 61,
+  "type": "word",
+  "ar": "ماكينة",
+  "tr": "makina",
+  "en": "ATM / machine"
+ },
+ {
+  "id": "bank_currency",
+  "level": 61,
+  "type": "word",
+  "ar": "عملة",
+  "tr": "ʿomla",
+  "en": "Currency"
+ },
+ {
+  "id": "bank_card",
+  "level": 61,
+  "type": "phrase",
+  "ar": "كارت بنكي",
+  "tr": "kart banki",
+  "en": "Bank card"
+ },
+ {
+  "id": "biz_company",
+  "level": 62,
+  "type": "word",
+  "ar": "شركة",
+  "tr": "sherka",
+  "en": "Company"
+ },
+ {
+  "id": "biz_project",
+  "level": 62,
+  "type": "word",
+  "ar": "مشروع",
+  "tr": "mashrooʿ",
+  "en": "Project"
+ },
+ {
+  "id": "biz_customer",
+  "level": 62,
+  "type": "word",
+  "ar": "زبون",
+  "tr": "zaboon",
+  "en": "Customer"
+ },
+ {
+  "id": "biz_deal",
+  "level": 62,
+  "type": "word",
+  "ar": "صفقة",
+  "tr": "safʾa",
+  "en": "Deal"
+ },
+ {
+  "id": "biz_report",
+  "level": 62,
+  "type": "word",
+  "ar": "تقرير",
+  "tr": "taʾriir",
+  "en": "Report"
+ },
+ {
+  "id": "biz_promotion",
+  "level": 62,
+  "type": "word",
+  "ar": "ترقية",
+  "tr": "targeyya",
+  "en": "Promotion"
+ },
+ {
+  "id": "biz_resign",
+  "level": 62,
+  "type": "word",
+  "ar": "استقالة",
+  "tr": "esteʾaala",
+  "en": "Resignation"
+ },
+ {
+  "id": "biz_opportunity",
+  "level": 62,
+  "type": "word",
+  "ar": "فرصة",
+  "tr": "fursa",
+  "en": "Opportunity"
+ },
+ {
+  "id": "biz_experience",
+  "level": 62,
+  "type": "word",
+  "ar": "خبرة",
+  "tr": "khebra",
+  "en": "Experience"
+ },
+ {
+  "id": "biz_remote",
+  "level": 62,
+  "type": "sentence",
+  "ar": "بشتغل من البيت",
+  "tr": "bashtaghal men el-beet",
+  "en": "I work from home"
+ },
+ {
+  "id": "car_petrol",
+  "level": 63,
+  "type": "word",
+  "ar": "بنزين",
+  "tr": "bensiin",
+  "en": "Petrol / gas"
+ },
+ {
+  "id": "car_brakes",
+  "level": 63,
+  "type": "word",
+  "ar": "فرامل",
+  "tr": "faraamel",
+  "en": "Brakes"
+ },
+ {
+  "id": "car_light",
+  "level": 63,
+  "type": "word",
+  "ar": "إشارة",
+  "tr": "eshaara",
+  "en": "Traffic light / signal"
+ },
+ {
+  "id": "car_traffic",
+  "level": 63,
+  "type": "word",
+  "ar": "زحمة",
+  "tr": "zaHma",
+  "en": "Traffic / crowd"
+ },
+ {
+  "id": "car_license",
+  "level": 63,
+  "type": "word",
+  "ar": "رخصة",
+  "tr": "rokhSa",
+  "en": "License"
+ },
+ {
+  "id": "car_accident",
+  "level": 63,
+  "type": "word",
+  "ar": "حادثة",
+  "tr": "Hadsa",
+  "en": "Accident"
+ },
+ {
+  "id": "car_speed",
+  "level": 63,
+  "type": "word",
+  "ar": "سرعة",
+  "tr": "soraʿa",
+  "en": "Speed"
+ },
+ {
+  "id": "car_bump",
+  "level": 63,
+  "type": "word",
+  "ar": "مطب",
+  "tr": "maTab",
+  "en": "Speed bump"
+ },
+ {
+  "id": "car_wheel",
+  "level": 63,
+  "type": "word",
+  "ar": "عجلة",
+  "tr": "ʿagala",
+  "en": "Wheel"
+ },
+ {
+  "id": "car_tire",
+  "level": 63,
+  "type": "word",
+  "ar": "كاوتش",
+  "tr": "kawitsh",
+  "en": "Tire"
+ },
+ {
+  "id": "car_takeright",
+  "level": 63,
+  "type": "sentence",
+  "ar": "خد يمين",
+  "tr": "khod yemiin",
+  "en": "Take a right"
+ },
+ {
+  "id": "off_id",
+  "level": 64,
+  "type": "word",
+  "ar": "بطاقة",
+  "tr": "betaaʾa",
+  "en": "ID card"
+ },
+ {
+  "id": "off_form",
+  "level": 64,
+  "type": "word",
+  "ar": "استمارة",
+  "tr": "estemaara",
+  "en": "Form"
+ },
+ {
+  "id": "off_signature",
+  "level": 64,
+  "type": "word",
+  "ar": "إمضا",
+  "tr": "emDa",
+  "en": "Signature"
+ },
+ {
+  "id": "off_stamp",
+  "level": 64,
+  "type": "word",
+  "ar": "ختم",
+  "tr": "khetm",
+  "en": "Stamp / seal"
+ },
+ {
+  "id": "off_post",
+  "level": 64,
+  "type": "word",
+  "ar": "البريد",
+  "tr": "el-bariid",
+  "en": "Post office"
+ },
+ {
+  "id": "off_request",
+  "level": 64,
+  "type": "word",
+  "ar": "طلب",
+  "tr": "TalaB",
+  "en": "Application / request"
+ },
+ {
+  "id": "off_approval",
+  "level": 64,
+  "type": "word",
+  "ar": "موافقة",
+  "tr": "mowaffaʾa",
+  "en": "Approval"
+ },
+ {
+  "id": "off_natid",
+  "level": 64,
+  "type": "phrase",
+  "ar": "رقم قومي",
+  "tr": "raʾam ʾawmi",
+  "en": "National ID number"
+ },
+ {
+  "id": "off_birthcert",
+  "level": 64,
+  "type": "phrase",
+  "ar": "شهادة ميلاد",
+  "tr": "shahaadet milaad",
+  "en": "Birth certificate"
+ },
+ {
+  "id": "off_govoffice",
+  "level": 64,
+  "type": "phrase",
+  "ar": "مكتب حكومي",
+  "tr": "maktab Hokoomi",
+  "en": "Government office"
+ },
+ {
+  "id": "off_queue",
+  "level": 64,
+  "type": "word",
+  "ar": "طابور",
+  "tr": "Taboor",
+  "en": "Queue / line"
+ },
+ {
+  "id": "faith_godwilling",
+  "level": 65,
+  "type": "phrase",
+  "ar": "إن شاء الله",
+  "tr": "in shaaʾ allah",
+  "en": "God willing"
+ },
+ {
+  "id": "faith_mashallah",
+  "level": 65,
+  "type": "phrase",
+  "ar": "ما شاء الله",
+  "tr": "ma shaaʾ allah",
+  "en": "God bless / amazing"
+ },
+ {
+  "id": "faith_bismillah",
+  "level": 65,
+  "type": "phrase",
+  "ar": "بسم الله",
+  "tr": "bismillah",
+  "en": "In God's name (before starting)"
+ },
+ {
+  "id": "faith_keepyou",
+  "level": 65,
+  "type": "phrase",
+  "ar": "ربنا يخليك",
+  "tr": "rabbena yekhalliik",
+  "en": "May God keep you (please/thanks)"
+ },
+ {
+  "id": "faith_bless",
+  "level": 65,
+  "type": "phrase",
+  "ar": "ربنا يبارك فيك",
+  "tr": "rabbena yebaarek fiik",
+  "en": "God bless you (m)"
+ },
+ {
+  "id": "faith_welcomeback",
+  "level": 65,
+  "type": "sentence",
+  "ar": "الحمد لله على السلامة",
+  "tr": "el-Hamdu lillah ʿalas-salaama",
+  "en": "Welcome back / glad you're safe"
+ },
+ {
+  "id": "faith_makeeasy",
+  "level": 65,
+  "type": "phrase",
+  "ar": "ربنا يسهل",
+  "tr": "rabbena yesahhel",
+  "en": "May God make it easy"
+ },
+ {
+  "id": "faith_restsoul",
+  "level": 65,
+  "type": "phrase",
+  "ar": "الله يرحمه",
+  "tr": "allah yerHamo",
+  "en": "God rest their soul"
+ },
+ {
+  "id": "faith_ohmy",
+  "level": 65,
+  "type": "phrase",
+  "ar": "يا ساتر",
+  "tr": "ya saater",
+  "en": "Oh my goodness!"
+ },
+ {
+  "id": "city_electricity",
+  "level": 66,
+  "type": "word",
+  "ar": "كهربا",
+  "tr": "kahraba",
+  "en": "Electricity"
+ },
+ {
+  "id": "city_gas",
+  "level": 66,
+  "type": "word",
+  "ar": "غاز",
+  "tr": "ghaaz",
+  "en": "Gas"
+ },
+ {
+  "id": "city_garbage",
+  "level": 66,
+  "type": "word",
+  "ar": "زبالة",
+  "tr": "zebaala",
+  "en": "Garbage"
+ },
+ {
+  "id": "city_square",
+  "level": 66,
+  "type": "word",
+  "ar": "ميدان",
+  "tr": "meedaan",
+  "en": "Square / roundabout"
+ },
+ {
+  "id": "city_bridge",
+  "level": 66,
+  "type": "word",
+  "ar": "كوبري",
+  "tr": "kobri",
+  "en": "Bridge"
+ },
+ {
+  "id": "city_tunnel",
+  "level": 66,
+  "type": "word",
+  "ar": "نفق",
+  "tr": "nafaʾ",
+  "en": "Tunnel"
+ },
+ {
+  "id": "city_sidewalk",
+  "level": 66,
+  "type": "word",
+  "ar": "رصيف",
+  "tr": "raSiif",
+  "en": "Sidewalk"
+ },
+ {
+  "id": "city_building",
+  "level": 66,
+  "type": "word",
+  "ar": "عمارة",
+  "tr": "ʿamaara",
+  "en": "Building"
+ },
+ {
+  "id": "city_floor",
+  "level": 66,
+  "type": "word",
+  "ar": "دور",
+  "tr": "door",
+  "en": "Floor (level)"
+ },
+ {
+  "id": "city_elevator",
+  "level": 66,
+  "type": "word",
+  "ar": "أسانسير",
+  "tr": "asanseer",
+  "en": "Elevator"
+ },
+ {
+  "id": "city_doorman",
+  "level": 66,
+  "type": "word",
+  "ar": "بواب",
+  "tr": "bawwaab",
+  "en": "Doorman"
+ },
+ {
+  "id": "qty_kilo",
+  "level": 67,
+  "type": "word",
+  "ar": "كيلو",
+  "tr": "kilo",
+  "en": "Kilo"
+ },
+ {
+  "id": "qty_halfkilo",
+  "level": 67,
+  "type": "phrase",
+  "ar": "نص كيلو",
+  "tr": "noSS kilo",
+  "en": "Half a kilo"
+ },
+ {
+  "id": "qty_gram",
+  "level": 67,
+  "type": "word",
+  "ar": "جرام",
+  "tr": "graam",
+  "en": "Gram"
+ },
+ {
+  "id": "qty_liter",
+  "level": 67,
+  "type": "word",
+  "ar": "لتر",
+  "tr": "litr",
+  "en": "Liter"
+ },
+ {
+  "id": "qty_meter",
+  "level": 67,
+  "type": "word",
+  "ar": "متر",
+  "tr": "metr",
+  "en": "Meter"
+ },
+ {
+  "id": "qty_box",
+  "level": 67,
+  "type": "word",
+  "ar": "علبة",
+  "tr": "ʿelba",
+  "en": "Box / can"
+ },
+ {
+  "id": "qty_dozen",
+  "level": 67,
+  "type": "word",
+  "ar": "دستة",
+  "tr": "dasta",
+  "en": "Dozen"
+ },
+ {
+  "id": "qty_quarter",
+  "level": 67,
+  "type": "word",
+  "ar": "ربع",
+  "tr": "robʿ",
+  "en": "A quarter"
+ },
+ {
+  "id": "qty_half",
+  "level": 67,
+  "type": "word",
+  "ar": "نص",
+  "tr": "noSS",
+  "en": "A half"
+ },
+ {
+  "id": "qty_third",
+  "level": 67,
+  "type": "word",
+  "ar": "تلت",
+  "tr": "talt",
+  "en": "A third"
+ },
+ {
+  "id": "qty_piece",
+  "level": 67,
+  "type": "word",
+  "ar": "حتة",
+  "tr": "Hetta",
+  "en": "A piece"
+ },
+ {
+  "id": "chore_sweep",
+  "level": 68,
+  "type": "word",
+  "ar": "بكنس",
+  "tr": "baknes",
+  "en": "I sweep"
+ },
+ {
+  "id": "chore_mop",
+  "level": 68,
+  "type": "word",
+  "ar": "بامسح",
+  "tr": "bamsaH",
+  "en": "I mop / wipe"
+ },
+ {
+  "id": "chore_tidy",
+  "level": 68,
+  "type": "word",
+  "ar": "بارتب",
+  "tr": "baratteb",
+  "en": "I tidy up"
+ },
+ {
+  "id": "chore_iron",
+  "level": 68,
+  "type": "word",
+  "ar": "باكوي",
+  "tr": "bakwi",
+  "en": "I iron"
+ },
+ {
+  "id": "chore_laundry",
+  "level": 68,
+  "type": "word",
+  "ar": "غسيل",
+  "tr": "ghasiil",
+  "en": "Laundry"
+ },
+ {
+  "id": "chore_dishes",
+  "level": 68,
+  "type": "word",
+  "ar": "مواعين",
+  "tr": "mawaʿiin",
+  "en": "Dishes"
+ },
+ {
+  "id": "chore_broom",
+  "level": 68,
+  "type": "word",
+  "ar": "مكنسة",
+  "tr": "moknsa",
+  "en": "Broom / vacuum"
+ },
+ {
+  "id": "chore_soap",
+  "level": 68,
+  "type": "word",
+  "ar": "صابون",
+  "tr": "Saboon",
+  "en": "Soap"
+ },
+ {
+  "id": "chore_towel",
+  "level": 68,
+  "type": "word",
+  "ar": "فوطة",
+  "tr": "fooTa",
+  "en": "Towel"
+ },
+ {
+  "id": "chore_clean",
+  "level": 68,
+  "type": "sentence",
+  "ar": "البيت نضيف",
+  "tr": "el-beet naDiif",
+  "en": "The house is clean"
+ },
+ {
+  "id": "idiom_godthere",
+  "level": 69,
+  "type": "sentence",
+  "ar": "ربنا موجود",
+  "tr": "rabbena mawgood",
+  "en": "Don't worry — God provides"
+ },
+ {
+  "id": "idiom_lifegood",
+  "level": 69,
+  "type": "sentence",
+  "ar": "الدنيا حلوة",
+  "tr": "ed-donya Helwa",
+  "en": "Life is good"
+ },
+ {
+  "id": "idiom_none",
+  "level": 69,
+  "type": "sentence",
+  "ar": "مالكش دعوة",
+  "tr": "malaksh daʿwa",
+  "en": "None of your business (m)"
+ },
+ {
+  "id": "idiom_gladly",
+  "level": 69,
+  "type": "phrase",
+  "ar": "على عيني",
+  "tr": "ʿala ʿeini",
+  "en": "Gladly / with pleasure"
+ },
+ {
+  "id": "idiom_okay",
+  "level": 69,
+  "type": "sentence",
+  "ar": "ماشي الحال",
+  "tr": "maashi el-Haal",
+  "en": "Things are okay"
+ },
+ {
+  "id": "idiom_takecare",
+  "level": 69,
+  "type": "sentence",
+  "ar": "خلي بالك من نفسك",
+  "tr": "khalli baalak men nafsak",
+  "en": "Take care of yourself (m)"
+ },
+ {
+  "id": "idiom_nouse",
+  "level": 69,
+  "type": "sentence",
+  "ar": "مفيش فايدة",
+  "tr": "mafiish fayda",
+  "en": "It's no use"
+ },
+ {
+  "id": "idiom_patience",
+  "level": 69,
+  "type": "sentence",
+  "ar": "الصبر مفتاح الفرج",
+  "tr": "eS-Sabr moftaaH el-farag",
+  "en": "Patience is the key to relief"
+ },
+ {
+  "id": "idiom_past",
+  "level": 69,
+  "type": "sentence",
+  "ar": "اللي فات مات",
+  "tr": "elli faat maat",
+  "en": "What's past is past"
+ },
+ {
+  "id": "idiom_blessyou",
+  "level": 69,
+  "type": "phrase",
+  "ar": "ربنا يكرمك",
+  "tr": "rabbena yekremak",
+  "en": "May God bless you (m)"
+ },
+ {
+  "id": "end_habibi",
+  "level": 70,
+  "type": "word",
+  "ar": "حبيبي",
+  "tr": "habiibi",
+  "en": "My love / dear (to a man)"
+ },
+ {
+  "id": "end_habibti",
+  "level": 70,
+  "type": "word",
+  "ar": "حبيبتي",
+  "tr": "habiibti",
+  "en": "My love / dear (to a woman)"
+ },
+ {
+  "id": "end_yahabibi",
+  "level": 70,
+  "type": "phrase",
+  "ar": "يا حبيبي",
+  "tr": "ya habiibi",
+  "en": "My dear! (affectionate, to m)"
+ },
+ {
+  "id": "end_hayati",
+  "level": 70,
+  "type": "word",
+  "ar": "حياتي",
+  "tr": "Hayaati",
+  "en": "My life (darling)"
+ },
+ {
+  "id": "end_omri",
+  "level": 70,
+  "type": "word",
+  "ar": "عمري",
+  "tr": "ʿomri",
+  "en": "My life / my everything"
+ },
+ {
+  "id": "end_yarohi",
+  "level": 70,
+  "type": "phrase",
+  "ar": "يا روحي",
+  "tr": "ya rooHi",
+  "en": "My soul (darling)"
+ },
+ {
+  "id": "end_yaamar",
+  "level": 70,
+  "type": "phrase",
+  "ar": "يا قمر",
+  "tr": "ya ʾamar",
+  "en": "Gorgeous (lit. 'oh moon')"
+ },
+ {
+  "id": "end_yagamil",
+  "level": 70,
+  "type": "phrase",
+  "ar": "يا جميل",
+  "tr": "ya gamiil",
+  "en": "Handsome / lovely (to m)"
+ },
+ {
+  "id": "end_yahelw",
+  "level": 70,
+  "type": "phrase",
+  "ar": "يا حلو",
+  "tr": "ya Helw",
+  "en": "Cutie (to m)"
+ },
+ {
+  "id": "end_yaasal",
+  "level": 70,
+  "type": "phrase",
+  "ar": "يا عسل",
+  "tr": "ya ʿasal",
+  "en": "Sweetie (lit. honey)"
+ },
+ {
+  "id": "end_noureini",
+  "level": 70,
+  "type": "phrase",
+  "ar": "نور عيني",
+  "tr": "noor ʿeini",
+  "en": "Light of my eyes (darling)"
+ },
+ {
+  "id": "end_yaalbi",
+  "level": 70,
+  "type": "phrase",
+  "ar": "يا قلبي",
+  "tr": "ya ʾalbi",
+  "en": "My heart (darling)"
+ },
+ {
+  "id": "react_tohfa",
+  "level": 71,
+  "type": "word",
+  "ar": "تحفة",
+  "tr": "toHfa",
+  "en": "Awesome / a gem"
+ },
+ {
+  "id": "react_fashikh",
+  "level": 71,
+  "type": "word",
+  "ar": "فشيخ",
+  "tr": "fasheekh",
+  "en": "Awesome / dope (slang)"
+ },
+ {
+  "id": "react_hayel",
+  "level": 71,
+  "type": "word",
+  "ar": "هايل",
+  "tr": "haayel",
+  "en": "Fantastic / great"
+ },
+ {
+  "id": "react_rawaa",
+  "level": 71,
+  "type": "word",
+  "ar": "روعة",
+  "tr": "rawʿa",
+  "en": "Wonderful"
+ },
+ {
+  "id": "react_rahib",
+  "level": 71,
+  "type": "word",
+  "ar": "رهيب",
+  "tr": "raheeb",
+  "en": "Amazing (slang)"
+ },
+ {
+  "id": "react_mazboot",
+  "level": 71,
+  "type": "word",
+  "ar": "مظبوط",
+  "tr": "maZbooT",
+  "en": "Exactly right / correct"
+ },
+ {
+  "id": "react_bezzabt",
+  "level": 71,
+  "type": "word",
+  "ar": "بالظبط",
+  "tr": "bezZabT",
+  "en": "Exactly"
+ },
+ {
+  "id": "react_helwawi",
+  "level": 71,
+  "type": "phrase",
+  "ar": "حلو أوي",
+  "tr": "Helw awi",
+  "en": "Really nice"
+ },
+ {
+  "id": "react_tamamawi",
+  "level": 71,
+  "type": "phrase",
+  "ar": "تمام أوي",
+  "tr": "tamaam awi",
+  "en": "Perfect"
+ },
+ {
+  "id": "react_waw",
+  "level": 71,
+  "type": "word",
+  "ar": "واو",
+  "tr": "waaw",
+  "en": "Wow"
+ },
+ {
+  "id": "react_mishmaaool",
+  "level": 71,
+  "type": "phrase",
+  "ar": "مش معقول",
+  "tr": "mish maʿʾool",
+  "en": "Unbelievable / no way"
+ },
+ {
+  "id": "react_yakhrabeti",
+  "level": 71,
+  "type": "word",
+  "ar": "يخربيتي",
+  "tr": "yakhrabeeti",
+  "en": "Wow! / oh no! (exclamation)"
+ },
+ {
+  "id": "fill_bardo",
+  "level": 72,
+  "type": "word",
+  "ar": "برضه",
+  "tr": "bardo",
+  "en": "Also / too / still"
+ },
+ {
+  "id": "fill_aslan",
+  "level": 72,
+  "type": "word",
+  "ar": "أصلاً",
+  "tr": "aSlan",
+  "en": "Actually / originally / at all"
+ },
+ {
+  "id": "fill_asdi",
+  "level": 72,
+  "type": "word",
+  "ar": "قصدي",
+  "tr": "ʾaSdi",
+  "en": "I mean / what I mean is"
+ },
+ {
+  "id": "fill_basita",
+  "level": 72,
+  "type": "word",
+  "ar": "بسيطة",
+  "tr": "basiiTa",
+  "en": "No big deal / it's simple"
+ },
+ {
+  "id": "fill_yaanieh",
+  "level": 72,
+  "type": "phrase",
+  "ar": "يعني إيه",
+  "tr": "yaʿni eh",
+  "en": "What do you mean? / what's that?"
+ },
+ {
+  "id": "fill_omaal",
+  "level": 72,
+  "type": "word",
+  "ar": "أمال",
+  "tr": "omaal",
+  "en": "Then? / what about it?"
+ },
+ {
+  "id": "fill_baa",
+  "level": 72,
+  "type": "word",
+  "ar": "بقى",
+  "tr": "baʾa",
+  "en": "So / then (emphatic particle)"
+ },
+ {
+  "id": "fill_khalis",
+  "level": 72,
+  "type": "word",
+  "ar": "خالص",
+  "tr": "khaaliS",
+  "en": "At all / completely"
+ },
+ {
+  "id": "fill_saraha",
+  "level": 72,
+  "type": "word",
+  "ar": "صراحة",
+  "tr": "Saraaha",
+  "en": "Honestly / frankly"
+ },
+ {
+  "id": "fill_omooman",
+  "level": 72,
+  "type": "word",
+  "ar": "عموماً",
+  "tr": "ʿomooman",
+  "en": "Anyway / in general"
+ },
+ {
+  "id": "fill_elmohem",
+  "level": 72,
+  "type": "word",
+  "ar": "المهم",
+  "tr": "el-mohem",
+  "en": "Anyway / the main thing"
+ },
+ {
+  "id": "fill_yadob",
+  "level": 72,
+  "type": "word",
+  "ar": "يدوب",
+  "tr": "yadoob",
+  "en": "Barely / just"
+ },
+ {
+  "id": "catch_akhbarak",
+  "level": 73,
+  "type": "phrase",
+  "ar": "أخبارك إيه",
+  "tr": "akhbaarak eh",
+  "en": "How are you? / what's up? (m)"
+ },
+ {
+  "id": "catch_elakhbar",
+  "level": 73,
+  "type": "phrase",
+  "ar": "إيه الأخبار",
+  "tr": "eh el-akhbaar",
+  "en": "What's new? / how's it going?"
+ },
+ {
+  "id": "catch_aamel",
+  "level": 73,
+  "type": "phrase",
+  "ar": "عامل إيه",
+  "tr": "ʿaamel eh",
+  "en": "How are you doing? (m)"
+ },
+ {
+  "id": "catch_aamlaf",
+  "level": 73,
+  "type": "phrase",
+  "ar": "عاملة إيه",
+  "tr": "ʿamla eh",
+  "en": "How are you doing? (to f)"
+ },
+ {
+  "id": "catch_ahwal",
+  "level": 73,
+  "type": "phrase",
+  "ar": "إيه الأحوال",
+  "tr": "eh el-aHwaal",
+  "en": "How are things?"
+ },
+ {
+  "id": "catch_nawwart",
+  "level": 73,
+  "type": "word",
+  "ar": "نورت",
+  "tr": "nawwart",
+  "en": "You lit up the place! (welcome, m)"
+ },
+ {
+  "id": "catch_ahlanbik",
+  "level": 73,
+  "type": "phrase",
+  "ar": "أهلا بيك",
+  "tr": "aHlan biik",
+  "en": "Welcome! (to m)"
+ },
+ {
+  "id": "catch_seha",
+  "level": 73,
+  "type": "phrase",
+  "ar": "إزاي صحتك",
+  "tr": "ezzay SeHetak",
+  "en": "How's your health? (m)"
+ },
+ {
+  "id": "catch_anakwayyes",
+  "level": 73,
+  "type": "phrase",
+  "ar": "أنا كويس",
+  "tr": "ana kwayyes",
+  "en": "I'm good (m)"
+ },
+ {
+  "id": "catch_tamamhamd",
+  "level": 73,
+  "type": "sentence",
+  "ar": "تمام الحمد لله",
+  "tr": "tamaam el-Hamdulillah",
+  "en": "Fine, thank God"
+ },
+ {
+  "id": "catch_wenta",
+  "level": 73,
+  "type": "word",
+  "ar": "وإنت",
+  "tr": "wenta",
+  "en": "And you? (to m)"
+ },
+ {
+  "id": "catch_kollfoll",
+  "level": 73,
+  "type": "sentence",
+  "ar": "كله زي الفل",
+  "tr": "kollo zayy el-foll",
+  "en": "Everything's great"
+ },
+ {
+  "id": "love_entakoll",
+  "level": 74,
+  "type": "sentence",
+  "ar": "إنت كل حاجة",
+  "tr": "enta kollo Haaga",
+  "en": "You're everything (to m)"
+ },
+ {
+  "id": "love_bahebbakawi",
+  "level": 74,
+  "type": "phrase",
+  "ar": "بحبك أوي",
+  "tr": "baHebbak awi",
+  "en": "I love you so much (m)"
+ },
+ {
+  "id": "love_bafakkar",
+  "level": 74,
+  "type": "phrase",
+  "ar": "بفكر فيك",
+  "tr": "bafakkar fiik",
+  "en": "I think about you (m)"
+ },
+ {
+  "id": "love_entigamila",
+  "level": 74,
+  "type": "phrase",
+  "ar": "إنتي جميلة",
+  "tr": "enti gamiila",
+  "en": "You're beautiful (to f)"
+ },
+ {
+  "id": "love_bamootfik",
+  "level": 74,
+  "type": "phrase",
+  "ar": "بموت فيك",
+  "tr": "bamoot fiik",
+  "en": "I'm crazy about you (m)"
+ },
+ {
+  "id": "love_albimaak",
+  "level": 74,
+  "type": "phrase",
+  "ar": "قلبي معاك",
+  "tr": "ʾalbi maʿaak",
+  "en": "My heart is with you (m)"
+ },
+ {
+  "id": "love_atgawwez",
+  "level": 74,
+  "type": "sentence",
+  "ar": "عايز أتجوزك",
+  "tr": "ʿaayez atgawwezek",
+  "en": "I want to marry you (to f)"
+ },
+ {
+  "id": "love_nefsiashoofak",
+  "level": 74,
+  "type": "sentence",
+  "ar": "نفسي أشوفك",
+  "tr": "nefsi ashoofak",
+  "en": "I long to see you (to m)"
+ },
+ {
+  "id": "love_weheshtniawi",
+  "level": 74,
+  "type": "phrase",
+  "ar": "وحشتني أوي",
+  "tr": "weHeshtni awi",
+  "en": "I missed you so much"
+ },
+ {
+  "id": "love_ayezashoofak",
+  "level": 74,
+  "type": "sentence",
+  "ar": "عايز أشوفك",
+  "tr": "ʿaayez ashoofak",
+  "en": "I want to see you (to m)"
+ },
+ {
+  "id": "ph_mestanni",
+  "level": 75,
+  "type": "word",
+  "ar": "مستني",
+  "tr": "mestanni",
+  "en": "Waiting (m)"
+ },
+ {
+  "id": "ph_mafishwat",
+  "level": 75,
+  "type": "phrase",
+  "ar": "مفيش وقت",
+  "tr": "mafiish waʾt",
+  "en": "There's no time"
+ },
+ {
+  "id": "ph_mestaagel",
+  "level": 75,
+  "type": "word",
+  "ar": "مستعجل",
+  "tr": "mestaʿgel",
+  "en": "In a hurry (m)"
+ },
+ {
+  "id": "ph_estannashwaya",
+  "level": 75,
+  "type": "phrase",
+  "ar": "استنى شوية",
+  "tr": "estanna shwayya",
+  "en": "Wait a bit"
+ },
+ {
+  "id": "ph_anagay",
+  "level": 75,
+  "type": "phrase",
+  "ar": "أنا جاي",
+  "tr": "ana gayy",
+  "en": "I'm coming (m)"
+ },
+ {
+  "id": "ph_khallenifakkar",
+  "level": 75,
+  "type": "phrase",
+  "ar": "خليني أفكر",
+  "tr": "khalleeni afakkar",
+  "en": "Let me think"
+ },
+ {
+  "id": "ph_mishfadi",
+  "level": 75,
+  "type": "phrase",
+  "ar": "مش فاضي",
+  "tr": "mish faaDi",
+  "en": "I'm busy / not free (m)"
+ },
+ {
+  "id": "ph_wesselt",
+  "level": 75,
+  "type": "word",
+  "ar": "وصلت",
+  "tr": "weSelt",
+  "en": "I've arrived"
+ },
+ {
+  "id": "ph_fittari",
+  "level": 75,
+  "type": "sentence",
+  "ar": "أنا في الطريق",
+  "tr": "ana fit-Tariiʾ",
+  "en": "I'm on the way"
+ },
+ {
+  "id": "ph_sanya",
+  "level": 75,
+  "type": "phrase",
+  "ar": "ثانية واحدة",
+  "tr": "sanya waHda",
+  "en": "One second"
+ },
+ {
+  "id": "ph_gayhalan",
+  "level": 75,
+  "type": "phrase",
+  "ar": "جاي حالاً",
+  "tr": "gayy Haalan",
+  "en": "Coming right now"
+ },
+ {
+  "id": "ph_mishdelwati",
+  "level": 75,
+  "type": "phrase",
+  "ar": "مش دلوقتي",
+  "tr": "mish delwaʾti",
+  "en": "Not now"
+ },
+ {
+  "id": "agr_zayenta",
+  "level": 76,
+  "type": "sentence",
+  "ar": "زي ما إنت عايز",
+  "tr": "zayy ma enta ʿaayez",
+  "en": "As you wish (m)"
+ },
+ {
+  "id": "agr_alarasi",
+  "level": 76,
+  "type": "phrase",
+  "ar": "على راسي",
+  "tr": "ʿala raasi",
+  "en": "Gladly / my pleasure (lit. on my head)"
+ },
+ {
+  "id": "agr_mineneya",
+  "level": 76,
+  "type": "phrase",
+  "ar": "من عينيا",
+  "tr": "min ʿeneyya",
+  "en": "With pleasure (lit. from my eyes)"
+ },
+ {
+  "id": "agr_laashokran",
+  "level": 76,
+  "type": "phrase",
+  "ar": "لأ شكراً",
+  "tr": "laʾ shokran",
+  "en": "No, thanks"
+ },
+ {
+  "id": "agr_mishmomken",
+  "level": 76,
+  "type": "phrase",
+  "ar": "مش ممكن",
+  "tr": "mish momken",
+  "en": "Not possible / no way"
+ },
+ {
+  "id": "agr_maadarsh",
+  "level": 76,
+  "type": "word",
+  "ar": "مقدرش",
+  "tr": "maʾdarsh",
+  "en": "I can't (m)"
+ },
+ {
+  "id": "agr_anamowafe",
+  "level": 76,
+  "type": "phrase",
+  "ar": "أنا موافق",
+  "tr": "ana mowaafeʾ",
+  "en": "I agree (m)"
+ },
+ {
+  "id": "agr_mishmehtemm",
+  "level": 76,
+  "type": "phrase",
+  "ar": "مش مهتم",
+  "tr": "mish mehtemm",
+  "en": "I'm not interested (m)"
+ },
+ {
+  "id": "agr_maashitamam",
+  "level": 76,
+  "type": "phrase",
+  "ar": "ماشي تمام",
+  "tr": "maashi tamaam",
+  "en": "Okay, fine"
+ },
+ {
+  "id": "agr_etfaana",
+  "level": 76,
+  "type": "word",
+  "ar": "اتفقنا",
+  "tr": "etfaʾna",
+  "en": "Deal / agreed"
+ },
+ {
+  "id": "excl_yaah",
+  "level": 77,
+  "type": "word",
+  "ar": "يااه",
+  "tr": "yaaah",
+  "en": "Wow / oh"
+ },
+ {
+  "id": "excl_yasalam",
+  "level": 77,
+  "type": "phrase",
+  "ar": "يا سلام",
+  "tr": "ya salaam",
+  "en": "Wow / how lovely"
+ },
+ {
+  "id": "excl_nahar",
+  "level": 77,
+  "type": "phrase",
+  "ar": "يا نهار أبيض",
+  "tr": "ya nahaar abyaD",
+  "en": "Oh my goodness! (surprise)"
+ },
+ {
+  "id": "excl_yakhabar",
+  "level": 77,
+  "type": "phrase",
+  "ar": "يا خبر",
+  "tr": "ya khabar",
+  "en": "Oh my! (shocking news)"
+ },
+ {
+  "id": "excl_haraam",
+  "level": 77,
+  "type": "word",
+  "ar": "حرام",
+  "tr": "Haraam",
+  "en": "What a shame / that's wrong"
+ },
+ {
+  "id": "excl_yalatif",
+  "level": 77,
+  "type": "phrase",
+  "ar": "يا لطيف",
+  "tr": "ya laTiif",
+  "en": "Oh dear"
+ },
+ {
+  "id": "excl_ehda",
+  "level": 77,
+  "type": "phrase",
+  "ar": "إيه ده",
+  "tr": "eh da",
+  "en": "What is this?! / what the…"
+ },
+ {
+  "id": "excl_baakeda",
+  "level": 77,
+  "type": "phrase",
+  "ar": "بقى كده",
+  "tr": "baʾa keda",
+  "en": "Oh, like that? / really?"
+ },
+ {
+  "id": "excl_yabakhtak",
+  "level": 77,
+  "type": "phrase",
+  "ar": "يا بختك",
+  "tr": "ya bakhtak",
+  "en": "Lucky you (m)"
+ },
+ {
+  "id": "excl_sobhan",
+  "level": 77,
+  "type": "phrase",
+  "ar": "سبحان الله",
+  "tr": "sobHaan allah",
+  "en": "Subhanallah! (amazement)"
+ },
+ {
+  "id": "comp_zooaak",
+  "level": 78,
+  "type": "phrase",
+  "ar": "ذوقك عالي",
+  "tr": "zooʾak ʿaali",
+  "en": "You have great taste (m)"
+ },
+ {
+  "id": "comp_oobaalak",
+  "level": 78,
+  "type": "word",
+  "ar": "عقبالك",
+  "tr": "ʿoʾbaalak",
+  "en": "May you be next! (good wishes, m)"
+ },
+ {
+  "id": "comp_alfmabrook",
+  "level": 78,
+  "type": "phrase",
+  "ar": "ألف مبروك",
+  "tr": "alf mabrook",
+  "en": "Congratulations!"
+ },
+ {
+  "id": "comp_akhlaak",
+  "level": 78,
+  "type": "phrase",
+  "ar": "أخلاقك حلوة",
+  "tr": "akhlaaʾak Helwa",
+  "en": "You're well-mannered (m)"
+ },
+ {
+  "id": "comp_teslamidak",
+  "level": 78,
+  "type": "phrase",
+  "ar": "تسلم إيدك",
+  "tr": "teslam iidak",
+  "en": "Bless your hands (thanks, m)"
+ },
+ {
+  "id": "comp_kotrkheir",
+  "level": 78,
+  "type": "phrase",
+  "ar": "كتر خيرك",
+  "tr": "kotr kheirak",
+  "en": "Thank you / bless you (m)"
+ },
+ {
+  "id": "comp_gadaa",
+  "level": 78,
+  "type": "word",
+  "ar": "جدع",
+  "tr": "gadaʿ",
+  "en": "A good, reliable guy"
+ },
+ {
+  "id": "comp_ebnhalal",
+  "level": 78,
+  "type": "phrase",
+  "ar": "ابن حلال",
+  "tr": "ebn Halaal",
+  "en": "A decent person"
+ },
+ {
+  "id": "comp_teslam",
+  "level": 78,
+  "type": "word",
+  "ar": "تسلم",
+  "tr": "teslam",
+  "en": "Bless you / thanks (m)"
+ },
+ {
+  "id": "comp_testahel",
+  "level": 78,
+  "type": "word",
+  "ar": "تستاهل",
+  "tr": "testaahel",
+  "en": "You deserve it (m)"
+ },
+ {
+  "id": "cmd_sibni",
+  "level": 79,
+  "type": "word",
+  "ar": "سيبني",
+  "tr": "sibni",
+  "en": "Leave me / let me be (m)"
+ },
+ {
+  "id": "cmd_khallena",
+  "level": 79,
+  "type": "word",
+  "ar": "خلينا",
+  "tr": "khalleena",
+  "en": "Let's / let us"
+ },
+ {
+  "id": "cmd_anarayeh",
+  "level": 79,
+  "type": "phrase",
+  "ar": "أنا رايح",
+  "tr": "ana raayeH",
+  "en": "I'm going (m)"
+ },
+ {
+  "id": "cmd_emshi",
+  "level": 79,
+  "type": "word",
+  "ar": "امشي",
+  "tr": "emshi",
+  "en": "Go / move"
+ },
+ {
+  "id": "cmd_haat",
+  "level": 79,
+  "type": "word",
+  "ar": "هات",
+  "tr": "haat",
+  "en": "Give / bring it"
+ },
+ {
+  "id": "cmd_khod",
+  "level": 79,
+  "type": "word",
+  "ar": "خد",
+  "tr": "khod",
+  "en": "Take"
+ },
+ {
+  "id": "cmd_shoof",
+  "level": 79,
+  "type": "word",
+  "ar": "شوف",
+  "tr": "shoof",
+  "en": "Look / see (m)"
+ },
+ {
+  "id": "cmd_esmaa",
+  "level": 79,
+  "type": "word",
+  "ar": "اسمع",
+  "tr": "esmaʿ",
+  "en": "Listen (m)"
+ },
+ {
+  "id": "cmd_olli",
+  "level": 79,
+  "type": "phrase",
+  "ar": "قول لي",
+  "tr": "ʾolli",
+  "en": "Tell me (m)"
+ },
+ {
+  "id": "cmd_balash",
+  "level": 79,
+  "type": "word",
+  "ar": "بلاش",
+  "tr": "balaash",
+  "en": "Don't / let's not"
+ },
+ {
+  "id": "cmd_oom",
+  "level": 79,
+  "type": "word",
+  "ar": "قوم",
+  "tr": "ʾoom",
+  "en": "Get up / come on (m)"
+ },
+ {
+  "id": "cmd_boss",
+  "level": 79,
+  "type": "word",
+  "ar": "بص",
+  "tr": "boSS",
+  "en": "Look (m)"
+ }
+]

@@ -147,7 +147,26 @@ home screen.
   and per-level progress bars.
 - **Themes** — six color themes (Rose, Violet, Bubblegum, Mint, Dark, Midnight),
   chosen at the bottom of the Home screen.
-- **Audio** — tap-to-hear pronunciation via the browser's Arabic voice.
+- **Recorded Egyptian audio (best on iPhone)** — the app now plays a **real Egyptian
+  recording** for any word that has one: drop MP3s named `audio/<word id>.mp3` into
+  the repo (word ids are in `words.csv` / `words.json`) and every player button and
+  auto-play uses them automatically, falling back to the speech engine for words
+  without a file. The repo ships `generate_audio.py`, which builds all ~878 clips in
+  one run using Azure's genuine Egyptian neural voices (free tier covers it easily) —
+  see the script header for the 5-minute setup. This is the way to get true Masri
+  audio on iOS, which has no Egyptian system voice.
+- **Audio — Masri pronunciation engine** — tap-to-hear speech no longer reads the
+  bare dictionary spelling (which browser voices pronounce with Standard-Arabic
+  vowels). Instead, every word is spoken from a **fully vocalized Egyptian
+  respelling** generated from its transliteration: the real Masri vowels, shaddas,
+  and glottal stops (so قهوة is spoken *"ʔahwa"*, not *"qahwa"*), with the emphatic
+  and throaty consonants (ح ص ط ض ظ ع) recovered from the true spelling. A settings
+  toggle can switch back to plain reading.
+- **Arabic voice picker** — Home → settings now lists every Arabic voice installed
+  on your device with a ▶ test button. Most devices only ship Standard-Arabic
+  voices; if yours offers an **Egyptian (ar-EG)** voice (marked ⭐), pick it — that
+  plus the engine gets you closest to native Masri audio. The app auto-prefers an
+  Egyptian voice when one exists.
 - **App icon** — a rose-gradient ʿain (ع) with a crescent moon, used as the
   favicon and home-screen icon.
 - **Backup & restore** — from the Home settings you can export all your progress
@@ -178,12 +197,18 @@ home screen.
 
 ---
 
-*Last updated (v1.2.0 · 7/10/2026, 8:20 PM Manila): **the next level now unlocks the
-instant you've learned every item in your current level** — no mastery gate. **Starring
-an item in a custom quiz instantly unlocks it** (it's added as learned and quizzable
-right away), and a new **"Add to custom quiz by mastery level"** panel lets you drop
-every learned Apprentice / Guru / Master / Enlightened / Burned item into your custom
-quiz in one tap.*
+*Last updated (v1.4.0 · 7/25/2026, 12:30 AM Manila): **recorded Egyptian audio** —
+the app now plays real Egyptian recordings from an `audio/` folder (`<word id>.mp3`)
+whenever they exist, with automatic fallback to the speech engine, plus a settings
+toggle. Ships `words.csv` / `words.json` (the full word list with ids) and
+`generate_audio.py`, a one-run script that generates all clips with Azure's genuine
+Egyptian voices — the definitive fix for iPhone, which has no Egyptian system voice.*
+
+*Earlier (v1.3.0): Masri pronunciation engine (fully vocalized Egyptian respelling
+for speech) and an Arabic voice picker with test button.*
+
+*Earlier (v1.2.0): instant level unlock once a level is fully learned; starring an
+item instantly unlocks it; "Add to custom quiz by mastery level" panel.*
 
 *Earlier (v1.1.0): mastery became your run of consecutive correct answers (100 in a
 row = full mastery) with five color-coded tiers; every quiz shows a bold green

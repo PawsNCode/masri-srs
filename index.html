@@ -31,8 +31,8 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "1.2.0";
-const APP_UPDATED = "7/10/2026, 8:20:00 PM";
+const APP_VERSION = "1.4.0";
+const APP_UPDATED = "7/25/2026, 12:30:00 AM";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
 // makes the home-screen shortcut go stale). Progress lives in localStorage,
@@ -203,15 +203,194 @@ function wordMnemonic(item) {
 }
 
 /* ---- Pronunciation (Web Speech API — uses the device's Arabic voice) ---- */
-function speak(text) {
+/* ============================================================
+   Pronunciation engine
+   ------------------------------------------------------------
+   Browser Arabic voices are almost always Modern Standard Arabic
+   and receive our unvocalized dictionary spelling, so they guess
+   MSA vowels — which sounds very different from real Masri.
+   Fix: for every word we know, speak a FULLY VOCALIZED phonetic
+   respelling generated from its Egyptian transliteration (correct
+   vowels, shaddas, glottal stops), and let the user pick the best
+   Arabic voice on their device (some have a true ar-EG voice).
+   ============================================================ */
+const SPEECH_PREFS = { phonetic: true, voiceURI: null, recorded: true }; // synced from settings by App
+
+/* ---- Recorded Egyptian audio ----
+   If the repo contains audio/<item id>.mp3 (real Egyptian TTS or recordings),
+   speak() plays that file and only falls back to the phonetic speech engine
+   when no recording exists. Missing files are remembered so we don't refetch. */
+const AUDIO_BASE = "audio/";
+let AUDIO_ID_BY_AR = {}; // dictionary spelling → item id (built after ITEMS)
+const AUDIO_STATUS = {}; // id → "ok" | "missing"
+let CURRENT_AUDIO = null;
+function playRecorded(id, onFail) {
+  if (AUDIO_STATUS[id] === "missing") { onFail(); return; }
+  try {
+    if (CURRENT_AUDIO) { try { CURRENT_AUDIO.pause(); } catch {} CURRENT_AUDIO = null; }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    const a = new Audio(AUDIO_BASE + id + ".mp3");
+    CURRENT_AUDIO = a;
+    a.onerror = () => { AUDIO_STATUS[id] = "missing"; onFail(); };
+    a.play().then(() => { AUDIO_STATUS[id] = "ok"; }).catch((err) => {
+      // A blocked autoplay isn't a missing file — only cache real load failures.
+      if (!err || err.name !== "NotAllowedError") AUDIO_STATUS[id] = "missing";
+      onFail();
+    });
+  } catch { onFail(); }
+}
+
+const H_FATHA = "\u064E", H_KASRA = "\u0650", H_DAMMA = "\u064F", H_SUKUN = "\u0652", H_SHADDA = "\u0651";
+const TR_DIGRAPHS = { sh: "ش", kh: "خ", gh: "غ", th: "ث", dh: "ذ" };
+const TR_CONS = {
+  b: "ب", t: "ت", g: "ج", j: "ج", d: "د", r: "ر", z: "ز", s: "س", f: "ف", q: "ق",
+  k: "ك", l: "ل", m: "م", n: "ن", h: "ه", w: "و", y: "ي", p: "ب", v: "ف", c: "ك",
+  "ʿ": "ع", "ʕ": "ع", "3": "ع", "7": "ح", "5": "خ", "2": "ء",
+  "ʾ": "ء", "'": "ء", "`": "ء", "’": "ء", "ʼ": "ء", "ʔ": "ء",
+};
+const TR_VOWELS = { a: "a", e: "i", i: "i", o: "u", u: "u" }; // vowel class
+
+// Parse one transliterated word into consonant/vowel tokens. Null if unparseable.
+function trTokens(word) {
+  const toks = [];
+  let i = 0;
+  const w = word.toLowerCase();
+  while (i < w.length) {
+    const two = w.slice(i, i + 2);
+    if (TR_DIGRAPHS[two]) { toks.push({ c: TR_DIGRAPHS[two] }); i += 2; continue; }
+    const ch = w[i];
+    if (TR_VOWELS[ch]) {
+      const cls = TR_VOWELS[ch];
+      const long = TR_VOWELS[w[i + 1]] === cls; // doubled vowel = long (aa, ee, ii, oo, uu)
+      toks.push({ v: cls, long });
+      i += long ? 2 : 1;
+      continue;
+    }
+    if (TR_CONS[ch]) { toks.push({ c: TR_CONS[ch] }); i += 1; continue; }
+    if (ch === "-" || ch === "·") { i += 1; continue; }
+    return null; // unknown symbol — caller falls back to dictionary spelling
+  }
+  return toks;
+}
+
+// Emit a fully vocalized Arabic respelling for one word's tokens.
+function trWordToArabic(word) {
+  const toks = trTokens(word);
+  if (!toks || !toks.length) return null;
+  let out = "";
+  let i = 0;
+  const emitVowel = (v, isFinal) => {
+    const mater = v.long || isFinal; // word-final short vowels get a mater letter so TTS voices them
+    if (v.v === "a") return H_FATHA + (mater ? "ا" : "");
+    if (v.v === "i") return H_KASRA + (mater ? "ي" : "");
+    return H_DAMMA + (mater ? "و" : "");
+  };
+  // Word-initial vowel rides a hamza carrier (Arabic can't start with a bare vowel).
+  let firstCons = true;
+  if (toks[0].v) {
+    const v = toks[0];
+    if (v.v === "a") out += v.long ? "آ" : "أ" + H_FATHA;
+    else if (v.v === "i") out += "إ" + H_KASRA + (v.long ? "ي" : "");
+    else out += "أ" + H_DAMMA + (v.long ? "و" : "");
+    i = 1;
+    firstCons = false; // word starts with a vowel, so no initial cluster to soften
+  }
+  while (i < toks.length) {
+    const t = toks[i];
+    if (t.v) { // vowel with no consonant to sit on (rare) — ride a hamza
+      out += "ء" + emitVowel(t, i === toks.length - 1);
+      i += 1;
+      continue;
+    }
+    let gem = false;
+    if (toks[i + 1] && toks[i + 1].c === t.c) { gem = true; i += 1; } // doubled consonant → shadda
+    out += t.c + (gem ? H_SHADDA : "");
+    const nxt = toks[i + 1];
+    if (nxt && nxt.v) {
+      out += emitVowel(nxt, i + 1 === toks.length - 1);
+      i += 2;
+    } else {
+      // No vowel follows. A word-initial cluster (Masri "shwaya") gets a light helping
+      // kasra so MSA voices don't choke on a leading sukun; otherwise sukun.
+      out += firstCons && nxt ? H_KASRA : H_SUKUN;
+      i += 1;
+    }
+    firstCons = false;
+  }
+  return out;
+}
+
+// Full transliteration (may be several words) → vocalized Arabic speech text.
+// `ar` (the dictionary spelling) recovers consonants the romanization can't express:
+// plain "h/s/t/d/z" become ح/ص/ط/ض/ظ, and vowel-initial words regain their ع,
+// wherever the real spelling uses them. Each rule lists the dictionary letters that
+// CONFIRM the soft reading ("stay") vs the letter that upgrades it ("to").
+const TWIN_RULES = {
+  "ه": { stay: "هة", to: "ح", out: "ح" },
+  "س": { stay: "سث", to: "ص", out: "ص" },
+  "ت": { stay: "تة", to: "ط", out: "ط" },
+  "د": { stay: "دذ", to: "ض", out: "ض" },
+  "ز": { stay: "زذ", to: "ظ", out: "ظ" },
+  "أ": { stay: "أإءاقئؤآى", to: "ع", out: "ع" },
+  "إ": { stay: "أإءاقئؤآى", to: "ع", out: "ع" },
+  "ء": { stay: "أإءاقئؤآى", to: "ع", out: "ع" }, // glottal from ق stays glottal — that's the Masri reading
+  "آ": { stay: "أإءاقئؤآى", to: "ع", out: "ع" + "\u064E" + "ا" },
+};
+function emphaticFix(speech, ar) {
+  if (!ar) return speech;
+  let p = 0; // scan pointer into the dictionary spelling
+  let out = "";
+  for (const ch of speech) {
+    const rule = TWIN_RULES[ch];
+    if (!rule) { out += ch; continue; }
+    let iStay = -1;
+    for (const sc of rule.stay) { const k = ar.indexOf(sc, p); if (k !== -1 && (iStay === -1 || k < iStay)) iStay = k; }
+    const iHard = ar.indexOf(rule.to, p);
+    if (iHard !== -1 && (iStay === -1 || iHard < iStay)) { out += rule.out; p = iHard + 1; }
+    else { out += ch; if (iStay !== -1) p = iStay + 1; }
+  }
+  return out;
+}
+function trToSpeech(tr, ar) {
+  if (!tr || tr === "—") return null;
+  const words = tr.replace(/[?!.,؟،()"]/g, "").trim().split(/\s+/);
+  const parts = [];
+  for (const w of words) {
+    let a = trWordToArabic(w);
+    if (!a) return null; // any unparseable word → use the dictionary spelling instead
+    if (a[0] === "ء") a = "أ" + a.slice(1); // word-initial glottal stop rides an alef seat
+    parts.push(a);
+  }
+  return emphaticFix(parts.join(" "), ar);
+}
+
+// Built after ITEMS is defined: dictionary Arabic → transliteration.
+let SPEECH_BY_AR = {};
+
+function pickVoice(voices) {
+  if (SPEECH_PREFS.voiceURI) {
+    const chosen = voices.find((x) => x.voiceURI === SPEECH_PREFS.voiceURI);
+    if (chosen) return chosen;
+  }
+  return (
+    voices.find((x) => x.lang && x.lang.toLowerCase().startsWith("ar-eg")) ||
+    voices.find((x) => x.lang && x.lang.toLowerCase().startsWith("ar")) || null
+  );
+}
+
+function speakTTS(text) {
   try {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
+    // Speak the vocalized Masri respelling when we know this word and the engine is on.
+    let say = text;
+    if (SPEECH_PREFS.phonetic && SPEECH_BY_AR[text]) {
+      const ph = trToSpeech(SPEECH_BY_AR[text], text);
+      if (ph) say = ph;
+    }
+    const u = new SpeechSynthesisUtterance(say);
     const voices = window.speechSynthesis.getVoices() || [];
-    const v =
-      voices.find((x) => x.lang && x.lang.toLowerCase().startsWith("ar-eg")) ||
-      voices.find((x) => x.lang && x.lang.toLowerCase().startsWith("ar"));
+    const v = pickVoice(voices);
     if (v) u.voice = v;
     u.lang = v ? v.lang : "ar-EG";
     u.rate = 0.82;
@@ -219,6 +398,12 @@ function speak(text) {
   } catch {
     /* ignore */
   }
+}
+
+function speak(text) {
+  const id = AUDIO_ID_BY_AR[text];
+  if (SPEECH_PREFS.recorded && id) playRecorded(id, () => speakTTS(text));
+  else speakTTS(text);
 }
 
 function Speaker({ text, size = 18, color = "#c02e80" }) {
@@ -1546,6 +1731,12 @@ const ITEMS = RAW.map(([id, level, type, ar, tr, en, alts]) => ({
   custom: false,
 }));
 const MAX_LEVEL = Math.max(...ITEMS.map((i) => i.level));
+// Map every dictionary spelling to its Egyptian transliteration for the speech engine.
+SPEECH_BY_AR = {};
+ITEMS.forEach((it) => { if (it.ar && it.tr && it.tr !== "—") SPEECH_BY_AR[it.ar] = it.tr; });
+// And to its item id, for recorded audio files (audio/<id>.mp3). First entry wins.
+AUDIO_ID_BY_AR = {};
+ITEMS.forEach((it) => { if (it.ar && !(it.ar in AUDIO_ID_BY_AR)) AUDIO_ID_BY_AR[it.ar] = it.id; });
 // A level is unlocked as soon as EVERY item in the current level has been learned
 // (has any progress). Climb as far as that holds so unlocking is always immediate.
 function nextUnlockedLevel(progress, cur) {
@@ -1767,7 +1958,7 @@ const DEFAULT_STATE = {
   custom: [],
   customItems: [],
   customLetters: [],
-  settings: { lessonBatch: 5, theme: "rose", quizType: "inapp", autoPlay: true },
+  settings: { lessonBatch: 5, theme: "rose", quizType: "inapp", autoPlay: true, phonetic: true, voiceURI: null, recorded: true },
   daily: { date: todayStr(), reviews: 0, lessons: 0 },
   history: {},
   script: { progress: {}, best: 0, batch: 5, quizDir: "recognize" },
@@ -2580,6 +2771,14 @@ function HarakatQuiz({ marks, onDone, onSet, harakat = {} }) {
 
 /* ===================== HOME ===================== */
 function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCounts, streak, onGo, onTrouble, onSetting, onTheme, onImport, onReset }) {
+  const [arVoices, setArVoices] = useState([]);
+  useEffect(() => {
+    if (!window.speechSynthesis) return;
+    const load = () => setArVoices((window.speechSynthesis.getVoices() || []).filter((v) => v.lang && v.lang.toLowerCase().startsWith("ar")));
+    load();
+    window.speechSynthesis.addEventListener && window.speechSynthesis.addEventListener("voiceschanged", load);
+    return () => { window.speechSynthesis.removeEventListener && window.speechSynthesis.removeEventListener("voiceschanged", load); };
+  }, []);
   const levelItemsAll = ITEMS.filter((it) => it.level === level);
   const levelLearned = levelItemsAll.filter((it) => state.progress[it.id]).length;
   const learnPct = levelItemsAll.length ? levelLearned / levelItemsAll.length : 0;
@@ -2714,6 +2913,38 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
           <button className="tap" role="switch" aria-checked={state.settings.autoPlay !== false} onClick={() => onSetting({ autoPlay: !(state.settings.autoPlay !== false) })} style={{ flexShrink: 0, width: 50, height: 28, borderRadius: 999, border: "none", cursor: "pointer", background: state.settings.autoPlay !== false ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, position: "relative", transition: "background .2s" }}>
             <span style={{ position: "absolute", top: 3, left: state.settings.autoPlay !== false ? 25 : 3, width: 22, height: 22, borderRadius: 999, background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.25)" }} />
           </button>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, paddingTop: 14, borderTop: `1px solid ${T.line}` }}>
+          <div>
+            <div style={{ fontSize: 14 }}>Recorded Egyptian audio</div>
+            <div style={{ fontSize: 11, color: T.textDim, marginTop: 2, lineHeight: 1.4 }}>Play real Egyptian recordings from the app's audio folder when available; words without one fall back to the engine below.</div>
+          </div>
+          <button className="tap" role="switch" aria-checked={state.settings.recorded !== false} onClick={() => onSetting({ recorded: !(state.settings.recorded !== false) })} style={{ flexShrink: 0, width: 50, height: 28, borderRadius: 999, border: "none", cursor: "pointer", background: state.settings.recorded !== false ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, position: "relative", transition: "background .2s" }}>
+            <span style={{ position: "absolute", top: 3, left: state.settings.recorded !== false ? 25 : 3, width: 22, height: 22, borderRadius: 999, background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.25)" }} />
+          </button>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, paddingTop: 14, borderTop: `1px solid ${T.line}` }}>
+          <div>
+            <div style={{ fontSize: 14 }}>Masri pronunciation engine</div>
+            <div style={{ fontSize: 11, color: T.textDim, marginTop: 2, lineHeight: 1.4 }}>Speaks each word with its true Egyptian vowels and stops (recommended). Off = read the dictionary spelling as-is.</div>
+          </div>
+          <button className="tap" role="switch" aria-checked={state.settings.phonetic !== false} onClick={() => onSetting({ phonetic: !(state.settings.phonetic !== false) })} style={{ flexShrink: 0, width: 50, height: 28, borderRadius: 999, border: "none", cursor: "pointer", background: state.settings.phonetic !== false ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, position: "relative", transition: "background .2s" }}>
+            <span style={{ position: "absolute", top: 3, left: state.settings.phonetic !== false ? 25 : 3, width: 22, height: 22, borderRadius: 999, background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.25)" }} />
+          </button>
+        </div>
+        <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${T.line}` }}>
+          <div style={{ fontSize: 14 }}>Arabic voice</div>
+          <div style={{ fontSize: 11, color: T.textDim, margin: "2px 0 8px", lineHeight: 1.4 }}>Pick the best Arabic voice on this device — an <b>Egyptian (ar-EG)</b> one, if listed, sounds by far the most accurate. Tap ▶ to test.</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <select value={state.settings.voiceURI || ""} onChange={(e) => onSetting({ voiceURI: e.target.value || null })} style={{ flex: 1, padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 13, outline: "none" }}>
+              <option value="">Auto (prefer Egyptian)</option>
+              {arVoices.map((v) => (
+                <option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang}){v.lang.toLowerCase().startsWith("ar-eg") ? " ⭐" : ""}</option>
+              ))}
+            </select>
+            <button className="tap" onClick={() => speak("إِزَّيَّك؟ أَنَا كُوَيِّسْ")} aria-label="test voice" style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${T.gold}`, background: `${T.gold}12`, color: T.gold, fontSize: 14, fontWeight: 700 }}>▶</button>
+          </div>
+          {arVoices.length === 0 && <div style={{ fontSize: 11, color: T.textDim, marginTop: 6 }}>No Arabic voices found on this device — install one in your phone's text-to-speech settings.</div>}
         </div>
         <div style={{ marginTop: 14 }}>
           {!confirm ? (
@@ -3194,6 +3425,15 @@ function App() {
 
   const persist = useCallback((next) => { setState(next); saveState(next); }, []);
   const allItems = useMemo(() => [...ITEMS, ...((state && state.custom) || [])], [state]);
+
+  // Keep the speech engine in sync with settings, and cover user-added cards too.
+  useEffect(() => {
+    if (!state) return;
+    SPEECH_PREFS.phonetic = state.settings.phonetic !== false;
+    SPEECH_PREFS.voiceURI = state.settings.voiceURI || null;
+    SPEECH_PREFS.recorded = state.settings.recorded !== false;
+    (state.custom || []).forEach((it) => { if (it.ar && it.tr && it.tr !== "—") SPEECH_BY_AR[it.ar] = it.tr; });
+  }, [state]);
 
   const derived = useMemo(() => {
     if (!state) return null;
