@@ -40,6 +40,14 @@
   "en": "How are you? (to a man)"
  },
  {
+  "id": "ezzayak_f",
+  "level": 1,
+  "type": "phrase",
+  "ar": "إزيِك",
+  "tr": "ezzayik",
+  "en": "How are you? (to a woman)"
+ },
+ {
   "id": "kollotamam",
   "level": 1,
   "type": "phrase",
@@ -72,6 +80,14 @@
   "en": "Please (to a man)"
  },
  {
+  "id": "minfadlak_f",
+  "level": 1,
+  "type": "phrase",
+  "ar": "من فضلِك",
+  "tr": "min fadlik",
+  "en": "Please (to a woman)"
+ },
+ {
   "id": "maasalama",
   "level": 1,
   "type": "phrase",
@@ -102,6 +118,14 @@
   "ar": "آسف",
   "tr": "aasif",
   "en": "Sorry (said by a man)"
+ },
+ {
+  "id": "aasif_f",
+  "level": 1,
+  "type": "word",
+  "ar": "آسفة",
+  "tr": "asfa",
+  "en": "Sorry (said by a woman)"
  },
  {
   "id": "lawsamaht",
@@ -238,6 +262,14 @@
   "ar": "أنهو",
   "tr": "anhu",
   "en": "Which (m)"
+ },
+ {
+  "id": "anhu_f",
+  "level": 2,
+  "type": "word",
+  "ar": "أنهي",
+  "tr": "anhi",
+  "en": "Which (f)"
  },
  {
   "id": "wahid",
@@ -488,12 +520,28 @@
   "en": "I understand (man)"
  },
  {
+  "id": "faahim_f",
+  "level": 4,
+  "type": "word",
+  "ar": "فاهمة",
+  "tr": "fahma",
+  "en": "I understand (woman)"
+ },
+ {
   "id": "aarif",
   "level": 4,
   "type": "word",
   "ar": "عارف",
   "tr": "ʿaarif",
   "en": "I know (man)"
+ },
+ {
+  "id": "aarif_f",
+  "level": 4,
+  "type": "word",
+  "ar": "عارفة",
+  "tr": "ʿarfa",
+  "en": "I know (woman)"
  },
  {
   "id": "andi",
@@ -510,6 +558,14 @@
   "ar": "عندك",
   "tr": "ʿandak",
   "en": "Do you have (to a man)"
+ },
+ {
+  "id": "andak_f",
+  "level": 4,
+  "type": "word",
+  "ar": "عندِك",
+  "tr": "ʿandik",
+  "en": "Do you have (to a woman)"
  },
  {
   "id": "mesh",
@@ -662,6 +718,14 @@
   "ar": "أنا عايز أكل",
   "tr": "ana ʿaayez akl",
   "en": "I want food (man)"
+ },
+ {
+  "id": "anaayezakl_f",
+  "level": 5,
+  "type": "sentence",
+  "ar": "أنا عايزة أكل",
+  "tr": "ana ʿayza akl",
+  "en": "I want food (woman)"
  },
  {
   "id": "mumkinhesab",
@@ -920,6 +984,14 @@
   "en": "I want to go here (man)"
  },
  {
+  "id": "anaayezarooh_f",
+  "level": 7,
+  "type": "sentence",
+  "ar": "أنا عايزة أروح هنا",
+  "tr": "ana ʿayza arooH hena",
+  "en": "I want to go here (woman)"
+ },
+ {
   "id": "bekaam",
   "level": 8,
   "type": "word",
@@ -958,6 +1030,14 @@
   "ar": "ده",
   "tr": "da",
   "en": "This (m)"
+ },
+ {
+  "id": "da_f",
+  "level": 8,
+  "type": "word",
+  "ar": "دي",
+  "tr": "di",
+  "en": "This (f)"
  },
  {
   "id": "kis",
@@ -1016,12 +1096,28 @@
   "en": "I want to buy this (man)"
  },
  {
+  "id": "anaayezashteri_f",
+  "level": 8,
+  "type": "sentence",
+  "ar": "أنا عايزة أشتري ده",
+  "tr": "ana ʿayza ashteri da",
+  "en": "I want to buy this (woman)"
+ },
+ {
   "id": "esmakeh",
   "level": 9,
   "type": "sentence",
   "ar": "اسمك إيه",
   "tr": "esmak eh",
   "en": "What's your name? (man)"
+ },
+ {
+  "id": "esmakeh_f",
+  "level": 9,
+  "type": "sentence",
+  "ar": "اسمِك إيه",
+  "tr": "esmik eh",
+  "en": "What's your name? (woman)"
  },
  {
   "id": "esmi",
@@ -1048,6 +1144,14 @@
   "en": "Where are you from? (man)"
  },
  {
+  "id": "entamenein_f",
+  "level": 9,
+  "type": "sentence",
+  "ar": "إنتي منين",
+  "tr": "enti menein",
+  "en": "Where are you from? (woman)"
+ },
+ {
   "id": "mabsoot",
   "level": 9,
   "type": "word",
@@ -1056,12 +1160,28 @@
   "en": "Happy (man)"
  },
  {
+  "id": "mabsoot_f",
+  "level": 9,
+  "type": "word",
+  "ar": "مبسوطة",
+  "tr": "mabsoota",
+  "en": "Happy (woman)"
+ },
+ {
   "id": "taabaan",
   "level": 9,
   "type": "word",
   "ar": "تعبان",
   "tr": "taʿbaan",
   "en": "Tired (man)"
+ },
+ {
+  "id": "taabaan_f",
+  "level": 9,
+  "type": "word",
+  "ar": "تعبانة",
+  "tr": "taʿbaana",
+  "en": "Tired (woman)"
  },
  {
   "id": "hamdulillah",
@@ -1078,6 +1198,14 @@
   "ar": "مش عارف",
   "tr": "mesh ʿaarif",
   "en": "I don't know (man)"
+ },
+ {
+  "id": "meshaarif_f",
+  "level": 9,
+  "type": "phrase",
+  "ar": "مش عارفة",
+  "tr": "mesh ʿarfa",
+  "en": "I don't know (woman)"
  },
  {
   "id": "batkallemarabi",
@@ -1104,12 +1232,28 @@
   "en": "How are you today? (man)"
  },
  {
+  "id": "ezzayaknaharda_f",
+  "level": 10,
+  "type": "sentence",
+  "ar": "إزيِك النهاردة",
+  "tr": "ezzayik en-naharda",
+  "en": "How are you today? (woman)"
+ },
+ {
   "id": "ahwaminfadlak",
   "level": 10,
   "type": "sentence",
   "ar": "أنا عايز قهوة من فضلك",
   "tr": "ana ʿaayez ʾahwa min fadlak",
   "en": "I want coffee, please (man)"
+ },
+ {
+  "id": "ahwaminfadlak_f",
+  "level": 10,
+  "type": "sentence",
+  "ar": "أنا عايزة قهوة من فضلِك",
+  "tr": "ana ʿayza ʾahwa min fadlik",
+  "en": "I want coffee, please (woman)"
  },
  {
   "id": "feenhammam",
@@ -1142,6 +1286,14 @@
   "ar": "أنا مش فاهم",
   "tr": "ana mesh faahim",
   "en": "I don't understand (man)"
+ },
+ {
+  "id": "meshfaahim_f",
+  "level": 10,
+  "type": "sentence",
+  "ar": "أنا مش فاهمة",
+  "tr": "ana mesh fahma",
+  "en": "I don't understand (woman)"
  },
  {
   "id": "tesaaedni",
@@ -1240,6 +1392,14 @@
   "en": "My friend (m)"
  },
  {
+  "id": "sahbi_f",
+  "level": 11,
+  "type": "word",
+  "ar": "صاحبتي",
+  "tr": "saHbeti",
+  "en": "My friend (f)"
+ },
+ {
   "id": "beet",
   "level": 12,
   "type": "word",
@@ -1328,12 +1488,28 @@
   "en": "Happy (man)"
  },
  {
+  "id": "farhaan_f",
+  "level": 13,
+  "type": "word",
+  "ar": "فرحانة",
+  "tr": "farHaana",
+  "en": "Happy (woman)"
+ },
+ {
   "id": "zalaan",
   "level": 13,
   "type": "word",
   "ar": "زعلان",
   "tr": "zaʿlaan",
   "en": "Upset (man)"
+ },
+ {
+  "id": "zalaan_f",
+  "level": 13,
+  "type": "word",
+  "ar": "زعلانة",
+  "tr": "zaʿlaana",
+  "en": "Upset (woman)"
  },
  {
   "id": "gaaan",
@@ -1344,12 +1520,28 @@
   "en": "Hungry (man)"
  },
  {
+  "id": "gaaan_f",
+  "level": 13,
+  "type": "word",
+  "ar": "جعانة",
+  "tr": "gaʿaana",
+  "en": "Hungry (woman)"
+ },
+ {
   "id": "atshaan",
   "level": 13,
   "type": "word",
   "ar": "عطشان",
   "tr": "ʿaTshaan",
   "en": "Thirsty (man)"
+ },
+ {
+  "id": "atshaan_f",
+  "level": 13,
+  "type": "word",
+  "ar": "عطشانة",
+  "tr": "ʿaTshaana",
+  "en": "Thirsty (woman)"
  },
  {
   "id": "khaayef",
@@ -1360,12 +1552,28 @@
   "en": "Afraid (man)"
  },
  {
+  "id": "khaayef_f",
+  "level": 13,
+  "type": "word",
+  "ar": "خايفة",
+  "tr": "khayfa",
+  "en": "Afraid (woman)"
+ },
+ {
   "id": "zahaan",
   "level": 13,
   "type": "word",
   "ar": "زهقان",
   "tr": "zahʾaan",
   "en": "Bored (man)"
+ },
+ {
+  "id": "zahaan_f",
+  "level": 13,
+  "type": "word",
+  "ar": "زهقانة",
+  "tr": "zahʾaana",
+  "en": "Bored (woman)"
  },
  {
   "id": "ayyaan",
@@ -1376,12 +1584,28 @@
   "en": "Sick (man)"
  },
  {
+  "id": "ayyaan_f",
+  "level": 13,
+  "type": "word",
+  "ar": "عيانة",
+  "tr": "ʿayyaana",
+  "en": "Sick (woman)"
+ },
+ {
   "id": "mashghool",
   "level": 13,
   "type": "word",
   "ar": "مشغول",
   "tr": "mashghool",
   "en": "Busy (man)"
+ },
+ {
+  "id": "mashghool_f",
+  "level": 13,
+  "type": "word",
+  "ar": "مشغولة",
+  "tr": "mashghoola",
+  "en": "Busy (woman)"
  },
  {
   "id": "rooh",
@@ -1392,12 +1616,28 @@
   "en": "Go! (to a man)"
  },
  {
+  "id": "rooh_f",
+  "level": 14,
+  "type": "word",
+  "ar": "روحي",
+  "tr": "rooHi",
+  "en": "Go! (to a woman)"
+ },
+ {
   "id": "taaala",
   "level": 14,
   "type": "word",
   "ar": "تعالى",
   "tr": "taʿaala",
   "en": "Come! (to a man)"
+ },
+ {
+  "id": "taaala_f",
+  "level": 14,
+  "type": "word",
+  "ar": "تعالي",
+  "tr": "taʿaali",
+  "en": "Come! (to a woman)"
  },
  {
   "id": "estanna",
@@ -1440,6 +1680,14 @@
   "en": "Do you want to come? (m)"
  },
  {
+  "id": "teeji_f",
+  "level": 14,
+  "type": "phrase",
+  "ar": "عايزة تيجي",
+  "tr": "ʿayza teegi",
+  "en": "Do you want to come? (f)"
+ },
+ {
   "id": "teeraf",
   "level": 14,
   "type": "phrase",
@@ -1448,12 +1696,28 @@
   "en": "Do you know? (m)"
  },
  {
+  "id": "teeraf_f",
+  "level": 14,
+  "type": "phrase",
+  "ar": "إنتي تعرفي",
+  "tr": "enti teʿrafi",
+  "en": "Do you know? (f)"
+ },
+ {
   "id": "saaken",
   "level": 15,
   "type": "sentence",
   "ar": "أنا ساكن في مصر",
   "tr": "ana saaken fi maSr",
   "en": "I live in Egypt (man)"
+ },
+ {
+  "id": "saaken_f",
+  "level": 15,
+  "type": "sentence",
+  "ar": "أنا ساكنة في مصر",
+  "tr": "ana sakna fi maSr",
+  "en": "I live in Egypt (woman)"
  },
  {
   "id": "elgaww",
@@ -1488,12 +1752,28 @@
   "en": "I want to learn Arabic (man)"
  },
  {
+  "id": "atallemarabi_f",
+  "level": 15,
+  "type": "sentence",
+  "ar": "أنا عايزة أتعلم عربي",
+  "tr": "ana ʿayza atʿallem ʿarabi",
+  "en": "I want to learn Arabic (woman)"
+ },
+ {
   "id": "hesabminfadlak",
   "level": 15,
   "type": "sentence",
   "ar": "الحساب من فضلك",
   "tr": "el-Hesaab min fadlak",
   "en": "The bill, please (man)"
+ },
+ {
+  "id": "hesabminfadlak_f",
+  "level": 15,
+  "type": "sentence",
+  "ar": "الحساب من فضلِك",
+  "tr": "el-Hesaab min fadlik",
+  "en": "The bill, please (woman)"
  },
  {
   "id": "n11",
@@ -1856,6 +2136,14 @@
   "en": "What are you doing? (m)"
  },
  {
+  "id": "p_doingwhat_f",
+  "level": 19,
+  "type": "sentence",
+  "ar": "بتعملي إيه",
+  "tr": "betiʿmeli eh",
+  "en": "What are you doing? (f)"
+ },
+ {
   "id": "p_canhelp",
   "level": 19,
   "type": "sentence",
@@ -1864,12 +2152,28 @@
   "en": "Can I help you? (m)"
  },
  {
+  "id": "p_canhelp_f",
+  "level": 19,
+  "type": "sentence",
+  "ar": "ممكن أساعدِك",
+  "tr": "mumkin asaʿdik",
+  "en": "Can I help you? (f)"
+ },
+ {
   "id": "p_whatlike",
   "level": 19,
   "type": "sentence",
   "ar": "تحب إيه",
   "tr": "teHebb eh",
   "en": "What would you like? (m)"
+ },
+ {
+  "id": "p_whatlike_f",
+  "level": 19,
+  "type": "sentence",
+  "ar": "تحبي إيه",
+  "tr": "teHebbi eh",
+  "en": "What would you like? (f)"
  },
  {
   "id": "pr_in",
@@ -2504,12 +2808,28 @@
   "en": "Teacher (m)"
  },
  {
+  "id": "w_teacher_f",
+  "level": 27,
+  "type": "word",
+  "ar": "مدرّسة",
+  "tr": "modarresa",
+  "en": "Teacher (f)"
+ },
+ {
   "id": "w_student",
   "level": 27,
   "type": "word",
   "ar": "طالب",
   "tr": "Taaleb",
   "en": "Student (m)"
+ },
+ {
+  "id": "w_student_f",
+  "level": 27,
+  "type": "word",
+  "ar": "طالبة",
+  "tr": "Taaleba",
+  "en": "Student (f)"
  },
  {
   "id": "w_degree",
@@ -2552,12 +2872,28 @@
   "en": "What do you do for work? (m)"
  },
  {
+  "id": "w_whatjob_f",
+  "level": 27,
+  "type": "sentence",
+  "ar": "بتشتغلي إيه",
+  "tr": "beteshtaghali eh",
+  "en": "What do you do for work? (f)"
+ },
+ {
   "id": "w_iateacher",
   "level": 27,
   "type": "sentence",
   "ar": "أنا مدرس",
   "tr": "ana modarres",
   "en": "I'm a teacher (m)"
+ },
+ {
+  "id": "w_iateacher_f",
+  "level": 27,
+  "type": "sentence",
+  "ar": "أنا مدرّسة",
+  "tr": "ana modarresa",
+  "en": "I'm a teacher (f)"
  },
  {
   "id": "ph_phone",
@@ -2624,6 +2960,14 @@
   "en": "Available / present (m)"
  },
  {
+  "id": "ph_available_f",
+  "level": 28,
+  "type": "word",
+  "ar": "موجودة",
+  "tr": "mawgooda",
+  "en": "Available / present (f)"
+ },
+ {
   "id": "ph_callme",
   "level": 28,
   "type": "sentence",
@@ -2632,12 +2976,28 @@
   "en": "Call me (m)"
  },
  {
+  "id": "ph_callme_f",
+  "level": 28,
+  "type": "sentence",
+  "ar": "كلميني",
+  "tr": "kallemiini",
+  "en": "Call me (f)"
+ },
+ {
   "id": "ph_sendme",
   "level": 28,
   "type": "sentence",
   "ar": "ابعتلي",
   "tr": "ebʿatli",
   "en": "Send me (m)"
+ },
+ {
+  "id": "ph_sendme_f",
+  "level": 28,
+  "type": "sentence",
+  "ar": "ابعتيلي",
+  "tr": "ebʿatiili",
+  "en": "Send me (f)"
  },
  {
   "id": "m_pound",
@@ -2686,6 +3046,14 @@
   "ar": "عندك فكة",
   "tr": "ʿandak fakka",
   "en": "Do you have change? (m)"
+ },
+ {
+  "id": "m_havechange_f",
+  "level": 29,
+  "type": "sentence",
+  "ar": "عندِك فكة",
+  "tr": "ʿandik fakka",
+  "en": "Do you have change? (f)"
  },
  {
   "id": "m_perkilo",
@@ -2824,6 +3192,14 @@
   "en": "I want to order (m)"
  },
  {
+  "id": "r_order_f",
+  "level": 32,
+  "type": "sentence",
+  "ar": "أنا عايزة أطلب",
+  "tr": "ana ʿayza aTlob",
+  "en": "I want to order (f)"
+ },
+ {
   "id": "r_cup",
   "level": 32,
   "type": "word",
@@ -2856,6 +3232,14 @@
   "en": "I'm full (m)"
  },
  {
+  "id": "r_full_f",
+  "level": 32,
+  "type": "sentence",
+  "ar": "أنا شبعانة",
+  "tr": "ana shabʿaana",
+  "en": "I'm full (f)"
+ },
+ {
   "id": "r_billplease",
   "level": 32,
   "type": "sentence",
@@ -2878,6 +3262,14 @@
   "ar": "موافق",
   "tr": "mowaafeʾ",
   "en": "I agree (m)"
+ },
+ {
+  "id": "o_agree_f",
+  "level": 33,
+  "type": "word",
+  "ar": "مُوافقة",
+  "tr": "mowafʾa",
+  "en": "I agree (f)"
  },
  {
   "id": "o_prefer",
@@ -2920,6 +3312,14 @@
   "en": "Not sure (m)"
  },
  {
+  "id": "o_notsure_f",
+  "level": 33,
+  "type": "phrase",
+  "ar": "مش متأكدة",
+  "tr": "mesh metʾakkeda",
+  "en": "Not sure (f)"
+ },
+ {
   "id": "o_great",
   "level": 33,
   "type": "word",
@@ -2952,12 +3352,28 @@
   "en": "Can I ask you a question? (m)"
  },
  {
+  "id": "s_askq_f",
+  "level": 34,
+  "type": "sentence",
+  "ar": "ممكن أسألِك سؤال",
+  "tr": "mumkin asʾalik suʾaal",
+  "en": "Can I ask you a question? (f)"
+ },
+ {
   "id": "s_english",
   "level": 34,
   "type": "sentence",
   "ar": "إنت بتتكلم إنجليزي",
   "tr": "enta betetkallem engliizi",
   "en": "Do you speak English? (m)"
+ },
+ {
+  "id": "s_english_f",
+  "level": 34,
+  "type": "sentence",
+  "ar": "إنتي بتتكلمي إنجليزي",
+  "tr": "enti betetkallemi engliizi",
+  "en": "Do you speak English? (f)"
  },
  {
   "id": "s_notfromhere",
@@ -2984,6 +3400,14 @@
   "en": "I'm lost (m)"
  },
  {
+  "id": "s_lost_f",
+  "level": 34,
+  "type": "sentence",
+  "ar": "أنا تايهة",
+  "tr": "ana tayha",
+  "en": "I'm lost (f)"
+ },
+ {
   "id": "s_waitmoment",
   "level": 34,
   "type": "sentence",
@@ -3008,12 +3432,28 @@
   "en": "As you like (m)"
  },
  {
+  "id": "s_asyoulike_f",
+  "level": 34,
+  "type": "sentence",
+  "ar": "براحتِك",
+  "tr": "be-raaHtik",
+  "en": "As you like (f)"
+ },
+ {
   "id": "s_nicemeet",
   "level": 35,
   "type": "sentence",
   "ar": "سعيد بمعرفتك",
   "tr": "saʿiid be-maʿreftak",
   "en": "Nice to meet you (m)"
+ },
+ {
+  "id": "s_nicemeet_f",
+  "level": 35,
+  "type": "sentence",
+  "ar": "سعيدة بمعرفتِك",
+  "tr": "saʿiida be-maʿreftik",
+  "en": "Nice to meet you (f)"
  },
  {
   "id": "s_meetagain",
@@ -3030,6 +3470,14 @@
   "ar": "اتصل بيا لو محتاج حاجة",
   "tr": "etesel biya law meHtaag Haaga",
   "en": "Call me if you need anything (m)"
+ },
+ {
+  "id": "s_callifneed_f",
+  "level": 35,
+  "type": "sentence",
+  "ar": "اتصلي بيا لو محتاجة حاجة",
+  "tr": "eteSli biya law meHtaaga Haaga",
+  "en": "Call me if you need anything (f)"
  },
  {
   "id": "s_loveegypt",
@@ -3062,6 +3510,14 @@
   "ar": "خد بالك",
   "tr": "khod baalak",
   "en": "Take care (m)"
+ },
+ {
+  "id": "s_takecare_f",
+  "level": 35,
+  "type": "sentence",
+  "ar": "خدي بالِك",
+  "tr": "khodi baalik",
+  "en": "Take care (f)"
  },
  {
   "id": "vc_yougo",
@@ -3112,6 +3568,14 @@
   "en": "You eat (m) / she eats"
  },
  {
+  "id": "vc_youeat_f",
+  "level": 36,
+  "type": "word",
+  "ar": "بتاكلي",
+  "tr": "betaakli",
+  "en": "You eat (f)"
+ },
+ {
   "id": "vc_heeat",
   "level": 36,
   "type": "word",
@@ -3134,6 +3598,14 @@
   "ar": "بتعمل",
   "tr": "betiʿmel",
   "en": "You do (m) / she does"
+ },
+ {
+  "id": "vc_youdo_f",
+  "level": 36,
+  "type": "word",
+  "ar": "بتعملي",
+  "tr": "betiʿmeli",
+  "en": "You do (f)"
  },
  {
   "id": "vc_hedo",
@@ -3304,6 +3776,14 @@
   "en": "I'm in a hurry (m)"
  },
  {
+  "id": "tx_hurry_f",
+  "level": 38,
+  "type": "sentence",
+  "ar": "أنا مستعجلة",
+  "tr": "ana mestaʿgela",
+  "en": "I'm in a hurry (f)"
+ },
+ {
   "id": "tx_toomuch",
   "level": 38,
   "type": "sentence",
@@ -3384,6 +3864,14 @@
   "en": "I want medicine (m)"
  },
  {
+  "id": "rx_wantmed_f",
+  "level": 39,
+  "type": "sentence",
+  "ar": "عايزة دوا",
+  "tr": "ʿayza dawa",
+  "en": "I want medicine (f)"
+ },
+ {
   "id": "rx_howmuchmed",
   "level": 39,
   "type": "sentence",
@@ -3424,12 +3912,28 @@
   "en": "Where do you live? (m)"
  },
  {
+  "id": "mt_wherelive_f",
+  "level": 40,
+  "type": "sentence",
+  "ar": "إنتي ساكنة فين",
+  "tr": "enti sakna fein",
+  "en": "Where do you live? (f)"
+ },
+ {
   "id": "mt_age",
   "level": 40,
   "type": "sentence",
   "ar": "عندك كام سنة",
   "tr": "ʿandak kaam sana",
   "en": "How old are you? (m)"
+ },
+ {
+  "id": "mt_age_f",
+  "level": 40,
+  "type": "sentence",
+  "ar": "عندِك كام سنة",
+  "tr": "ʿandik kaam sana",
+  "en": "How old are you? (f)"
  },
  {
   "id": "mt_coffee",
@@ -3448,6 +3952,14 @@
   "en": "Can I get your number? (m)"
  },
  {
+  "id": "mt_number_f",
+  "level": 40,
+  "type": "sentence",
+  "ar": "ممكن رقمِك",
+  "tr": "mumkin raʾamik",
+  "en": "Can I get your number? (f)"
+ },
+ {
   "id": "mt_gladmet",
   "level": 40,
   "type": "sentence",
@@ -3456,12 +3968,28 @@
   "en": "I'm glad I met you (m)"
  },
  {
+  "id": "mt_gladmet_f",
+  "level": 40,
+  "type": "sentence",
+  "ar": "أنا سعيدة إني قابلتِك",
+  "tr": "ana saʿiida eni ʾabeltik",
+  "en": "I'm glad I met you (f)"
+ },
+ {
   "id": "mt_nice",
   "level": 40,
   "type": "sentence",
   "ar": "إنت لطيف",
   "tr": "enta laTiif",
   "en": "You're nice (m)"
+ },
+ {
+  "id": "mt_nice_f",
+  "level": 40,
+  "type": "sentence",
+  "ar": "إنتي لطيفة",
+  "tr": "enti laTiifa",
+  "en": "You're nice (f)"
  },
  {
   "id": "mt_sit",
@@ -3496,6 +4024,14 @@
   "en": "I feel really unwell (m)"
  },
  {
+  "id": "dr_unwell_f",
+  "level": 41,
+  "type": "sentence",
+  "ar": "أنا تعبانة أوي",
+  "tr": "ana taʿbaana awi",
+  "en": "I feel really unwell (f)"
+ },
+ {
   "id": "dr_temp",
   "level": 41,
   "type": "sentence",
@@ -3520,6 +4056,14 @@
   "en": "I feel dizzy (m)"
  },
  {
+  "id": "dr_dizzy_f",
+  "level": 41,
+  "type": "sentence",
+  "ar": "حاسة بدوخة",
+  "tr": "Hassa be-dookha",
+  "en": "I feel dizzy (f)"
+ },
+ {
   "id": "dr_sincewhen",
   "level": 41,
   "type": "phrase",
@@ -3534,6 +4078,14 @@
   "ar": "محتاج راحة",
   "tr": "meHtaag raaHa",
   "en": "I need rest (m)"
+ },
+ {
+  "id": "dr_needrest_f",
+  "level": 41,
+  "type": "sentence",
+  "ar": "محتاجة راحة",
+  "tr": "meHtaaga raaHa",
+  "en": "I need rest (f)"
  },
  {
   "id": "dr_allergy",
@@ -3600,6 +4152,14 @@
   "en": "I want to rent an apartment (m)"
  },
  {
+  "id": "rent_want_f",
+  "level": 42,
+  "type": "sentence",
+  "ar": "عايزة أأجر شقة",
+  "tr": "ʿayza aʾaggar shaʾʾa",
+  "en": "I want to rent an apartment (f)"
+ },
+ {
   "id": "rent_rooms",
   "level": 42,
   "type": "sentence",
@@ -3664,6 +4224,14 @@
   "en": "I love you (to a man)"
  },
  {
+  "id": "fr_loveyou_f",
+  "level": 43,
+  "type": "sentence",
+  "ar": "بحبِك",
+  "tr": "baHebbik",
+  "en": "I love you (to a woman)"
+ },
+ {
   "id": "fr_missyou",
   "level": 43,
   "type": "sentence",
@@ -3678,6 +4246,14 @@
   "ar": "بفتكرك",
   "tr": "baftekrak",
   "en": "I think about you (to a man)"
+ },
+ {
+  "id": "fr_thinkofyou_f",
+  "level": 43,
+  "type": "sentence",
+  "ar": "بفتكرِك",
+  "tr": "baftekrik",
+  "en": "I think about you (to a woman)"
  },
  {
   "id": "fr_upsetwith",
@@ -3696,12 +4272,28 @@
   "en": "Annoyed / upset (m)"
  },
  {
+  "id": "fr_annoyed_f",
+  "level": 43,
+  "type": "word",
+  "ar": "متضايقة",
+  "tr": "metDayʾa",
+  "en": "Annoyed / upset (f)"
+ },
+ {
   "id": "fr_happywith",
   "level": 43,
   "type": "sentence",
   "ar": "مبسوط معاك",
   "tr": "mabsoot maʿaak",
   "en": "I'm happy with you (m)"
+ },
+ {
+  "id": "fr_happywith_f",
+  "level": 43,
+  "type": "sentence",
+  "ar": "مبسوطة معاكي",
+  "tr": "mabsoota maʿaaki",
+  "en": "I'm happy with you (f)"
  },
  {
   "id": "fr_worried",
@@ -3712,12 +4304,28 @@
   "en": "I'm worried about you (m)"
  },
  {
+  "id": "fr_worried_f",
+  "level": 43,
+  "type": "sentence",
+  "ar": "خايفة عليكي",
+  "tr": "khayfa ʿaleeki",
+  "en": "I'm worried about you (f)"
+ },
+ {
   "id": "fr_important",
   "level": 43,
   "type": "sentence",
   "ar": "إنت مهم بالنسبة لي",
   "tr": "enta mohem belnesbaali",
   "en": "You're important to me (m)"
+ },
+ {
+  "id": "fr_important_f",
+  "level": 43,
+  "type": "sentence",
+  "ar": "إنتي مهمة بالنسبة لي",
+  "tr": "enti mohemma belnesbaali",
+  "en": "You're important to me (f)"
  },
  {
   "id": "fr_relationship",
@@ -3744,12 +4352,28 @@
   "en": "Forgive me (to a man)"
  },
  {
+  "id": "fr_forgiveme_f",
+  "level": 43,
+  "type": "sentence",
+  "ar": "سامحيني",
+  "tr": "samHiini",
+  "en": "Forgive me (to a woman)"
+ },
+ {
   "id": "fr_thankseverything",
   "level": 43,
   "type": "sentence",
   "ar": "متشكر على كل حاجة",
   "tr": "meteshakker ʿala kollo Haaga",
   "en": "Thanks for everything (m)"
+ },
+ {
+  "id": "fr_thankseverything_f",
+  "level": 43,
+  "type": "sentence",
+  "ar": "متشكرة على كل حاجة",
+  "tr": "meteshakkera ʿala kollo Haaga",
+  "en": "Thanks for everything (f)"
  },
  {
   "id": "fam_grandpa",
@@ -4992,6 +5616,14 @@
   "en": "Happy holidays! (to a man)"
  },
  {
+  "id": "hol_manyhappy_f",
+  "level": 56,
+  "type": "sentence",
+  "ar": "كل سنة وإنتي طيبة",
+  "tr": "koll sana wenti Tayyeba",
+  "en": "Happy holidays! (to a woman)"
+ },
+ {
   "id": "sl_normal",
   "level": 57,
   "type": "word",
@@ -5022,6 +5654,14 @@
   "ar": "قصدك إيه",
   "tr": "ʾaSdak eh",
   "en": "What do you mean? (m)"
+ },
+ {
+  "id": "sl_whatmean_f",
+  "level": 57,
+  "type": "sentence",
+  "ar": "قصدِك إيه",
+  "tr": "ʾaSdik eh",
+  "en": "What do you mean? (f)"
  },
  {
   "id": "sl_honestly",
@@ -5070,6 +5710,14 @@
   "ar": "معاك حق",
   "tr": "maʿaak Haʾʾ",
   "en": "You're right (m)"
+ },
+ {
+  "id": "sl_youreright_f",
+  "level": 57,
+  "type": "sentence",
+  "ar": "معاكي حق",
+  "tr": "maʿaaki Haʾʾ",
+  "en": "You're right (f)"
  },
  {
   "id": "sl_ihope",
@@ -5184,12 +5832,28 @@
   "en": "Kind (m)"
  },
  {
+  "id": "per_kind_f",
+  "level": 59,
+  "type": "word",
+  "ar": "طيبة",
+  "tr": "Tayyeba",
+  "en": "Kind (f)"
+ },
+ {
   "id": "per_generous",
   "level": 59,
   "type": "word",
   "ar": "كريم",
   "tr": "kariim",
   "en": "Generous (m)"
+ },
+ {
+  "id": "per_generous_f",
+  "level": 59,
+  "type": "word",
+  "ar": "كريمة",
+  "tr": "kariima",
+  "en": "Generous (f)"
  },
  {
   "id": "per_stingy",
@@ -5200,12 +5864,28 @@
   "en": "Stingy (m)"
  },
  {
+  "id": "per_stingy_f",
+  "level": 59,
+  "type": "word",
+  "ar": "بخيلة",
+  "tr": "bakhiila",
+  "en": "Stingy (f)"
+ },
+ {
   "id": "per_patient",
   "level": 59,
   "type": "word",
   "ar": "صبور",
   "tr": "Saboor",
   "en": "Patient (m)"
+ },
+ {
+  "id": "per_patient_f",
+  "level": 59,
+  "type": "word",
+  "ar": "صبورة",
+  "tr": "Saboora",
+  "en": "Patient (f)"
  },
  {
   "id": "per_temper",
@@ -5216,12 +5896,28 @@
   "en": "Short-tempered (m)"
  },
  {
+  "id": "per_temper_f",
+  "level": 59,
+  "type": "word",
+  "ar": "عصبية",
+  "tr": "ʿaSabeyya",
+  "en": "Short-tempered (f)"
+ },
+ {
   "id": "per_calm",
   "level": 59,
   "type": "word",
   "ar": "هادي",
   "tr": "haadi",
   "en": "Calm (m)"
+ },
+ {
+  "id": "per_calm_f",
+  "level": 59,
+  "type": "word",
+  "ar": "هادية",
+  "tr": "hadya",
+  "en": "Calm (f)"
  },
  {
   "id": "per_honest",
@@ -5232,12 +5928,28 @@
   "en": "Honest (m)"
  },
  {
+  "id": "per_honest_f",
+  "level": 59,
+  "type": "word",
+  "ar": "أمينة",
+  "tr": "amiina",
+  "en": "Honest (f)"
+ },
+ {
   "id": "per_brave",
   "level": 59,
   "type": "word",
   "ar": "شجاع",
   "tr": "shogaaʿ",
   "en": "Brave (m)"
+ },
+ {
+  "id": "per_brave_f",
+  "level": 59,
+  "type": "word",
+  "ar": "شجاعة",
+  "tr": "shogaaʿa",
+  "en": "Brave (f)"
  },
  {
   "id": "per_shy",
@@ -5248,12 +5960,28 @@
   "en": "Shy (m)"
  },
  {
+  "id": "per_shy_f",
+  "level": 59,
+  "type": "word",
+  "ar": "خجولة",
+  "tr": "khagoola",
+  "en": "Shy (f)"
+ },
+ {
   "id": "per_stubborn",
   "level": 59,
   "type": "word",
   "ar": "عنيد",
   "tr": "ʿaniid",
   "en": "Stubborn (m)"
+ },
+ {
+  "id": "per_stubborn_f",
+  "level": 59,
+  "type": "word",
+  "ar": "عنيدة",
+  "tr": "ʿaniida",
+  "en": "Stubborn (f)"
  },
  {
   "id": "per_smart",
@@ -5264,12 +5992,28 @@
   "en": "Smart (m)"
  },
  {
+  "id": "per_smart_f",
+  "level": 59,
+  "type": "word",
+  "ar": "ذكية",
+  "tr": "zakeyya",
+  "en": "Smart (f)"
+ },
+ {
   "id": "per_funny",
   "level": 59,
   "type": "word",
   "ar": "ظريف",
   "tr": "ZariiF",
   "en": "Funny / pleasant (m)"
+ },
+ {
+  "id": "per_funny_f",
+  "level": 59,
+  "type": "word",
+  "ar": "ظريفة",
+  "tr": "Zariifa",
+  "en": "Funny / pleasant (f)"
  },
  {
   "id": "emo_happy",
@@ -5280,12 +6024,28 @@
   "en": "Happy (m)"
  },
  {
+  "id": "emo_happy_f",
+  "level": 60,
+  "type": "word",
+  "ar": "سعيدة",
+  "tr": "saʿiida",
+  "en": "Happy (f)"
+ },
+ {
   "id": "emo_sad",
   "level": 60,
   "type": "word",
   "ar": "حزين",
   "tr": "Haziin",
   "en": "Sad (m)"
+ },
+ {
+  "id": "emo_sad_f",
+  "level": 60,
+  "type": "word",
+  "ar": "حزينة",
+  "tr": "Haziina",
+  "en": "Sad (f)"
  },
  {
   "id": "emo_angry",
@@ -5296,12 +6056,28 @@
   "en": "Angry (m)"
  },
  {
+  "id": "emo_angry_f",
+  "level": 60,
+  "type": "word",
+  "ar": "غضبانة",
+  "tr": "ghaDbaana",
+  "en": "Angry (f)"
+ },
+ {
   "id": "emo_worried",
   "level": 60,
   "type": "word",
   "ar": "قلقان",
   "tr": "ʾalʾaan",
   "en": "Worried (m)"
+ },
+ {
+  "id": "emo_worried_f",
+  "level": 60,
+  "type": "word",
+  "ar": "قلقانة",
+  "tr": "ʾalʾaana",
+  "en": "Worried (f)"
  },
  {
   "id": "emo_proud",
@@ -5312,12 +6088,28 @@
   "en": "Proud (m)"
  },
  {
+  "id": "emo_proud_f",
+  "level": 60,
+  "type": "word",
+  "ar": "فخورة",
+  "tr": "fakhoora",
+  "en": "Proud (f)"
+ },
+ {
   "id": "emo_jealous",
   "level": 60,
   "type": "word",
   "ar": "غيران",
   "tr": "gheraan",
   "en": "Jealous (m)"
+ },
+ {
+  "id": "emo_jealous_f",
+  "level": 60,
+  "type": "word",
+  "ar": "غيرانة",
+  "tr": "gheraana",
+  "en": "Jealous (f)"
  },
  {
   "id": "emo_surprised",
@@ -5328,12 +6120,28 @@
   "en": "Surprised (m)"
  },
  {
+  "id": "emo_surprised_f",
+  "level": 60,
+  "type": "word",
+  "ar": "مستغربة",
+  "tr": "mestaghreba",
+  "en": "Surprised (f)"
+ },
+ {
   "id": "emo_lonely",
   "level": 60,
   "type": "word",
   "ar": "وحيد",
   "tr": "waHiid",
   "en": "Lonely (m)"
+ },
+ {
+  "id": "emo_lonely_f",
+  "level": 60,
+  "type": "word",
+  "ar": "وحيدة",
+  "tr": "waHiida",
+  "en": "Lonely (f)"
  },
  {
   "id": "emo_excited",
@@ -5344,12 +6152,28 @@
   "en": "Excited (m)"
  },
  {
+  "id": "emo_excited_f",
+  "level": 60,
+  "type": "word",
+  "ar": "متحمسة",
+  "tr": "motHammesa",
+  "en": "Excited (f)"
+ },
+ {
   "id": "emo_relaxed",
   "level": 60,
   "type": "word",
   "ar": "مرتاح",
   "tr": "mortaaH",
   "en": "Relaxed / comfortable (m)"
+ },
+ {
+  "id": "emo_relaxed_f",
+  "level": 60,
+  "type": "word",
+  "ar": "مرتاحة",
+  "tr": "mortaaHa",
+  "en": "Relaxed / comfortable (f)"
  },
  {
   "id": "emo_embarrassed",
@@ -5360,12 +6184,28 @@
   "en": "Embarrassed (m)"
  },
  {
+  "id": "emo_embarrassed_f",
+  "level": 60,
+  "type": "word",
+  "ar": "خجلانة",
+  "tr": "khaglaana",
+  "en": "Embarrassed (f)"
+ },
+ {
   "id": "emo_optimistic",
   "level": 60,
   "type": "word",
   "ar": "متفائل",
   "tr": "motafaael",
   "en": "Optimistic (m)"
+ },
+ {
+  "id": "emo_optimistic_f",
+  "level": 60,
+  "type": "word",
+  "ar": "متفائلة",
+  "tr": "motafaaela",
+  "en": "Optimistic (f)"
  },
  {
   "id": "bank_account",
@@ -5752,6 +6592,14 @@
   "en": "God bless you (m)"
  },
  {
+  "id": "faith_bless_f",
+  "level": 65,
+  "type": "phrase",
+  "ar": "ربنا يبارك فيكي",
+  "tr": "rabbena yebaarek fiiki",
+  "en": "God bless you (f)"
+ },
+ {
   "id": "faith_welcomeback",
   "level": 65,
   "type": "sentence",
@@ -6064,6 +6912,14 @@
   "en": "None of your business (m)"
  },
  {
+  "id": "idiom_none_f",
+  "level": 69,
+  "type": "sentence",
+  "ar": "مالكيش دعوة",
+  "tr": "malkiish daʿwa",
+  "en": "None of your business (f)"
+ },
+ {
   "id": "idiom_gladly",
   "level": 69,
   "type": "phrase",
@@ -6086,6 +6942,14 @@
   "ar": "خلي بالك من نفسك",
   "tr": "khalli baalak men nafsak",
   "en": "Take care of yourself (m)"
+ },
+ {
+  "id": "idiom_takecare_f",
+  "level": 69,
+  "type": "sentence",
+  "ar": "خلي بالِك من نفسِك",
+  "tr": "khalli baalik men nafsik",
+  "en": "Take care of yourself (f)"
  },
  {
   "id": "idiom_nouse",
@@ -6118,6 +6982,14 @@
   "ar": "ربنا يكرمك",
   "tr": "rabbena yekremak",
   "en": "May God bless you (m)"
+ },
+ {
+  "id": "idiom_blessyou_f",
+  "level": 69,
+  "type": "phrase",
+  "ar": "ربنا يكرمِك",
+  "tr": "rabbena yekremik",
+  "en": "May God bless you (f)"
  },
  {
   "id": "end_habibi",
@@ -6184,12 +7056,28 @@
   "en": "Handsome / lovely (to m)"
  },
  {
+  "id": "end_yagamil_f",
+  "level": 70,
+  "type": "phrase",
+  "ar": "يا جميلة",
+  "tr": "ya gamiila",
+  "en": "Beautiful / lovely (to f)"
+ },
+ {
   "id": "end_yahelw",
   "level": 70,
   "type": "phrase",
   "ar": "يا حلو",
   "tr": "ya Helw",
   "en": "Cutie (to m)"
+ },
+ {
+  "id": "end_yahelw_f",
+  "level": 70,
+  "type": "phrase",
+  "ar": "يا حلوة",
+  "tr": "ya Helwa",
+  "en": "Cutie (to f)"
  },
  {
   "id": "end_yaasal",
@@ -6416,6 +7304,14 @@
   "en": "How are you? / what's up? (m)"
  },
  {
+  "id": "catch_akhbarak_f",
+  "level": 73,
+  "type": "phrase",
+  "ar": "أخبارِك إيه",
+  "tr": "akhbaarik eh",
+  "en": "How are you? / what's up? (f)"
+ },
+ {
   "id": "catch_elakhbar",
   "level": 73,
   "type": "phrase",
@@ -6456,12 +7352,28 @@
   "en": "You lit up the place! (welcome, m)"
  },
  {
+  "id": "catch_nawwart_f",
+  "level": 73,
+  "type": "word",
+  "ar": "نورتي",
+  "tr": "nawwarti",
+  "en": "You lit up the place! (welcome, f)"
+ },
+ {
   "id": "catch_ahlanbik",
   "level": 73,
   "type": "phrase",
   "ar": "أهلا بيك",
   "tr": "aHlan biik",
   "en": "Welcome! (to m)"
+ },
+ {
+  "id": "catch_ahlanbik_f",
+  "level": 73,
+  "type": "phrase",
+  "ar": "أهلا بيكي",
+  "tr": "ahlan biiki",
+  "en": "Welcome! (to f)"
  },
  {
   "id": "catch_seha",
@@ -6472,12 +7384,28 @@
   "en": "How's your health? (m)"
  },
  {
+  "id": "catch_seha_f",
+  "level": 73,
+  "type": "phrase",
+  "ar": "إزاي صحتِك",
+  "tr": "ezzay SeHetik",
+  "en": "How's your health? (f)"
+ },
+ {
   "id": "catch_anakwayyes",
   "level": 73,
   "type": "phrase",
   "ar": "أنا كويس",
   "tr": "ana kwayyes",
   "en": "I'm good (m)"
+ },
+ {
+  "id": "catch_anakwayyes_f",
+  "level": 73,
+  "type": "phrase",
+  "ar": "أنا كويسة",
+  "tr": "ana kwayyesa",
+  "en": "I'm good (f)"
  },
  {
   "id": "catch_tamamhamd",
@@ -6496,6 +7424,14 @@
   "en": "And you? (to m)"
  },
  {
+  "id": "catch_wenta_f",
+  "level": 73,
+  "type": "word",
+  "ar": "وإنتي",
+  "tr": "wenti",
+  "en": "And you? (to f)"
+ },
+ {
   "id": "catch_kollfoll",
   "level": 73,
   "type": "sentence",
@@ -6512,6 +7448,14 @@
   "en": "You're everything (to m)"
  },
  {
+  "id": "love_entakoll_f",
+  "level": 74,
+  "type": "sentence",
+  "ar": "إنتي كل حاجة",
+  "tr": "enti kollo Haaga",
+  "en": "You're everything (to f)"
+ },
+ {
   "id": "love_bahebbakawi",
   "level": 74,
   "type": "phrase",
@@ -6520,12 +7464,28 @@
   "en": "I love you so much (m)"
  },
  {
+  "id": "love_bahebbakawi_f",
+  "level": 74,
+  "type": "phrase",
+  "ar": "بحبِك أوي",
+  "tr": "baHebbik awi",
+  "en": "I love you so much (f)"
+ },
+ {
   "id": "love_bafakkar",
   "level": 74,
   "type": "phrase",
   "ar": "بفكر فيك",
   "tr": "bafakkar fiik",
   "en": "I think about you (m)"
+ },
+ {
+  "id": "love_bafakkar_f",
+  "level": 74,
+  "type": "phrase",
+  "ar": "بفكر فيكي",
+  "tr": "bafakkar fiiki",
+  "en": "I think about you (f)"
  },
  {
   "id": "love_entigamila",
@@ -6544,12 +7504,28 @@
   "en": "I'm crazy about you (m)"
  },
  {
+  "id": "love_bamootfik_f",
+  "level": 74,
+  "type": "phrase",
+  "ar": "بموت فيكي",
+  "tr": "bamoot fiiki",
+  "en": "I'm crazy about you (f)"
+ },
+ {
   "id": "love_albimaak",
   "level": 74,
   "type": "phrase",
   "ar": "قلبي معاك",
   "tr": "ʾalbi maʿaak",
   "en": "My heart is with you (m)"
+ },
+ {
+  "id": "love_albimaak_f",
+  "level": 74,
+  "type": "phrase",
+  "ar": "قلبي معاكي",
+  "tr": "ʾalbi maʿaaki",
+  "en": "My heart is with you (f)"
  },
  {
   "id": "love_atgawwez",
@@ -6568,6 +7544,14 @@
   "en": "I long to see you (to m)"
  },
  {
+  "id": "love_nefsiashoofak_f",
+  "level": 74,
+  "type": "sentence",
+  "ar": "نفسي أشوفِك",
+  "tr": "nefsi ashoofik",
+  "en": "I long to see you (to f)"
+ },
+ {
   "id": "love_weheshtniawi",
   "level": 74,
   "type": "phrase",
@@ -6584,12 +7568,28 @@
   "en": "I want to see you (to m)"
  },
  {
+  "id": "love_ayezashoofak_f",
+  "level": 74,
+  "type": "sentence",
+  "ar": "عايز أشوفِك",
+  "tr": "ʿaayez ashoofik",
+  "en": "I want to see you (to f)"
+ },
+ {
   "id": "ph_mestanni",
   "level": 75,
   "type": "word",
   "ar": "مستني",
   "tr": "mestanni",
   "en": "Waiting (m)"
+ },
+ {
+  "id": "ph_mestanni_f",
+  "level": 75,
+  "type": "word",
+  "ar": "مستنية",
+  "tr": "mestanneyya",
+  "en": "Waiting (f)"
  },
  {
   "id": "ph_mafishwat",
@@ -6608,6 +7608,14 @@
   "en": "In a hurry (m)"
  },
  {
+  "id": "ph_mestaagel_f",
+  "level": 75,
+  "type": "word",
+  "ar": "مستعجلة",
+  "tr": "mestaʿgela",
+  "en": "In a hurry (f)"
+ },
+ {
   "id": "ph_estannashwaya",
   "level": 75,
   "type": "phrase",
@@ -6624,6 +7632,14 @@
   "en": "I'm coming (m)"
  },
  {
+  "id": "ph_anagay_f",
+  "level": 75,
+  "type": "phrase",
+  "ar": "أنا جاية",
+  "tr": "ana gayya",
+  "en": "I'm coming (f)"
+ },
+ {
   "id": "ph_khallenifakkar",
   "level": 75,
   "type": "phrase",
@@ -6638,6 +7654,14 @@
   "ar": "مش فاضي",
   "tr": "mish faaDi",
   "en": "I'm busy / not free (m)"
+ },
+ {
+  "id": "ph_mishfadi_f",
+  "level": 75,
+  "type": "phrase",
+  "ar": "مش فاضية",
+  "tr": "mish faDya",
+  "en": "I'm busy / not free (f)"
  },
  {
   "id": "ph_wesselt",
@@ -6688,6 +7712,14 @@
   "en": "As you wish (m)"
  },
  {
+  "id": "agr_zayenta_f",
+  "level": 76,
+  "type": "sentence",
+  "ar": "زي ما إنتي عايزة",
+  "tr": "zayy ma enti ʿayza",
+  "en": "As you wish (f)"
+ },
+ {
   "id": "agr_alarasi",
   "level": 76,
   "type": "phrase",
@@ -6736,12 +7768,28 @@
   "en": "I agree (m)"
  },
  {
+  "id": "agr_anamowafe_f",
+  "level": 76,
+  "type": "phrase",
+  "ar": "أنا موافقة",
+  "tr": "ana mowafʾa",
+  "en": "I agree (f)"
+ },
+ {
   "id": "agr_mishmehtemm",
   "level": 76,
   "type": "phrase",
   "ar": "مش مهتم",
   "tr": "mish mehtemm",
   "en": "I'm not interested (m)"
+ },
+ {
+  "id": "agr_mishmehtemm_f",
+  "level": 76,
+  "type": "phrase",
+  "ar": "مش مهتمة",
+  "tr": "mish mehtemma",
+  "en": "I'm not interested (f)"
  },
  {
   "id": "agr_maashitamam",
@@ -6832,6 +7880,14 @@
   "en": "Lucky you (m)"
  },
  {
+  "id": "excl_yabakhtak_f",
+  "level": 77,
+  "type": "phrase",
+  "ar": "يا بختِك",
+  "tr": "ya bakhtik",
+  "en": "Lucky you (f)"
+ },
+ {
   "id": "excl_sobhan",
   "level": 77,
   "type": "phrase",
@@ -6848,12 +7904,28 @@
   "en": "You have great taste (m)"
  },
  {
+  "id": "comp_zooaak_f",
+  "level": 78,
+  "type": "phrase",
+  "ar": "ذوقِك عالي",
+  "tr": "zooʾik ʿaali",
+  "en": "You have great taste (f)"
+ },
+ {
   "id": "comp_oobaalak",
   "level": 78,
   "type": "word",
   "ar": "عقبالك",
   "tr": "ʿoʾbaalak",
   "en": "May you be next! (good wishes, m)"
+ },
+ {
+  "id": "comp_oobaalak_f",
+  "level": 78,
+  "type": "word",
+  "ar": "عقبالِك",
+  "tr": "ʿoʾbaalik",
+  "en": "May you be next! (good wishes, f)"
  },
  {
   "id": "comp_alfmabrook",
@@ -6872,6 +7944,14 @@
   "en": "You're well-mannered (m)"
  },
  {
+  "id": "comp_akhlaak_f",
+  "level": 78,
+  "type": "phrase",
+  "ar": "أخلاقِك حلوة",
+  "tr": "akhlaaʾik Helwa",
+  "en": "You're well-mannered (f)"
+ },
+ {
   "id": "comp_teslamidak",
   "level": 78,
   "type": "phrase",
@@ -6880,12 +7960,28 @@
   "en": "Bless your hands (thanks, m)"
  },
  {
+  "id": "comp_teslamidak_f",
+  "level": 78,
+  "type": "phrase",
+  "ar": "تسلم إيدِك",
+  "tr": "teslam iidik",
+  "en": "Bless your hands (thanks, f)"
+ },
+ {
   "id": "comp_kotrkheir",
   "level": 78,
   "type": "phrase",
   "ar": "كتر خيرك",
   "tr": "kotr kheirak",
   "en": "Thank you / bless you (m)"
+ },
+ {
+  "id": "comp_kotrkheir_f",
+  "level": 78,
+  "type": "phrase",
+  "ar": "كتر خيرِك",
+  "tr": "kotr kheirik",
+  "en": "Thank you / bless you (f)"
  },
  {
   "id": "comp_gadaa",
@@ -6912,6 +8008,14 @@
   "en": "Bless you / thanks (m)"
  },
  {
+  "id": "comp_teslam_f",
+  "level": 78,
+  "type": "word",
+  "ar": "تسلمي",
+  "tr": "teslami",
+  "en": "Bless you / thanks (f)"
+ },
+ {
   "id": "comp_testahel",
   "level": 78,
   "type": "word",
@@ -6920,12 +8024,28 @@
   "en": "You deserve it (m)"
  },
  {
+  "id": "comp_testahel_f",
+  "level": 78,
+  "type": "word",
+  "ar": "تستاهلي",
+  "tr": "testahli",
+  "en": "You deserve it (f)"
+ },
+ {
   "id": "cmd_sibni",
   "level": 79,
   "type": "word",
   "ar": "سيبني",
   "tr": "sibni",
   "en": "Leave me / let me be (m)"
+ },
+ {
+  "id": "cmd_sibni_f",
+  "level": 79,
+  "type": "word",
+  "ar": "سيبيني",
+  "tr": "sibiini",
+  "en": "Leave me / let me be (f)"
  },
  {
   "id": "cmd_khallena",
@@ -6942,6 +8062,14 @@
   "ar": "أنا رايح",
   "tr": "ana raayeH",
   "en": "I'm going (m)"
+ },
+ {
+  "id": "cmd_anarayeh_f",
+  "level": 79,
+  "type": "phrase",
+  "ar": "أنا رايحة",
+  "tr": "ana rayHa",
+  "en": "I'm going (f)"
  },
  {
   "id": "cmd_emshi",
@@ -6976,6 +8104,14 @@
   "en": "Look / see (m)"
  },
  {
+  "id": "cmd_shoof_f",
+  "level": 79,
+  "type": "word",
+  "ar": "شوفي",
+  "tr": "shoofi",
+  "en": "Look / see (f)"
+ },
+ {
   "id": "cmd_esmaa",
   "level": 79,
   "type": "word",
@@ -6984,12 +8120,28 @@
   "en": "Listen (m)"
  },
  {
+  "id": "cmd_esmaa_f",
+  "level": 79,
+  "type": "word",
+  "ar": "اسمعي",
+  "tr": "esmaʿi",
+  "en": "Listen (f)"
+ },
+ {
   "id": "cmd_olli",
   "level": 79,
   "type": "phrase",
   "ar": "قول لي",
   "tr": "ʾolli",
   "en": "Tell me (m)"
+ },
+ {
+  "id": "cmd_olli_f",
+  "level": 79,
+  "type": "phrase",
+  "ar": "قولي لي",
+  "tr": "ʾoliili",
+  "en": "Tell me (f)"
  },
  {
   "id": "cmd_balash",
@@ -7008,11 +8160,27 @@
   "en": "Get up / come on (m)"
  },
  {
+  "id": "cmd_oom_f",
+  "level": 79,
+  "type": "word",
+  "ar": "قومي",
+  "tr": "ʾoomi",
+  "en": "Get up / come on (f)"
+ },
+ {
   "id": "cmd_boss",
   "level": 79,
   "type": "word",
   "ar": "بص",
   "tr": "boSS",
   "en": "Look (m)"
+ },
+ {
+  "id": "cmd_boss_f",
+  "level": 79,
+  "type": "word",
+  "ar": "بصي",
+  "tr": "boSSi",
+  "en": "Look (f)"
  }
 ]

@@ -10,8 +10,14 @@ home screen.
 ## Features
 
 ### Vocabulary (WaniKani-style)
-- **878 items across 79 levels** — words, phrases, and full sentences, grouped by
-  theme and difficulty (greetings → grammar → daily life → dialogues → slang).
+- **1,024 items across 79 levels** — words, phrases, and full sentences, grouped by
+  theme and difficulty (greetings → grammar → daily life → dialogues → slang), with
+  **male and female forms side by side**: every gendered word, phrase, and sentence
+  (adjectives, commands, questions, endearments) appears in both forms, the feminine
+  directly after the masculine, so you always learn and compare the pair together
+  (taʿbaan/taʿbaana, rooH/rooHi, esmak eh/esmik eh…). Where the two forms are spelled
+  identically in bare script, the feminine carries a small vowel mark (عندَك → عندِك)
+  so you can see and hear the difference.
 - **Instant level unlock** — the next level opens the moment you've **learned every
   item** in your current level (no need to master them first). Learn the last word of
   a level and its successor is immediately available in Lessons.
@@ -197,13 +203,13 @@ home screen.
 
 ---
 
-*Last updated (v1.4.2 · 7/25/2026, 3:05 PM Manila): the Items list now marks every
-word that has **recorded Egyptian audio with a 🎙 symbol** (also shown on the word's
-detail page), driven by an `audio_manifest.json` that `split_audio.py` writes
-automatically on every run — so the marks always match the audio folder. The
-manifest also lets the app skip lookups for words it knows have no recording yet.*
+*Last updated (v1.5.0 · 7/25/2026, 4:30 PM Manila): **146 feminine forms added** —
+every gendered item now exists in both masculine and feminine, placed side by side
+(878 → 1,024 items). Existing progress, custom quizzes, and audio are untouched; the
+new words get audio via five new batch files (batch_26–30) using the same routine.*
 
-*Earlier (v1.4.1): footer shows the live latest-push date alongside the app version.*
+*Earlier (v1.4.2): 🎙 marks on words with recorded audio, via an auto-generated
+audio manifest.*
 
 *Earlier (v1.4.0): recorded-audio support (`audio/<id>.mp3` with automatic fallback),
 word list exports, and audio-generation tooling.*
