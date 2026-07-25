@@ -197,12 +197,13 @@ home screen.
 
 ---
 
-*Last updated (v1.4.0 · 7/25/2026, 12:30 AM Manila): **recorded Egyptian audio** —
-the app now plays real Egyptian recordings from an `audio/` folder (`<word id>.mp3`)
-whenever they exist, with automatic fallback to the speech engine, plus a settings
-toggle. Ships `words.csv` / `words.json` (the full word list with ids) and
-`generate_audio.py`, a one-run script that generates all clips with Azure's genuine
-Egyptian voices — the definitive fix for iPhone, which has no Egyptian system voice.*
+*Last updated (v1.4.1 · 7/25/2026, 2:15 PM Manila): first batch of **recorded
+Egyptian audio is live** in the app. The footer now shows two dates: when the app
+code itself was updated, and — fetched live from GitHub — when anything (including
+audio batches) was last pushed, so the "last updated" info is always accurate.*
+
+*Earlier (v1.4.0): recorded-audio support (`audio/<id>.mp3` with automatic fallback),
+word list exports, and audio-generation tooling.*
 
 *Earlier (v1.3.0): Masri pronunciation engine (fully vocalized Egyptian respelling
 for speech) and an Arabic voice picker with test button.*
