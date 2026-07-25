@@ -153,6 +153,12 @@ home screen.
   and per-level progress bars.
 - **Themes** — six color themes (Rose, Violet, Bubblegum, Mint, Dark, Midnight),
   chosen at the bottom of the Home screen.
+- **Record your own voice** — on any word's detail page, tap **🎤 Record my voice**
+  to capture your own pronunciation (10 seconds max). A **▶ My voice** button then
+  sits beside the original speaker, with re-record and delete options. Words with an
+  own-voice recording show a **🎤** in the Items list. Recordings are saved with your
+  progress on the device and are **included in backup export/import**, so they travel
+  with your data to any device.
 - **Recorded Egyptian audio (best on iPhone)** — the app now plays a **real Egyptian
   recording** for any word that has one: drop MP3s named `audio/<word id>.mp3` into
   the repo (word ids are in `words.csv` / `words.json`) and every player button and
@@ -203,7 +209,11 @@ home screen.
 
 ---
 
-*Last updated (v1.5.1 · 7/25/2026): the footer's "App updated" line now shows the
+*Last updated (v1.6.0 · 7/25/2026): **record your own pronunciation** — a 🎤
+recorder on every word's detail page saves your voice beside the original audio,
+marks the word with 🎤 in Items, and rides along in backup export/import.*
+
+*Earlier (v1.5.1 · 7/25/2026): the footer's "App updated" line now shows the
 release date only — the exact time of the newest push (app or audio) comes from the
 live GitHub line beneath it, which is always accurate.*
 

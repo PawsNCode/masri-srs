@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "1.5.1";
+const APP_VERSION = "1.6.0";
 const APP_UPDATED = "7/25/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -2100,6 +2100,7 @@ async function loadState(){ try{ const v=localStorage.getItem(STORE_KEY); return
 async function saveState(state){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch{} }
 
 const DEFAULT_STATE = {
+  recordings: {},
   v: 2,
   currentLevel: 1,
   progress: {},
@@ -2493,6 +2494,91 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
   );
 }
 
+// Bridge so ItemDetail (rendered both from Items and inside quizzes) can read/save
+// the user's own recordings without threading props everywhere. Set by App each render.
+let REC_API = null;
+
+// Record-your-own-pronunciation widget: mic capture → base64 in app state, so it
+// persists locally and rides along in backup export/import automatically.
+function VoiceRecorder({ itemId }) {
+  const [rec, setRec] = useState(() => (REC_API ? REC_API.get(itemId) : null));
+  const [phase, setPhase] = useState("idle"); // idle | recording | denied
+  const mrRef = useRef(null);
+  const chunksRef = useRef([]);
+  const timerRef = useRef(null);
+
+  useEffect(() => () => { // cleanup if closed mid-recording
+    if (mrRef.current && mrRef.current.state === "recording") { try { mrRef.current.stop(); } catch {} }
+    if (timerRef.current) clearTimeout(timerRef.current);
+  }, []);
+
+  const start = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = ["audio/mp4", "audio/webm"].find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t));
+      const mr = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      mrRef.current = mr;
+      chunksRef.current = [];
+      mr.ondataavailable = (e) => { if (e.data && e.data.size) chunksRef.current.push(e.data); };
+      mr.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunksRef.current, { type: mr.mimeType || "audio/webm" });
+        const fr = new FileReader();
+        fr.onload = () => {
+          const url = fr.result;
+          if (REC_API) REC_API.save(itemId, url);
+          setRec(url);
+          setPhase("idle");
+        };
+        fr.readAsDataURL(blob);
+      };
+      mr.start();
+      setPhase("recording");
+      timerRef.current = setTimeout(() => { if (mr.state === "recording") mr.stop(); }, 10000); // 10s cap keeps storage small
+    } catch {
+      setPhase("denied");
+    }
+  };
+  const stop = () => { if (timerRef.current) clearTimeout(timerRef.current); if (mrRef.current && mrRef.current.state === "recording") mrRef.current.stop(); };
+  const play = () => {
+    try {
+      if (CURRENT_AUDIO) { try { CURRENT_AUDIO.pause(); } catch {} }
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      const a = new Audio(rec);
+      CURRENT_AUDIO = a;
+      a.play().catch(() => {});
+    } catch {}
+  };
+  const remove = () => { if (REC_API) REC_API.del(itemId); setRec(null); };
+
+  const btn = (label, onClick, solid) => (
+    <button className="tap" onClick={onClick} style={{ padding: "8px 13px", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${T.gold}`, background: solid ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : `${T.gold}12`, color: solid ? "#fff" : T.gold }}>{label}</button>
+  );
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+        {phase === "recording" ? (
+          <>
+            <span className="fade" style={{ fontSize: 12.5, color: BAD_RED, fontWeight: 700 }}>● recording…</span>
+            {btn("■ Stop & save", stop, true)}
+          </>
+        ) : rec ? (
+          <>
+            {btn("▶ My voice", play, true)}
+            {btn("● Re-record", start)}
+            {btn("🗑", remove)}
+          </>
+        ) : (
+          btn("🎤 Record my voice", start)
+        )}
+      </div>
+      {phase === "denied" && <div style={{ fontSize: 11, color: BAD_RED, textAlign: "center", marginTop: 6 }}>Microphone blocked — allow mic access for this site in your browser settings.</div>}
+      {phase === "recording" && <div style={{ fontSize: 11, color: T.textDim, textAlign: "center", marginTop: 6 }}>Say the word, then tap stop (10s max).</div>}
+    </div>
+  );
+}
+
 /* ===================== SHARED: letter breakdown, type-try, script peek, item detail ===================== */
 
 // Universal mnemonic for a word/phrase/sentence (keyword-link or chunk-and-story).
@@ -2671,6 +2757,7 @@ function ItemDetail({ item, onClose, autoPlay }) {
           {AUDIO_SET && AUDIO_SET.has(item.id) && (
             <div style={{ fontSize: 11, color: T.textDim, marginTop: 8 }}>🎙 recorded Egyptian audio</div>
           )}
+          <VoiceRecorder itemId={item.id} />
         </div>
 
         <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "20px 2px 10px" }}>How to type it · tap a letter</div>
@@ -3277,6 +3364,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
           </span>
         ))}
         <span style={{ color: T.textDim }}>🎙 recorded audio</span>
+        <span style={{ color: T.textDim }}>🎤 my voice</span>
         <span style={{ color: T.textDim, marginLeft: "auto" }}>★ adds to custom quiz</span>
       </div>
 
@@ -3297,7 +3385,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
               <Speaker text={it.ar} size={14} color={T.terra} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, color: T.text }}>{it.en}</div>
-                <div style={{ fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}{audioIds && audioIds.has(it.id) && <span title="Recorded Egyptian audio (speechgen)" style={{ fontStyle: "normal", marginLeft: 5 }}>🎙</span>}</div>
+                <div style={{ fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}{audioIds && audioIds.has(it.id) && <span title="Recorded Egyptian audio (speechgen)" style={{ fontStyle: "normal", marginLeft: 5 }}>🎙</span>}{state.recordings && state.recordings[it.id] && <span title="My own recording" style={{ fontStyle: "normal", marginLeft: 5 }}>🎤</span>}</div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
                 <div style={{ fontSize: 10, color: b.c, border: `1px solid ${b.c}55`, borderRadius: 7, padding: "2px 7px", fontWeight: 700, whiteSpace: "nowrap" }}>{b.t}</div>
@@ -3600,6 +3688,13 @@ function App() {
 
   const persist = useCallback((next) => { setState(next); saveState(next); }, []);
   const allItems = useMemo(() => [...ITEMS, ...((state && state.custom) || [])], [state]);
+
+  // Own-voice recordings live in state → saved locally and included in backup export/import.
+  REC_API = {
+    get: (id) => (stateRef.current && stateRef.current.recordings ? stateRef.current.recordings[id] || null : null),
+    save: (id, url) => { const s = stateRef.current; persist({ ...s, recordings: { ...(s.recordings || {}), [id]: url } }); },
+    del: (id) => { const s = stateRef.current; const r = { ...(s.recordings || {}) }; delete r[id]; persist({ ...s, recordings: r }); },
+  };
 
   // Keep the speech engine in sync with settings, and cover user-added cards too.
   useEffect(() => {
