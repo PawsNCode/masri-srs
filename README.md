@@ -203,7 +203,11 @@ home screen.
 
 ---
 
-*Last updated (v1.5.0 · 7/25/2026, 4:30 PM Manila): **146 feminine forms added** —
+*Last updated (v1.5.1 · 7/25/2026): the footer's "App updated" line now shows the
+release date only — the exact time of the newest push (app or audio) comes from the
+live GitHub line beneath it, which is always accurate.*
+
+*Earlier today (v1.5.0 · 7/25/2026): **146 feminine forms added** —
 every gendered item now exists in both masculine and feminine, placed side by side
 (878 → 1,024 items). Existing progress, custom quizzes, and audio are untouched; the
 new words get audio via five new batch files (batch_26–30) using the same routine.*
