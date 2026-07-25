@@ -108,8 +108,12 @@ def main():
             failed += 1
             print(f"SKIPPED — {result}")
     total_files = len(list(AUDIO.glob("*.mp3")))
+    # Write the manifest the app uses to mark words that have recorded audio (🎙).
+    ids = sorted(p.stem for p in AUDIO.glob("*.mp3"))
+    (HERE / "audio_manifest.json").write_text(json.dumps(ids), encoding="utf-8")
     print(f"\nBatches split now: {done} · already done: {skipped} · not downloaded yet: {missing} · failed: {failed}")
-    print(f"audio/ now contains {total_files} word files. Push anytime — the app uses whatever exists.")
+    print(f"audio/ now contains {total_files} word files. audio_manifest.json updated ({len(ids)} entries).")
+    print("Push anytime — the app uses whatever exists.")
 
 if __name__ == "__main__":
     main()

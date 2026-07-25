@@ -197,10 +197,13 @@ home screen.
 
 ---
 
-*Last updated (v1.4.1 · 7/25/2026, 2:15 PM Manila): first batch of **recorded
-Egyptian audio is live** in the app. The footer now shows two dates: when the app
-code itself was updated, and — fetched live from GitHub — when anything (including
-audio batches) was last pushed, so the "last updated" info is always accurate.*
+*Last updated (v1.4.2 · 7/25/2026, 3:05 PM Manila): the Items list now marks every
+word that has **recorded Egyptian audio with a 🎙 symbol** (also shown on the word's
+detail page), driven by an `audio_manifest.json` that `split_audio.py` writes
+automatically on every run — so the marks always match the audio folder. The
+manifest also lets the app skip lookups for words it knows have no recording yet.*
+
+*Earlier (v1.4.1): footer shows the live latest-push date alongside the app version.*
 
 *Earlier (v1.4.0): recorded-audio support (`audio/<id>.mp3` with automatic fallback),
 word list exports, and audio-generation tooling.*

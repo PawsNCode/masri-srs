@@ -31,8 +31,8 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "1.4.1";
-const APP_UPDATED = "7/25/2026, 2:15:00 PM";
+const APP_VERSION = "1.4.2";
+const APP_UPDATED = "7/25/2026, 3:05:00 PM";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
 // makes the home-screen shortcut go stale). Progress lives in localStorage,
@@ -223,9 +223,11 @@ const SPEECH_PREFS = { phonetic: true, voiceURI: null, recorded: true }; // sync
 const AUDIO_BASE = "audio/";
 let AUDIO_ID_BY_AR = {}; // dictionary spelling → item id (built after ITEMS)
 const AUDIO_STATUS = {}; // id → "ok" | "missing"
+let AUDIO_SET = null; // Set of ids that have a recording (from audio_manifest.json), null until loaded
 let CURRENT_AUDIO = null;
 function playRecorded(id, onFail) {
   if (AUDIO_STATUS[id] === "missing") { onFail(); return; }
+  if (AUDIO_SET && !AUDIO_SET.has(id)) { onFail(); return; } // manifest says no recording — skip the fetch
   try {
     if (CURRENT_AUDIO) { try { CURRENT_AUDIO.pause(); } catch {} CURRENT_AUDIO = null; }
     if (window.speechSynthesis) window.speechSynthesis.cancel();
@@ -2520,6 +2522,9 @@ function ItemDetail({ item, onClose, autoPlay }) {
           <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 16 }}>{item.tr}</div>
           <div style={{ fontFamily: displayFont, fontSize: 20, marginTop: 4 }}>{item.en}</div>
           <div style={{ marginTop: 14 }}><Speaker text={item.ar} size={22} color={T.gold} /></div>
+          {AUDIO_SET && AUDIO_SET.has(item.id) && (
+            <div style={{ fontSize: 11, color: T.textDim, marginTop: 8 }}>🎙 recorded Egyptian audio</div>
+          )}
         </div>
 
         <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "20px 2px 10px" }}>How to type it · tap a letter</div>
@@ -3001,7 +3006,7 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
 }
 
 /* ===================== ITEMS (browse + select-to-quiz + add) ===================== */
-function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, customItems, onToggleCustom, onStartCustom, onClearCustom, onAddByStage, onOpenDetail }) {
+function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, customItems, onToggleCustom, onStartCustom, onClearCustom, onAddByStage, audioIds, onOpenDetail }) {
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [showAdd, setShowAdd] = useState(false);
@@ -3125,6 +3130,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
             <span style={{ width: 9, height: 9, borderRadius: 3, background: t.color }} />{t.label}
           </span>
         ))}
+        <span style={{ color: T.textDim }}>🎙 recorded audio</span>
         <span style={{ color: T.textDim, marginLeft: "auto" }}>★ adds to custom quiz</span>
       </div>
 
@@ -3145,7 +3151,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
               <Speaker text={it.ar} size={14} color={T.terra} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, color: T.text }}>{it.en}</div>
-                <div style={{ fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}</div>
+                <div style={{ fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}{audioIds && audioIds.has(it.id) && <span title="Recorded Egyptian audio (speechgen)" style={{ fontStyle: "normal", marginLeft: 5 }}>🎙</span>}</div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
                 <div style={{ fontSize: 10, color: b.c, border: `1px solid ${b.c}55`, borderRadius: 7, padding: "2px 7px", fontWeight: 700, whiteSpace: "nowrap" }}>{b.t}</div>
@@ -3458,6 +3464,21 @@ function App() {
     (state.custom || []).forEach((it) => { if (it.ar && it.tr && it.tr !== "—") SPEECH_BY_AR[it.ar] = it.tr; });
   }, [state]);
 
+  // Which words have recorded audio (🎙)? Load the manifest written by split_audio.py.
+  const [audioIds, setAudioIds] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    fetch("audio_manifest.json?v=" + Date.now())
+      .then((r) => (r.ok ? r.json() : null))
+      .then((list) => {
+        if (!alive || !Array.isArray(list)) return;
+        AUDIO_SET = new Set(list);
+        setAudioIds(AUDIO_SET);
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
   const derived = useMemo(() => {
     if (!state) return null;
     const now = Date.now();
@@ -3713,7 +3734,7 @@ function App() {
         {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("items")} title="Practice" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
         {view === "script" && <ScriptView scriptState={state.script} setScript={(next) => persist({ ...state, script: next })} autoReview={scriptAuto} onAutoConsumed={() => setScriptAuto(false)} customLetters={state.customLetters || []} onCustomLetters={onCustomLetters} />}
         {view === "items" && (
-          <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onAddByStage={onAddItemsToCustom} onOpenDetail={setDetailItem} />
+          <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onAddByStage={onAddItemsToCustom} audioIds={audioIds} onOpenDetail={setDetailItem} />
         )}
         {view === "stats" && <StatsView state={state} allItems={allItems} level={state.currentLevel} streak={streak} />}
       </div>
