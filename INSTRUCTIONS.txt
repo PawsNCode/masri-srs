@@ -1,0 +1,45 @@
+MASRI SRS — FREE SPEECHGEN AUDIO KIT
+====================================
+
+What this does: gets real Egyptian audio into the app using speechgen's
+free characters — one download per batch instead of 878 downloads —
+then a script names every word file automatically.
+
+ONE-TIME SETUP
+1) Copy everything in this kit into your masri-srs repo folder
+   (the "batches" folder, batches.json, split_audio.py).
+2) Install ffmpeg (needed by the splitter):
+     Mac:      brew install ffmpeg
+     Windows:  winget install ffmpeg
+     Linux:    sudo apt install ffmpeg
+
+DAILY ROUTINE (about 2 minutes, ~1-2 batches per day on free characters)
+1) Open https://speechgen.io/en/tts-arabic-egypt/ and select the
+   Egyptian voice you like (remember it — always use the same one!).
+2) Open batches/batch_01.txt, copy ALL of it (words AND the
+   <break time="2s"/> tags — the tags create the pauses the splitter
+   needs), paste into speechgen, and generate.
+3) Download the MP3 and save it into your repo folder named exactly
+   like the text file:  batch_01.mp3
+4) Next day (or same day if free characters remain): batch_02, etc.
+   There are 25 batches in total.
+
+WHENEVER YOU'VE DOWNLOADED SOME BATCHES
+1) In your repo folder run:      python3 split_audio.py
+   It cuts each batch into word files in audio/ and verifies the count.
+   Already-done batches are skipped; failed ones are reported, never
+   half-saved.
+2) Push:
+     git add .
+     git commit -m "add recorded Egyptian audio"
+     git push
+3) Tap "Refresh to latest version" in the app. Words with audio play
+   the real recording; the rest keep the fallback voice until their
+   batch arrives.
+
+TIPS
+- Keep the SAME voice for every batch so the app sounds consistent.
+- Don't add or remove anything when pasting a batch — the word order
+  and count must match exactly.
+- If a batch fails to split, re-download it (make sure the break tags
+  were pasted) and run the script again.
