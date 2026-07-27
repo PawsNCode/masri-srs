@@ -209,7 +209,15 @@ home screen.
 
 ---
 
-*Last updated (v2.0.0 · 7/25/2026): a huge one. **Conversations** — a new
+*Last updated (v2.0.1 · 7/27/2026): **Conversations now lives inside Lessons** —
+the Lessons menu has a "🗣 Conversation lessons" card (the Home shortcut is gone).
+Each conversation category gained a **"View all items"** button that jumps straight
+to the Items list filtered to that category — every conversation line shows there
+with its mastery tier & %, sound button, ★, 🎙/🎤 marks, and tap-to-edit detail,
+exactly like vocabulary. Items also gained a **🗣 Conv filter chip** to browse all
+400 conversation lines at once.*
+
+*Earlier (v2.0.0 · 7/25/2026): a huge one. **Conversations** — a new
 always-unlocked section (Home → 🗣 Conversations) with four themed categories of 100
 real exchanges each (Greetings & Small Talk, Meeting New People, Restaurant & Café,
 Shopping & Bargaining; 400 new items, 1,024 → 1,424), learned and reviewed with the

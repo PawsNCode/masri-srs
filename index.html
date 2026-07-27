@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.0.1";
 const APP_UPDATED = "7/25/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -2810,7 +2810,7 @@ function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "
 }
 
 /* ===================== LEARN SESSION (teach N, then quiz them) ===================== */
-function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, quizType = "inapp", onQuizType, autoPlay = true }) {
+function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, onConv, quizType = "inapp", onQuizType, autoPlay = true }) {
   const [queue] = useState(() => pool.slice(0, batch));
   const [phase, setPhase] = useState("menu");
   const [i, setI] = useState(0);
@@ -2840,6 +2840,14 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
           <div style={{ fontSize: 14, fontWeight: 700 }}>✨ Quiz all learned words {learnedCount ? `(${learnedCount})` : ""}</div>
           <div style={{ fontSize: 11.5, marginTop: 2, color: T.textDim }}>{learnedCount ? "A shuffled drill over everything you've learned so far" : "Learn some words first"}</div>
         </button>
+
+        {/* Conversations */}
+        {onConv && (
+          <button className="tap" onClick={onConv} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 10, textAlign: "left", border: `1px solid ${T.gold}55`, background: `${T.gold}0d`, color: T.gold }}>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>🗣 Conversation lessons →</div>
+            <div style={{ fontSize: 11.5, marginTop: 2, color: T.textDim }}>Real exchanges by situation — greetings, meeting people, restaurant, shopping</div>
+          </button>
+        )}
 
         {/* Custom quiz */}
         <button className="tap" onClick={() => (customCount ? onCustom && onCustom() : onGotoItems && onGotoItems())} style={{ width: "100%", padding: 14, borderRadius: 13, textAlign: "left", border: `1px solid ${T.line}`, background: T.panel, color: T.text }}>
@@ -3470,7 +3478,7 @@ function HarakatQuiz({ marks, onDone, onSet, harakat = {} }) {
 /* ===================== HOME ===================== */
 // Conversation lessons hub: always-unlocked themed categories (levels ≥ CONV_START)
 // that ride the exact same SRS, mastery, audio, recording, and editing machinery.
-function ConvHub({ state, allItems, onBack, onLearn, onQuiz }) {
+function ConvHub({ state, allItems, onBack, onLearn, onQuiz, onItems }) {
   const cats = [];
   for (let l = CONV_START; l <= MAX_LEVEL; l++) {
     const items = allItems.filter((it) => it.level === l);
@@ -3481,7 +3489,7 @@ function ConvHub({ state, allItems, onBack, onLearn, onQuiz }) {
   }
   return (
     <div className="fade">
-      <button className="tap" onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "8px 14px", borderRadius: 999, border: `1px solid ${T.line}`, background: T.panel, color: T.gold, fontSize: 13, fontWeight: 700 }}>‹ Home</button>
+      <button className="tap" onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "8px 14px", borderRadius: 999, border: `1px solid ${T.line}`, background: T.panel, color: T.gold, fontSize: 13, fontWeight: 700 }}>‹ Lessons</button>
       <div style={{ fontFamily: displayFont, fontSize: 24, marginBottom: 2 }}>🗣 Conversations</div>
       <div style={{ fontSize: 12.5, color: T.textDim, marginBottom: 14, lineHeight: 1.5 }}>Real exchanges by situation — always unlocked, learned and reviewed with the same SRS as everything else.</div>
       {cats.map((c) => (
@@ -3496,6 +3504,7 @@ function ConvHub({ state, allItems, onBack, onLearn, onQuiz }) {
             <button className="tap" disabled={c.learned >= c.total} onClick={() => onLearn(c.l)} style={{ flex: 1, padding: 11, borderRadius: 11, border: "none", background: c.learned < c.total ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: c.learned < c.total ? "#fff" : T.textDim, fontWeight: 700, fontSize: 13 }}>Learn new</button>
             <button className="tap" disabled={!c.learned} onClick={() => onQuiz(c.l)} style={{ flex: 1, padding: 11, borderRadius: 11, border: `1.5px solid ${c.learned ? T.gold : T.line}`, background: c.learned ? `${T.gold}12` : "transparent", color: c.learned ? T.gold : T.textDim, fontWeight: 700, fontSize: 13 }}>Quiz learned</button>
           </div>
+          <button className="tap" onClick={() => onItems(c.l)} style={{ width: "100%", marginTop: 8, padding: 9, borderRadius: 10, border: `1px dashed ${T.line}`, background: "transparent", color: T.textDim, fontSize: 12, fontWeight: 600 }}>📋 View all {c.total} items — mastery, sound, edit</button>
         </div>
       ))}
     </div>
@@ -3605,12 +3614,7 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
         <span style={{ fontSize: 12, fontWeight: 600, opacity: 0.8 }}>{leeches > 0 ? "drill these →" : "none right now"}</span>
       </button>
 
-      <button className="tap" onClick={() => onGo("conv")} style={{ width: "100%", marginBottom: 14, padding: "13px 16px", borderRadius: 14, border: `1px solid ${T.gold}55`, background: `${T.gold}0d`, color: T.gold, fontSize: 13.5, fontWeight: 700, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span>🗣 Conversations</span>
-        <span style={{ fontSize: 12, fontWeight: 600, opacity: 0.85 }}>real exchanges by situation →</span>
-      </button>
-
-      <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+<div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
         {STAGE_GROUPS.map((g) => (
           <div key={g} style={{ flex: 1, background: T.panel, border: `1px solid ${T.line}`, borderRadius: 12, padding: "10px 4px", textAlign: "center" }}>
             <div style={{ fontSize: 18, fontWeight: 700, color: stageMeta(g === "Apprentice" ? 1 : g === "Guru" ? 5 : g === "Master" ? 7 : g === "Enlightened" ? 8 : 9).color }}>{stageCounts[g] || 0}</div>
@@ -3738,7 +3742,7 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
 }
 
 /* ===================== ITEMS (browse + select-to-quiz + add) ===================== */
-function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, customItems, onToggleCustom, onStartCustom, onClearCustom, onAddByStage, audioIds, onReorder, onOpenDetail }) {
+function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, customItems, onToggleCustom, onStartCustom, onClearCustom, onAddByStage, audioIds, onReorder, initialFilter, onOpenDetail }) {
   const [reorderMode, setReorderMode] = useState(false);
   const moveItem = (it, dir) => {
     const ids = allItems.filter((x) => x.level === it.level).map((x) => x.id);
@@ -3748,7 +3752,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
     [ids[i], ids[j]] = [ids[j], ids[i]];
     onReorder(it.level, ids);
   };
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState(initialFilter != null ? initialFilter : "all");
   const [query, setQuery] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [showStage, setShowStage] = useState(false);
@@ -3758,13 +3762,13 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
   const [tr, setTr] = useState("");
   const [en, setEn] = useState("");
   const now = Date.now();
-  const levels = ["all", ...Array.from({ length: MAX_LEVEL }, (_, k) => k + 1)];
+  const levels = ["all", "conv", ...Array.from({ length: MAX_LEVEL }, (_, k) => k + 1)];
   const raw = query.trim();
   const ql = raw.toLowerCase();
   const qar = normAr(raw);
   const qtr = normTr(raw);
   const shown = allItems.filter((it) => {
-    if (!raw) return filter === "all" || it.level === filter;
+    if (!raw) return filter === "all" || (filter === "conv" ? it.level >= CONV_START : it.level === filter);
     const enHit = it.en.toLowerCase().includes(ql);
     const trHit = qtr.length > 0 && (normTr(it.tr).includes(qtr) || (it.alts || []).some((a) => normTr(a).includes(qtr)));
     const arHit = qar.length > 0 && (normAr(it.ar).includes(qar) || (it.alts || []).some((a) => normAr(a).includes(qar)));
@@ -3813,7 +3817,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
       ) : (
         <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8, marginBottom: 4 }}>
           {levels.map((l) => (
-            <button key={l} className="tap" onClick={() => setFilter(l)} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === l ? T.gold : T.line}`, background: filter === l ? `${T.gold}18` : "transparent", color: filter === l ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>{l === "all" ? `All (${totalCount})` : `Lv ${l} (${countByLevel[l] || 0})`}</button>
+            <button key={l} className="tap" onClick={() => setFilter(l)} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === l ? T.gold : T.line}`, background: filter === l ? `${T.gold}18` : "transparent", color: filter === l ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>{l === "all" ? `All (${totalCount})` : l === "conv" ? `🗣 Conv (${allItems.filter((x) => x.level >= CONV_START).length})` : `Lv ${l} (${countByLevel[l] || 0})`}</button>
           ))}
         </div>
       )}
@@ -4349,6 +4353,8 @@ function App() {
   }, [persist]);
 
   const [convCat, setConvCat] = useState(null);
+  const [itemsFilter, setItemsFilter] = useState(null);
+  useEffect(() => { if (view !== "items" && itemsFilter !== null) setItemsFilter(null); }, [view]);
   const startConvLearn = useCallback((l) => { setConvCat(l); setView("convlearn"); }, []);
   const startConvQuiz = useCallback((l) => {
     const s = stateRef.current;
@@ -4520,7 +4526,7 @@ function App() {
           />
         )}
         {view === "lessons" && (
-          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
+          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} onConv={() => setView("conv")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}
         {view === "reviews" && (
           <ReviewsHub
@@ -4537,12 +4543,12 @@ function App() {
         {view === "reviewrun" && <TypedQuiz items={reviewRun} mode="srs" onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("reviews")} title="Reviews" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
         {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("items")} title="Practice" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
         {view === "script" && <ScriptView scriptState={state.script} setScript={(next) => persist({ ...state, script: next })} autoReview={scriptAuto} onAutoConsumed={() => setScriptAuto(false)} customLetters={state.customLetters || []} onCustomLetters={onCustomLetters} />}
-        {view === "conv" && <ConvHub state={state} allItems={allItems} onBack={() => setView("home")} onLearn={startConvLearn} onQuiz={startConvQuiz} />}
+        {view === "conv" && <ConvHub state={state} allItems={allItems} onBack={() => setView("lessons")} onLearn={startConvLearn} onQuiz={startConvQuiz} onItems={(l) => { setItemsFilter(l); setView("items"); }} />}
         {view === "convlearn" && convCat && (
           <LearnSession pool={allItems.filter((it) => it.level === convCat && !state.progress[it.id])} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("conv")} learnedCount={allItems.filter((it) => it.level === convCat && state.progress[it.id]).length} onQuizLearned={() => startConvQuiz(convCat)} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}
         {view === "items" && (
-          <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onAddByStage={onAddItemsToCustom} audioIds={audioIds} onReorder={onReorderLevel} onOpenDetail={setDetailItem} />
+          <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onAddByStage={onAddItemsToCustom} audioIds={audioIds} onReorder={onReorderLevel} initialFilter={itemsFilter} onOpenDetail={setDetailItem} />
         )}
         {view === "stats" && <StatsView state={state} allItems={allItems} level={state.currentLevel} streak={streak} />}
       </div>
