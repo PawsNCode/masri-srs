@@ -8182,5 +8182,3205 @@
   "ar": "بصي",
   "tr": "boSSi",
   "en": "Look (f)"
+ },
+ {
+  "id": "cga_001",
+  "level": 80,
+  "type": "phrase",
+  "ar": "صباح الخير عليكم",
+  "tr": "SabaaH el-kheir ʿaleikum",
+  "en": "Good morning to you all"
+ },
+ {
+  "id": "cga_002",
+  "level": 80,
+  "type": "phrase",
+  "ar": "صباح الفل",
+  "tr": "SabaaH el-foll",
+  "en": "Morning of jasmine (warm good morning)"
+ },
+ {
+  "id": "cga_003",
+  "level": 80,
+  "type": "phrase",
+  "ar": "صباح النور",
+  "tr": "SabaaH en-noor",
+  "en": "Morning of light (reply to good morning)"
+ },
+ {
+  "id": "cga_004",
+  "level": 80,
+  "type": "phrase",
+  "ar": "مساء الفل",
+  "tr": "masaaʾ el-foll",
+  "en": "Evening of jasmine (warm good evening)"
+ },
+ {
+  "id": "cga_005",
+  "level": 80,
+  "type": "phrase",
+  "ar": "مساء النور",
+  "tr": "masaaʾ en-noor",
+  "en": "Evening of light (reply to good evening)"
+ },
+ {
+  "id": "cga_006",
+  "level": 80,
+  "type": "phrase",
+  "ar": "وعليكم السلام",
+  "tr": "we-ʿaleikum es-salaam",
+  "en": "And peace upon you (reply to salam)"
+ },
+ {
+  "id": "cga_007",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إزيك يا باشا؟",
+  "tr": "ezzayak ya basha?",
+  "en": "How are you, boss? (friendly, to m)"
+ },
+ {
+  "id": "cga_008",
+  "level": 80,
+  "type": "sentence",
+  "ar": "عامل إيه النهاردة؟",
+  "tr": "ʿaamel eh en-naharda?",
+  "en": "How are you doing today? (to m)"
+ },
+ {
+  "id": "cga_009",
+  "level": 80,
+  "type": "sentence",
+  "ar": "عاملة إيه النهاردة؟",
+  "tr": "ʿamla eh en-naharda?",
+  "en": "How are you doing today? (to f)"
+ },
+ {
+  "id": "cga_010",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إيه الأخبار؟",
+  "tr": "eh el-akhbaar?",
+  "en": "What's the news? / What's up?"
+ },
+ {
+  "id": "cga_011",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أخبارك إيه يا صاحبي؟",
+  "tr": "akhbaarak eh ya SaHbi?",
+  "en": "What's up, my friend? (to m)"
+ },
+ {
+  "id": "cga_012",
+  "level": 80,
+  "type": "sentence",
+  "ar": "كله تمام والحمد لله",
+  "tr": "kollo tamaam wel-Hamdu lellah",
+  "en": "All good, thank God"
+ },
+ {
+  "id": "cga_013",
+  "level": 80,
+  "type": "phrase",
+  "ar": "الحمد لله على كل حال",
+  "tr": "el-Hamdu lellah ʿala koll Haal",
+  "en": "Thank God in any case"
+ },
+ {
+  "id": "cga_014",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الأمور ماشية",
+  "tr": "el-omoor mashya",
+  "en": "Things are moving along"
+ },
+ {
+  "id": "cga_015",
+  "level": 80,
+  "type": "sentence",
+  "ar": "نص نص",
+  "tr": "noSS noSS",
+  "en": "So-so (half half)"
+ },
+ {
+  "id": "cga_016",
+  "level": 80,
+  "type": "sentence",
+  "ar": "زي الفل",
+  "tr": "zayy el-foll",
+  "en": "Great! (like jasmine)"
+ },
+ {
+  "id": "cga_017",
+  "level": 80,
+  "type": "sentence",
+  "ar": "مش بطال",
+  "tr": "mesh baTTaal",
+  "en": "Not bad"
+ },
+ {
+  "id": "cga_018",
+  "level": 80,
+  "type": "sentence",
+  "ar": "وإنت عامل إيه؟",
+  "tr": "wenta ʿaamel eh?",
+  "en": "And how are you doing? (to m)"
+ },
+ {
+  "id": "cga_019",
+  "level": 80,
+  "type": "sentence",
+  "ar": "وإنتي عاملة إيه؟",
+  "tr": "wenti ʿamla eh?",
+  "en": "And how are you doing? (to f)"
+ },
+ {
+  "id": "cga_020",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إيه أخبار الشغل؟",
+  "tr": "eh akhbaar esh-shoghl?",
+  "en": "How's work going?"
+ },
+ {
+  "id": "cga_021",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إيه أخبار الدراسة؟",
+  "tr": "eh akhbaar ed-derasa?",
+  "en": "How are your studies going?"
+ },
+ {
+  "id": "cga_022",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إيه أخبار العيلة؟",
+  "tr": "eh akhbaar el-ʿeila?",
+  "en": "How's the family?"
+ },
+ {
+  "id": "cga_023",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الكل بخير الحمد لله",
+  "tr": "el-koll be-kheir el-Hamdu lellah",
+  "en": "Everyone's fine, thank God"
+ },
+ {
+  "id": "cga_024",
+  "level": 80,
+  "type": "sentence",
+  "ar": "وحشتني أوي والله",
+  "tr": "waHashteni awi wallahi",
+  "en": "I really missed you so much (to m)"
+ },
+ {
+  "id": "cga_025",
+  "level": 80,
+  "type": "sentence",
+  "ar": "وحشتيني أوي",
+  "tr": "waHashtiini awi",
+  "en": "I missed you so much (to f)"
+ },
+ {
+  "id": "cga_026",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إنت وحشتني أكتر",
+  "tr": "enta waHashteni aktar",
+  "en": "I missed you more (to m)"
+ },
+ {
+  "id": "cga_027",
+  "level": 80,
+  "type": "sentence",
+  "ar": "من زمان ما شفتكش",
+  "tr": "men zamaan ma shoftaksh",
+  "en": "I haven't seen you in ages (to m)"
+ },
+ {
+  "id": "cga_028",
+  "level": 80,
+  "type": "sentence",
+  "ar": "فينك من زمان؟",
+  "tr": "feinak men zamaan?",
+  "en": "Where have you been all this time? (to m)"
+ },
+ {
+  "id": "cga_029",
+  "level": 80,
+  "type": "sentence",
+  "ar": "فينك يا راجل؟",
+  "tr": "feinak ya raagel?",
+  "en": "Where have you been, man?"
+ },
+ {
+  "id": "cga_030",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الدنيا شغل",
+  "tr": "ed-donya shoghl",
+  "en": "Life is all work (excuse for being busy)"
+ },
+ {
+  "id": "cga_031",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إن شاء الله نتقابل قريب",
+  "tr": "en shaaʾ allah netʾaabel ʾorayyeb",
+  "en": "Hopefully we'll meet soon"
+ },
+ {
+  "id": "cga_032",
+  "level": 80,
+  "type": "sentence",
+  "ar": "سلملي على البيت",
+  "tr": "sallemli ʿala el-beit",
+  "en": "Give my regards to the family at home"
+ },
+ {
+  "id": "cga_033",
+  "level": 80,
+  "type": "sentence",
+  "ar": "سلملي على ماما",
+  "tr": "sallemli ʿala mama",
+  "en": "Say hi to your mom for me"
+ },
+ {
+  "id": "cga_034",
+  "level": 80,
+  "type": "sentence",
+  "ar": "ربنا يخليك ليا",
+  "tr": "rabbena ykhalliik leyya",
+  "en": "May God keep you for me (thanks, to m)"
+ },
+ {
+  "id": "cga_035",
+  "level": 80,
+  "type": "sentence",
+  "ar": "ربنا يخليكي",
+  "tr": "rabbena ykhalliiki",
+  "en": "May God keep you (thanks/bless, to f)"
+ },
+ {
+  "id": "cga_036",
+  "level": 80,
+  "type": "sentence",
+  "ar": "نهارك سعيد",
+  "tr": "nahaarak saʿiid",
+  "en": "Have a nice day (to m)"
+ },
+ {
+  "id": "cga_037",
+  "level": 80,
+  "type": "sentence",
+  "ar": "نهارك سعيد مبارك",
+  "tr": "nahaarak saʿiid mubaarak",
+  "en": "Have a blessed day (to m)"
+ },
+ {
+  "id": "cga_038",
+  "level": 80,
+  "type": "sentence",
+  "ar": "تصبح على خير",
+  "tr": "teSbaH ʿala kheir",
+  "en": "Good night (to m)"
+ },
+ {
+  "id": "cga_039",
+  "level": 80,
+  "type": "sentence",
+  "ar": "تصبحي على خير",
+  "tr": "teSbaHi ʿala kheir",
+  "en": "Good night (to f)"
+ },
+ {
+  "id": "cga_040",
+  "level": 80,
+  "type": "sentence",
+  "ar": "وإنت من أهله",
+  "tr": "wenta men ahlo",
+  "en": "And you too (reply to good night, to m)"
+ },
+ {
+  "id": "cga_041",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أشوفك بكرة الصبح",
+  "tr": "ashoofak bokra eS-SobH",
+  "en": "See you tomorrow morning (to m)"
+ },
+ {
+  "id": "cga_042",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أشوفك على خير",
+  "tr": "ashoofak ʿala kheir",
+  "en": "See you soon / take care (to m)"
+ },
+ {
+  "id": "cga_043",
+  "level": 80,
+  "type": "sentence",
+  "ar": "خلي بالك من نفسك يا صاحبي",
+  "tr": "khalli baalak men nafsak ya SaHbi",
+  "en": "Take care of yourself, my friend"
+ },
+ {
+  "id": "cga_044",
+  "level": 80,
+  "type": "sentence",
+  "ar": "مع ألف سلامة",
+  "tr": "maʿa alf salaama",
+  "en": "With a thousand goodbyes (farewell)"
+ },
+ {
+  "id": "cga_045",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الله يسلمك",
+  "tr": "allah yesallemak",
+  "en": "God keep you safe (reply to goodbye, to m)"
+ },
+ {
+  "id": "cga_046",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الجو حر أوي النهاردة",
+  "tr": "el-gaww Harr awi en-naharda",
+  "en": "The weather is very hot today"
+ },
+ {
+  "id": "cga_047",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الجو حلو النهاردة",
+  "tr": "el-gaww Helw en-naharda",
+  "en": "The weather is nice today"
+ },
+ {
+  "id": "cga_048",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الدنيا برد أوي",
+  "tr": "ed-donya bard awi",
+  "en": "It's very cold"
+ },
+ {
+  "id": "cga_049",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الدنيا بتمطر بره",
+  "tr": "ed-donya betmaTTar barra",
+  "en": "It's raining outside"
+ },
+ {
+  "id": "cga_050",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الجو مش مستحمل",
+  "tr": "el-gaww mesh mestaHmel",
+  "en": "The weather is unbearable"
+ },
+ {
+  "id": "cga_051",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الصيف السنادي حر جامد",
+  "tr": "eS-Seif es-sanadi Harr gaamed",
+  "en": "This summer is seriously hot"
+ },
+ {
+  "id": "cga_052",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إيه رأيك في الجو؟",
+  "tr": "eh raʾyak fel-gaww?",
+  "en": "What do you think of the weather? (to m)"
+ },
+ {
+  "id": "cga_053",
+  "level": 80,
+  "type": "sentence",
+  "ar": "نمت كويس امبارح؟",
+  "tr": "nemt kwayyes embaareH?",
+  "en": "Did you sleep well last night? (to m)"
+ },
+ {
+  "id": "cga_054",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أنا لسه صاحي",
+  "tr": "ana lessa SaaHi",
+  "en": "I just woke up (m)"
+ },
+ {
+  "id": "cga_055",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أنا لسه صاحية",
+  "tr": "ana lessa SaHya",
+  "en": "I just woke up (f)"
+ },
+ {
+  "id": "cga_056",
+  "level": 80,
+  "type": "sentence",
+  "ar": "محتاج قهوة الأول",
+  "tr": "meHtaag ʾahwa el-awwel",
+  "en": "I need coffee first (m)"
+ },
+ {
+  "id": "cga_057",
+  "level": 80,
+  "type": "sentence",
+  "ar": "فطرت إيه النهاردة؟",
+  "tr": "feTert eh en-naharda?",
+  "en": "What did you have for breakfast today?"
+ },
+ {
+  "id": "cga_058",
+  "level": 80,
+  "type": "sentence",
+  "ar": "لسه ما فطرتش",
+  "tr": "lessa ma faTartesh",
+  "en": "I haven't had breakfast yet"
+ },
+ {
+  "id": "cga_059",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إيه خططك النهاردة؟",
+  "tr": "eh khoTaTak en-naharda?",
+  "en": "What are your plans today? (to m)"
+ },
+ {
+  "id": "cga_060",
+  "level": 80,
+  "type": "sentence",
+  "ar": "مفيش حاجة مخططة",
+  "tr": "mafiish Haaga mekhaTTaTa",
+  "en": "Nothing planned"
+ },
+ {
+  "id": "cga_061",
+  "level": 80,
+  "type": "sentence",
+  "ar": "هقعد في البيت",
+  "tr": "haʾʿod fel-beit",
+  "en": "I'll stay home"
+ },
+ {
+  "id": "cga_062",
+  "level": 80,
+  "type": "sentence",
+  "ar": "هنزل شوية",
+  "tr": "hanzel shwayya",
+  "en": "I'll go out for a bit"
+ },
+ {
+  "id": "cga_063",
+  "level": 80,
+  "type": "sentence",
+  "ar": "تحب نخرج بكرة؟",
+  "tr": "teHebb nokhrog bokra?",
+  "en": "Want to go out tomorrow? (to m)"
+ },
+ {
+  "id": "cga_064",
+  "level": 80,
+  "type": "sentence",
+  "ar": "اتفقنا خلاص",
+  "tr": "ettafaʾna khalaaS",
+  "en": "Agreed then / it's settled"
+ },
+ {
+  "id": "cga_065",
+  "level": 80,
+  "type": "sentence",
+  "ar": "شفت الماتش امبارح؟",
+  "tr": "shoft el-match embaareH?",
+  "en": "Did you see the game yesterday? (to m)"
+ },
+ {
+  "id": "cga_066",
+  "level": 80,
+  "type": "sentence",
+  "ar": "كان ماتش جامد أوي",
+  "tr": "kaan match gaamed awi",
+  "en": "It was a great game"
+ },
+ {
+  "id": "cga_067",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إنت بتشجع مين؟",
+  "tr": "enta betshaggaʿ miin?",
+  "en": "Which team do you support? (to m)"
+ },
+ {
+  "id": "cga_068",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أنا أهلاوي",
+  "tr": "ana ahlaawi",
+  "en": "I'm an Ahly fan"
+ },
+ {
+  "id": "cga_069",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أنا زملكاوي",
+  "tr": "ana zamalkaawi",
+  "en": "I'm a Zamalek fan"
+ },
+ {
+  "id": "cga_070",
+  "level": 80,
+  "type": "sentence",
+  "ar": "سمعت الخبر؟",
+  "tr": "semeʿt el-khabar?",
+  "en": "Did you hear the news? (to m)"
+ },
+ {
+  "id": "cga_071",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إيه اللي حصل؟",
+  "tr": "eh elli HaSal?",
+  "en": "What happened?"
+ },
+ {
+  "id": "cga_072",
+  "level": 80,
+  "type": "sentence",
+  "ar": "ما تقلقش، كله هيبقى تمام",
+  "tr": "ma teʾlaʾsh, kollo hayebʾa tamaam",
+  "en": "Don't worry, everything will be fine (to m)"
+ },
+ {
+  "id": "cga_073",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إن شاء الله خير",
+  "tr": "en shaaʾ allah kheir",
+  "en": "God willing, it's for the best"
+ },
+ {
+  "id": "cga_074",
+  "level": 80,
+  "type": "sentence",
+  "ar": "يلا نشرب شاي",
+  "tr": "yalla neshrab shaay",
+  "en": "Come on, let's have tea"
+ },
+ {
+  "id": "cga_075",
+  "level": 80,
+  "type": "sentence",
+  "ar": "تيجي نتمشى شوية؟",
+  "tr": "tiigi netmasha shwayya?",
+  "en": "Want to take a walk?"
+ },
+ {
+  "id": "cga_076",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أنا مشغول شوية دلوقتي",
+  "tr": "ana mashghool shwayya delwaʾti",
+  "en": "I'm a bit busy right now (m)"
+ },
+ {
+  "id": "cga_077",
+  "level": 80,
+  "type": "sentence",
+  "ar": "نتكلم بعدين؟",
+  "tr": "netkallem baʿdein?",
+  "en": "Can we talk later?"
+ },
+ {
+  "id": "cga_078",
+  "level": 80,
+  "type": "sentence",
+  "ar": "كلمني لما تفضى",
+  "tr": "kallemni lamma tefDa",
+  "en": "Call me when you're free (to m)"
+ },
+ {
+  "id": "cga_079",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أنا تحت أمرك",
+  "tr": "ana taHt amrak",
+  "en": "I'm at your service (to m)"
+ },
+ {
+  "id": "cga_080",
+  "level": 80,
+  "type": "sentence",
+  "ar": "في أي وقت",
+  "tr": "fi ayy waʾt",
+  "en": "Anytime"
+ },
+ {
+  "id": "cga_081",
+  "level": 80,
+  "type": "sentence",
+  "ar": "إيه الجديد عندك؟",
+  "tr": "eh el-gediid ʿandak?",
+  "en": "What's new with you? (to m)"
+ },
+ {
+  "id": "cga_082",
+  "level": 80,
+  "type": "sentence",
+  "ar": "مفيش جديد، زي ما هو",
+  "tr": "mafiish gediid, zayy ma howwa",
+  "en": "Nothing new, same as always"
+ },
+ {
+  "id": "cga_083",
+  "level": 80,
+  "type": "sentence",
+  "ar": "الحياة ماشية",
+  "tr": "el-Hayaah mashya",
+  "en": "Life goes on"
+ },
+ {
+  "id": "cga_084",
+  "level": 80,
+  "type": "sentence",
+  "ar": "ربنا يسهل الأمور",
+  "tr": "rabbena yesahhel el-omoor",
+  "en": "May God ease things along"
+ },
+ {
+  "id": "cga_085",
+  "level": 80,
+  "type": "sentence",
+  "ar": "خير إن شاء الله؟",
+  "tr": "kheir en shaaʾ allah?",
+  "en": "Everything okay? (asking with concern)"
+ },
+ {
+  "id": "cga_086",
+  "level": 80,
+  "type": "sentence",
+  "ar": "كله خير",
+  "tr": "kollo kheir",
+  "en": "Everything's fine"
+ },
+ {
+  "id": "cga_087",
+  "level": 80,
+  "type": "sentence",
+  "ar": "بقالك كتير هنا؟",
+  "tr": "baʾaalak ketiir hena?",
+  "en": "Have you been here long? (to m)"
+ },
+ {
+  "id": "cga_088",
+  "level": 80,
+  "type": "sentence",
+  "ar": "لسه واصل حالاً",
+  "tr": "lessa waaSel Haalan",
+  "en": "I just arrived (m)"
+ },
+ {
+  "id": "cga_089",
+  "level": 80,
+  "type": "sentence",
+  "ar": "اتفضل اقعد",
+  "tr": "etfaDDal oʾʿod",
+  "en": "Please, have a seat (to m)"
+ },
+ {
+  "id": "cga_090",
+  "level": 80,
+  "type": "sentence",
+  "ar": "اتفضلي اقعدي",
+  "tr": "etfaDDali oʾʿodi",
+  "en": "Please, have a seat (to f)"
+ },
+ {
+  "id": "cga_091",
+  "level": 80,
+  "type": "sentence",
+  "ar": "البيت بيتك",
+  "tr": "el-beit beitak",
+  "en": "Make yourself at home (to m)"
+ },
+ {
+  "id": "cga_092",
+  "level": 80,
+  "type": "sentence",
+  "ar": "نورت البيت",
+  "tr": "nawwart el-beit",
+  "en": "You lit up the house (welcome, to m)"
+ },
+ {
+  "id": "cga_093",
+  "level": 80,
+  "type": "sentence",
+  "ar": "ده نورك",
+  "tr": "da noorak",
+  "en": "That's your light (reply to nawwart, to m)"
+ },
+ {
+  "id": "cga_094",
+  "level": 80,
+  "type": "sentence",
+  "ar": "تشرب حاجة؟",
+  "tr": "teshrab Haaga?",
+  "en": "Would you like something to drink? (to m)"
+ },
+ {
+  "id": "cga_095",
+  "level": 80,
+  "type": "sentence",
+  "ar": "تشربي حاجة؟",
+  "tr": "teshrabi Haaga?",
+  "en": "Would you like something to drink? (to f)"
+ },
+ {
+  "id": "cga_096",
+  "level": 80,
+  "type": "sentence",
+  "ar": "ولا يهمك",
+  "tr": "wala yhemmak",
+  "en": "Don't worry about it (to m)"
+ },
+ {
+  "id": "cga_097",
+  "level": 80,
+  "type": "sentence",
+  "ar": "على راسي من فوق",
+  "tr": "ʿala raasi men fooʾ",
+  "en": "With the greatest pleasure"
+ },
+ {
+  "id": "cga_098",
+  "level": 80,
+  "type": "sentence",
+  "ar": "أي خدمة يا صاحبي",
+  "tr": "ayy khedma ya SaHbi",
+  "en": "Any service, my friend / you're welcome"
+ },
+ {
+  "id": "cga_099",
+  "level": 80,
+  "type": "sentence",
+  "ar": "خليك معايا",
+  "tr": "khalliik maʿaaya",
+  "en": "Stay with me / stay in touch (to m)"
+ },
+ {
+  "id": "cga_100",
+  "level": 80,
+  "type": "sentence",
+  "ar": "يلا سلام",
+  "tr": "yalla salaam",
+  "en": "Okay, bye!"
+ },
+ {
+  "id": "cmn_001",
+  "level": 81,
+  "type": "sentence",
+  "ar": "اسمي مش مهم، المهم إنت اسمك إيه؟",
+  "tr": "esmi mesh mohemm, el-mohemm enta esmak eh?",
+  "en": "Never mind my name — what's yours? (playful, to m)"
+ },
+ {
+  "id": "cmn_002",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا اسمي أحمد، وإنت؟",
+  "tr": "ana esmi Ahmed, wenta?",
+  "en": "My name is Ahmed, and you? (to m)"
+ },
+ {
+  "id": "cmn_003",
+  "level": 81,
+  "type": "sentence",
+  "ar": "تشرفنا يا فندم",
+  "tr": "tsharrafna ya fandem",
+  "en": "Pleased to meet you, sir/madam"
+ },
+ {
+  "id": "cmn_004",
+  "level": 81,
+  "type": "sentence",
+  "ar": "الشرف ليا",
+  "tr": "esh-sharaf leyya",
+  "en": "The honor is mine"
+ },
+ {
+  "id": "cmn_005",
+  "level": 81,
+  "type": "sentence",
+  "ar": "إنت منين بالظبط؟",
+  "tr": "enta menein bezZabT?",
+  "en": "Where exactly are you from? (to m)"
+ },
+ {
+  "id": "cmn_006",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا من القاهرة",
+  "tr": "ana men el-qaahira",
+  "en": "I'm from Cairo"
+ },
+ {
+  "id": "cmn_007",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا من إسكندرية",
+  "tr": "ana men eskendereyya",
+  "en": "I'm from Alexandria"
+ },
+ {
+  "id": "cmn_008",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا مش مصري",
+  "tr": "ana mesh maSri",
+  "en": "I'm not Egyptian (m)"
+ },
+ {
+  "id": "cmn_009",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا مش مصرية",
+  "tr": "ana mesh maSreyya",
+  "en": "I'm not Egyptian (f)"
+ },
+ {
+  "id": "cmn_010",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا أجنبي بس بحب مصر",
+  "tr": "ana agnabi bass baHebb maSr",
+  "en": "I'm a foreigner but I love Egypt (m)"
+ },
+ {
+  "id": "cmn_011",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بتتكلم عربي كويس أوي",
+  "tr": "betetkallem ʿarabi kwayyes awi",
+  "en": "You speak Arabic very well (to m)"
+ },
+ {
+  "id": "cmn_012",
+  "level": 81,
+  "type": "sentence",
+  "ar": "لسه بتعلم",
+  "tr": "lessa batʿallem",
+  "en": "I'm still learning"
+ },
+ {
+  "id": "cmn_013",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بتعلم عربي من سنة",
+  "tr": "batʿallem ʿarabi men sana",
+  "en": "I've been learning Arabic for a year"
+ },
+ {
+  "id": "cmn_014",
+  "level": 81,
+  "type": "sentence",
+  "ar": "ممكن تتكلم بالراحة؟",
+  "tr": "momken tetkallem ber-raaHa?",
+  "en": "Can you speak slowly? (to m)"
+ },
+ {
+  "id": "cmn_015",
+  "level": 81,
+  "type": "sentence",
+  "ar": "ممكن تعيد تاني؟",
+  "tr": "momken teʿiid taani?",
+  "en": "Can you repeat that? (to m)"
+ },
+ {
+  "id": "cmn_016",
+  "level": 81,
+  "type": "sentence",
+  "ar": "فهمت عليك",
+  "tr": "fehemt ʿaleik",
+  "en": "I understood you (to m)"
+ },
+ {
+  "id": "cmn_017",
+  "level": 81,
+  "type": "sentence",
+  "ar": "معلش، مش فاهم كويس",
+  "tr": "maʿlesh, mesh faahem kwayyes",
+  "en": "Sorry, I don't understand well (m)"
+ },
+ {
+  "id": "cmn_018",
+  "level": 81,
+  "type": "sentence",
+  "ar": "يعني إيه الكلمة دي؟",
+  "tr": "yaʿni eh el-kelma di?",
+  "en": "What does this word mean?"
+ },
+ {
+  "id": "cmn_019",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بتشتغل إيه بالظبط؟",
+  "tr": "beteshtaghal eh bezZabT?",
+  "en": "What exactly do you do for work? (to m)"
+ },
+ {
+  "id": "cmn_020",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا مهندس",
+  "tr": "ana mohandes",
+  "en": "I'm an engineer (m)"
+ },
+ {
+  "id": "cmn_021",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا مهندسة",
+  "tr": "ana mohandesa",
+  "en": "I'm an engineer (f)"
+ },
+ {
+  "id": "cmn_022",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا دكتور",
+  "tr": "ana doktoor",
+  "en": "I'm a doctor (m)"
+ },
+ {
+  "id": "cmn_023",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا دكتورة",
+  "tr": "ana doktoora",
+  "en": "I'm a doctor (f)"
+ },
+ {
+  "id": "cmn_024",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا طالب في الجامعة",
+  "tr": "ana Taaleb fel-gamʿa",
+  "en": "I'm a university student (m)"
+ },
+ {
+  "id": "cmn_025",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا طالبة في الجامعة",
+  "tr": "ana Taaleba fel-gamʿa",
+  "en": "I'm a university student (f)"
+ },
+ {
+  "id": "cmn_026",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا بشتغل من البيت",
+  "tr": "ana bashtaghal men el-beit",
+  "en": "I work from home"
+ },
+ {
+  "id": "cmn_027",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا في إجازة",
+  "tr": "ana fi agaaza",
+  "en": "I'm on vacation"
+ },
+ {
+  "id": "cmn_028",
+  "level": 81,
+  "type": "sentence",
+  "ar": "جيت مصر إمتى؟",
+  "tr": "geit maSr emta?",
+  "en": "When did you come to Egypt? (to m)"
+ },
+ {
+  "id": "cmn_029",
+  "level": 81,
+  "type": "sentence",
+  "ar": "وصلت من أسبوع",
+  "tr": "waSalt men esbooʿ",
+  "en": "I arrived a week ago"
+ },
+ {
+  "id": "cmn_030",
+  "level": 81,
+  "type": "sentence",
+  "ar": "هفضل هنا شهرين",
+  "tr": "hafDal hena shahrein",
+  "en": "I'll stay here for two months"
+ },
+ {
+  "id": "cmn_031",
+  "level": 81,
+  "type": "sentence",
+  "ar": "مصر عجبتك؟",
+  "tr": "maSr ʿagabetak?",
+  "en": "Do you like Egypt? (to m)"
+ },
+ {
+  "id": "cmn_032",
+  "level": 81,
+  "type": "sentence",
+  "ar": "مصر جميلة أوي",
+  "tr": "maSr gamiila awi",
+  "en": "Egypt is very beautiful"
+ },
+ {
+  "id": "cmn_033",
+  "level": 81,
+  "type": "sentence",
+  "ar": "الناس هنا طيبين أوي",
+  "tr": "en-naas hena Tayyebiin awi",
+  "en": "People here are very kind"
+ },
+ {
+  "id": "cmn_034",
+  "level": 81,
+  "type": "sentence",
+  "ar": "الأكل المصري تحفة",
+  "tr": "el-akl el-maSri toHfa",
+  "en": "Egyptian food is amazing"
+ },
+ {
+  "id": "cmn_035",
+  "level": 81,
+  "type": "sentence",
+  "ar": "عندك كام سنة لو مش عيب؟",
+  "tr": "ʿandak kaam sana law mesh ʿeib?",
+  "en": "How old are you, if it's not rude? (to m)"
+ },
+ {
+  "id": "cmn_036",
+  "level": 81,
+  "type": "sentence",
+  "ar": "عندي تلاتين سنة",
+  "tr": "ʿandi talatiin sana",
+  "en": "I'm thirty years old"
+ },
+ {
+  "id": "cmn_037",
+  "level": 81,
+  "type": "sentence",
+  "ar": "إنت متجوز؟",
+  "tr": "enta metgawwez?",
+  "en": "Are you married? (to m)"
+ },
+ {
+  "id": "cmn_038",
+  "level": 81,
+  "type": "sentence",
+  "ar": "إنتي متجوزة؟",
+  "tr": "enti metgawweza?",
+  "en": "Are you married? (to f)"
+ },
+ {
+  "id": "cmn_039",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا متجوز وعندي أولاد",
+  "tr": "ana metgawwez we-ʿandi awlaad",
+  "en": "I'm married with kids (m)"
+ },
+ {
+  "id": "cmn_040",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا لسه عازب",
+  "tr": "ana lessa ʿaazeb",
+  "en": "I'm still single (m)"
+ },
+ {
+  "id": "cmn_041",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا لسه عزباء",
+  "tr": "ana lessa ʿazbaaʾ",
+  "en": "I'm still single (f)"
+ },
+ {
+  "id": "cmn_042",
+  "level": 81,
+  "type": "sentence",
+  "ar": "عندك إخوات؟",
+  "tr": "ʿandak ekhwaat?",
+  "en": "Do you have siblings? (to m)"
+ },
+ {
+  "id": "cmn_043",
+  "level": 81,
+  "type": "sentence",
+  "ar": "عندي أخ وأخت",
+  "tr": "ʿandi akh we-okht",
+  "en": "I have a brother and a sister"
+ },
+ {
+  "id": "cmn_044",
+  "level": 81,
+  "type": "sentence",
+  "ar": "ساكن فين في مصر؟",
+  "tr": "saaken fein fi maSr?",
+  "en": "Where do you live in Egypt? (to m)"
+ },
+ {
+  "id": "cmn_045",
+  "level": 81,
+  "type": "sentence",
+  "ar": "ساكن في وسط البلد",
+  "tr": "saaken fi wesT el-balad",
+  "en": "I live downtown (m)"
+ },
+ {
+  "id": "cmn_046",
+  "level": 81,
+  "type": "sentence",
+  "ar": "ساكنة في المعادي",
+  "tr": "sakna fel-maʿaadi",
+  "en": "I live in Maadi (f)"
+ },
+ {
+  "id": "cmn_047",
+  "level": 81,
+  "type": "sentence",
+  "ar": "المنطقة دي هادية",
+  "tr": "el-manTeʾa di hadya",
+  "en": "This area is quiet"
+ },
+ {
+  "id": "cmn_048",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بتحب تعمل إيه في وقت فراغك؟",
+  "tr": "betHebb teʿmel eh fi waʾt faraaghak?",
+  "en": "What do you like to do in your free time? (to m)"
+ },
+ {
+  "id": "cmn_049",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بحب القراية والسفر",
+  "tr": "baHebb el-ʾeraaya wes-safar",
+  "en": "I love reading and traveling"
+ },
+ {
+  "id": "cmn_050",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بحب الرياضة",
+  "tr": "baHebb er-reyaaDa",
+  "en": "I love sports"
+ },
+ {
+  "id": "cmn_051",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بلعب كورة كل جمعة",
+  "tr": "balʿab koora koll gomʿa",
+  "en": "I play football every Friday"
+ },
+ {
+  "id": "cmn_052",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بحب الموسيقى المصرية",
+  "tr": "baHebb el-mosiiʾa el-maSreyya",
+  "en": "I love Egyptian music"
+ },
+ {
+  "id": "cmn_053",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بتسمع مين؟",
+  "tr": "betesmaʿ miin?",
+  "en": "Who do you listen to? (to m)"
+ },
+ {
+  "id": "cmn_054",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بحب أم كلثوم",
+  "tr": "baHebb omm kalsoum",
+  "en": "I love Umm Kulthum"
+ },
+ {
+  "id": "cmn_055",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بتحب الأفلام؟",
+  "tr": "betHebb el-aflaam?",
+  "en": "Do you like movies? (to m)"
+ },
+ {
+  "id": "cmn_056",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بحب الأفلام المصرية القديمة",
+  "tr": "baHebb el-aflaam el-maSreyya el-ʾadiima",
+  "en": "I love old Egyptian movies"
+ },
+ {
+  "id": "cmn_057",
+  "level": 81,
+  "type": "sentence",
+  "ar": "إيه فيلمك المفضل؟",
+  "tr": "eh filmak el-mofaDDal?",
+  "en": "What's your favorite movie? (to m)"
+ },
+ {
+  "id": "cmn_058",
+  "level": 81,
+  "type": "sentence",
+  "ar": "زرت الأهرامات قبل كده؟",
+  "tr": "zort el-ahramaat ʾabl keda?",
+  "en": "Have you visited the pyramids before? (to m)"
+ },
+ {
+  "id": "cmn_059",
+  "level": 81,
+  "type": "sentence",
+  "ar": "لسه ما رحتش",
+  "tr": "lessa ma roHtesh",
+  "en": "I haven't gone yet"
+ },
+ {
+  "id": "cmn_060",
+  "level": 81,
+  "type": "sentence",
+  "ar": "لازم تروح، حاجة تجنن",
+  "tr": "laazem terooH, Haaga tegannen",
+  "en": "You must go, it's amazing (to m)"
+ },
+ {
+  "id": "cmn_061",
+  "level": 81,
+  "type": "sentence",
+  "ar": "إيه أحسن حتة في مصر؟",
+  "tr": "eh aHsan Hetta fi maSr?",
+  "en": "What's the best place in Egypt?"
+ },
+ {
+  "id": "cmn_062",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أسوان جميلة في الشتا",
+  "tr": "aswaan gamiila fesh-sheta",
+  "en": "Aswan is beautiful in winter"
+ },
+ {
+  "id": "cmn_063",
+  "level": 81,
+  "type": "sentence",
+  "ar": "البحر الأحمر تحفة",
+  "tr": "el-baHr el-aHmar toHfa",
+  "en": "The Red Sea is stunning"
+ },
+ {
+  "id": "cmn_064",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بتحب البحر ولا الجبل؟",
+  "tr": "betHebb el-baHr walla el-gabal?",
+  "en": "Do you prefer the sea or the mountains? (to m)"
+ },
+ {
+  "id": "cmn_065",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا من عشاق البحر",
+  "tr": "ana men ʿoshshaaʾ el-baHr",
+  "en": "I'm a sea lover"
+ },
+ {
+  "id": "cmn_066",
+  "level": 81,
+  "type": "sentence",
+  "ar": "عندك حساب انستجرام؟",
+  "tr": "ʿandak Hesaab instagram?",
+  "en": "Do you have an Instagram account? (to m)"
+ },
+ {
+  "id": "cmn_067",
+  "level": 81,
+  "type": "sentence",
+  "ar": "نتبادل الأرقام؟",
+  "tr": "netbaadel el-arʾaam?",
+  "en": "Shall we exchange numbers?"
+ },
+ {
+  "id": "cmn_068",
+  "level": 81,
+  "type": "sentence",
+  "ar": "ابعتلي رسالة على واتساب",
+  "tr": "ebʿatli resaala ʿala whatsapp",
+  "en": "Send me a message on WhatsApp (to m)"
+ },
+ {
+  "id": "cmn_069",
+  "level": 81,
+  "type": "sentence",
+  "ar": "هضيفك دلوقتي",
+  "tr": "haDiifak delwaʾti",
+  "en": "I'll add you now (to m)"
+ },
+ {
+  "id": "cmn_070",
+  "level": 81,
+  "type": "sentence",
+  "ar": "اتشرفت بيك جداً",
+  "tr": "etsharraft biik geddan",
+  "en": "It was a great honor meeting you (to m)"
+ },
+ {
+  "id": "cmn_071",
+  "level": 81,
+  "type": "sentence",
+  "ar": "اتشرفت بيكي جداً",
+  "tr": "etsharraft biiki geddan",
+  "en": "It was a great honor meeting you (to f)"
+ },
+ {
+  "id": "cmn_072",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أتمنى نتقابل تاني",
+  "tr": "atmanna netʾaabel taani",
+  "en": "I hope we meet again"
+ },
+ {
+  "id": "cmn_073",
+  "level": 81,
+  "type": "sentence",
+  "ar": "هتكون فين بكرة؟",
+  "tr": "hatkoon fein bokra?",
+  "en": "Where will you be tomorrow? (to m)"
+ },
+ {
+  "id": "cmn_074",
+  "level": 81,
+  "type": "sentence",
+  "ar": "تعالى اتغدى معانا",
+  "tr": "taʿaala etghadda maʿaana",
+  "en": "Come have lunch with us (to m)"
+ },
+ {
+  "id": "cmn_075",
+  "level": 81,
+  "type": "sentence",
+  "ar": "يشرفني جداً",
+  "tr": "yesharrafni geddan",
+  "en": "It would be my honor"
+ },
+ {
+  "id": "cmn_076",
+  "level": 81,
+  "type": "sentence",
+  "ar": "إنت ضيفنا النهاردة",
+  "tr": "enta Deifna en-naharda",
+  "en": "You're our guest today (to m)"
+ },
+ {
+  "id": "cmn_077",
+  "level": 81,
+  "type": "sentence",
+  "ar": "ده كتير عليا",
+  "tr": "da ketiir ʿalayya",
+  "en": "That's too generous of you"
+ },
+ {
+  "id": "cmn_078",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بجد إنت إنسان محترم",
+  "tr": "begadd enta ensaan moHtaram",
+  "en": "Honestly, you're a respectable person (to m)"
+ },
+ {
+  "id": "cmn_079",
+  "level": 81,
+  "type": "sentence",
+  "ar": "إنت خفيف الدم",
+  "tr": "enta khafiif ed-damm",
+  "en": "You're funny / charming (to m)"
+ },
+ {
+  "id": "cmn_080",
+  "level": 81,
+  "type": "sentence",
+  "ar": "إنتي خفيفة الدم",
+  "tr": "enti khafiifet ed-damm",
+  "en": "You're funny / charming (to f)"
+ },
+ {
+  "id": "cmn_081",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بتضحكني على طول",
+  "tr": "betDaHHakni ʿala Tool",
+  "en": "You always make me laugh (to m)"
+ },
+ {
+  "id": "cmn_082",
+  "level": 81,
+  "type": "sentence",
+  "ar": "عندك حق والله",
+  "tr": "ʿandak Haʾʾ wallahi",
+  "en": "You're right, honestly (to m)"
+ },
+ {
+  "id": "cmn_083",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا موافق معاك",
+  "tr": "ana mowaafeʾ maʿaak",
+  "en": "I agree with you (m to m)"
+ },
+ {
+  "id": "cmn_084",
+  "level": 81,
+  "type": "sentence",
+  "ar": "وجهة نظر محترمة",
+  "tr": "weghet naZar moHtarama",
+  "en": "A respectable point of view"
+ },
+ {
+  "id": "cmn_085",
+  "level": 81,
+  "type": "sentence",
+  "ar": "أنا شايف غير كده",
+  "tr": "ana shaayef gheir keda",
+  "en": "I see it differently (m)"
+ },
+ {
+  "id": "cmn_086",
+  "level": 81,
+  "type": "sentence",
+  "ar": "قصدي حاجة تانية",
+  "tr": "ʾaSdi Haaga tanya",
+  "en": "I mean something else"
+ },
+ {
+  "id": "cmn_087",
+  "level": 81,
+  "type": "sentence",
+  "ar": "خليني أفكر شوية",
+  "tr": "khalliini afakkar shwayya",
+  "en": "Let me think a bit"
+ },
+ {
+  "id": "cmn_088",
+  "level": 81,
+  "type": "sentence",
+  "ar": "سؤال حلو ده",
+  "tr": "soʾaal Helw da",
+  "en": "That's a good question"
+ },
+ {
+  "id": "cmn_089",
+  "level": 81,
+  "type": "sentence",
+  "ar": "مش عارف أجاوب إزاي",
+  "tr": "mesh ʿaaref agaaweb ezzaay",
+  "en": "I don't know how to answer (m)"
+ },
+ {
+  "id": "cmn_090",
+  "level": 81,
+  "type": "sentence",
+  "ar": "احكيلي عن نفسك",
+  "tr": "eHkiili ʿan nafsak",
+  "en": "Tell me about yourself (to m)"
+ },
+ {
+  "id": "cmn_091",
+  "level": 81,
+  "type": "sentence",
+  "ar": "احكيلي عن بلدك",
+  "tr": "eHkiili ʿan baladak",
+  "en": "Tell me about your country (to m)"
+ },
+ {
+  "id": "cmn_092",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بلدي بعيدة من هنا",
+  "tr": "baladi beʿiida men hena",
+  "en": "My country is far from here"
+ },
+ {
+  "id": "cmn_093",
+  "level": 81,
+  "type": "sentence",
+  "ar": "الفرق كبير بين البلدين",
+  "tr": "el-farʾ kebiir bein el-baladein",
+  "en": "There's a big difference between the two countries"
+ },
+ {
+  "id": "cmn_094",
+  "level": 81,
+  "type": "sentence",
+  "ar": "الثقافة هنا مختلفة",
+  "tr": "es-saqaafa hena mokhtalefa",
+  "en": "The culture here is different"
+ },
+ {
+  "id": "cmn_095",
+  "level": 81,
+  "type": "sentence",
+  "ar": "بحب أتعلم عن الثقافات",
+  "tr": "baHebb atʿallem ʿan es-saqafaat",
+  "en": "I love learning about cultures"
+ },
+ {
+  "id": "cmn_096",
+  "level": 81,
+  "type": "sentence",
+  "ar": "علمني كلمة جديدة",
+  "tr": "ʿallemni kelma gediida",
+  "en": "Teach me a new word (to m)"
+ },
+ {
+  "id": "cmn_097",
+  "level": 81,
+  "type": "sentence",
+  "ar": "هعلمك مصري صح",
+  "tr": "haʿallemak maSri SaHH",
+  "en": "I'll teach you proper Egyptian (to m)"
+ },
+ {
+  "id": "cmn_098",
+  "level": 81,
+  "type": "sentence",
+  "ar": "إنت أحسن مدرس",
+  "tr": "enta aHsan modarres",
+  "en": "You're the best teacher (to m)"
+ },
+ {
+  "id": "cmn_099",
+  "level": 81,
+  "type": "sentence",
+  "ar": "خليك على تواصل",
+  "tr": "khalliik ʿala tawaaSol",
+  "en": "Stay in touch (to m)"
+ },
+ {
+  "id": "cmn_100",
+  "level": 81,
+  "type": "sentence",
+  "ar": "ده رقمي، كلمني في أي وقت",
+  "tr": "da raʾami, kallemni fi ayy waʾt",
+  "en": "This is my number, call me anytime (to m)"
+ },
+ {
+  "id": "crs_001",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ترابيزة لاتنين لو سمحت",
+  "tr": "Tarabeiza le-tnein law samaHt",
+  "en": "A table for two, please"
+ },
+ {
+  "id": "crs_002",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عندكم ترابيزة فاضية؟",
+  "tr": "ʿandoko Tarabeiza faDya?",
+  "en": "Do you have a free table?"
+ },
+ {
+  "id": "crs_003",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن نقعد بره؟",
+  "tr": "momken noʾʿod barra?",
+  "en": "Can we sit outside?"
+ },
+ {
+  "id": "crs_004",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن المنيو لو سمحت؟",
+  "tr": "momken el-menu law samaHt?",
+  "en": "Can I have the menu, please?"
+ },
+ {
+  "id": "crs_005",
+  "level": 82,
+  "type": "sentence",
+  "ar": "إيه أحسن حاجة عندكم؟",
+  "tr": "eh aHsan Haaga ʿandoko?",
+  "en": "What's your best dish?"
+ },
+ {
+  "id": "crs_006",
+  "level": 82,
+  "type": "sentence",
+  "ar": "إيه أكلة اليوم؟",
+  "tr": "eh aklet el-yoom?",
+  "en": "What's today's special?"
+ },
+ {
+  "id": "crs_007",
+  "level": 82,
+  "type": "sentence",
+  "ar": "بتنصحني بإيه؟",
+  "tr": "betenSaHni be-eh?",
+  "en": "What do you recommend?"
+ },
+ {
+  "id": "crs_008",
+  "level": 82,
+  "type": "sentence",
+  "ar": "أنا جعان أوي",
+  "tr": "ana gaʿaan awi",
+  "en": "I'm very hungry (m)"
+ },
+ {
+  "id": "crs_009",
+  "level": 82,
+  "type": "sentence",
+  "ar": "أنا جعانة أوي",
+  "tr": "ana gaʿaana awi",
+  "en": "I'm very hungry (f)"
+ },
+ {
+  "id": "crs_010",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عايز كشري لو سمحت",
+  "tr": "ʿaayez koshari law samaHt",
+  "en": "I'd like koshari, please (m)"
+ },
+ {
+  "id": "crs_011",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عايزة طبق ملوخية",
+  "tr": "ʿayza Tabaʾ molokheyya",
+  "en": "I'd like a plate of molokhia (f)"
+ },
+ {
+  "id": "crs_012",
+  "level": 82,
+  "type": "sentence",
+  "ar": "هات لنا فول وطعمية",
+  "tr": "haat lena fool we-Taʿmeyya",
+  "en": "Bring us fuul and taameya"
+ },
+ {
+  "id": "crs_013",
+  "level": 82,
+  "type": "sentence",
+  "ar": "واحد فراخ مشوية",
+  "tr": "waaHed feraakh mashweyya",
+  "en": "One grilled chicken"
+ },
+ {
+  "id": "crs_014",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عايز اللحمة مستوية كويس",
+  "tr": "ʿaayez el-laHma mestewya kwayyes",
+  "en": "I want the meat well done (m)"
+ },
+ {
+  "id": "crs_015",
+  "level": 82,
+  "type": "sentence",
+  "ar": "من غير بصل لو سمحت",
+  "tr": "men gheir baSal law samaHt",
+  "en": "Without onions, please"
+ },
+ {
+  "id": "crs_016",
+  "level": 82,
+  "type": "sentence",
+  "ar": "أنا مش باكل لحمة",
+  "tr": "ana mesh baakol laHma",
+  "en": "I don't eat meat"
+ },
+ {
+  "id": "crs_017",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عندكم أكل نباتي؟",
+  "tr": "ʿandoko akl nabaati?",
+  "en": "Do you have vegetarian food?"
+ },
+ {
+  "id": "crs_018",
+  "level": 82,
+  "type": "sentence",
+  "ar": "أنا عندي حساسية من المكسرات",
+  "tr": "ana ʿandi Hasaseyya men el-mekassaraat",
+  "en": "I'm allergic to nuts"
+ },
+ {
+  "id": "crs_019",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الأكل ده حار؟",
+  "tr": "el-akl da Haarr?",
+  "en": "Is this food spicy?"
+ },
+ {
+  "id": "crs_020",
+  "level": 82,
+  "type": "sentence",
+  "ar": "خليه حار شوية",
+  "tr": "khalliih Haarr shwayya",
+  "en": "Make it a bit spicy"
+ },
+ {
+  "id": "crs_021",
+  "level": 82,
+  "type": "sentence",
+  "ar": "إيه المشروبات اللي عندكم؟",
+  "tr": "eh el-mashrobaat elli ʿandoko?",
+  "en": "What drinks do you have?"
+ },
+ {
+  "id": "crs_022",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عصير مانجا لو سمحت",
+  "tr": "ʿaSiir manga law samaHt",
+  "en": "Mango juice, please"
+ },
+ {
+  "id": "crs_023",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عصير قصب ساقع",
+  "tr": "ʿaSiir ʾaSab saaʾeʿ",
+  "en": "Cold sugarcane juice"
+ },
+ {
+  "id": "crs_024",
+  "level": 82,
+  "type": "sentence",
+  "ar": "واحد شاي بنعناع",
+  "tr": "waaHed shaay be-neʿnaaʿ",
+  "en": "One tea with mint"
+ },
+ {
+  "id": "crs_025",
+  "level": 82,
+  "type": "sentence",
+  "ar": "قهوة مظبوطة لو سمحت",
+  "tr": "ʾahwa mazbooTa law samaHt",
+  "en": "Coffee with medium sugar, please"
+ },
+ {
+  "id": "crs_026",
+  "level": 82,
+  "type": "sentence",
+  "ar": "قهوة سادة",
+  "tr": "ʾahwa saada",
+  "en": "Black coffee, no sugar"
+ },
+ {
+  "id": "crs_027",
+  "level": 82,
+  "type": "sentence",
+  "ar": "مية معدنية ساقعة",
+  "tr": "mayya maʿdaneyya saʾʿa",
+  "en": "Cold mineral water"
+ },
+ {
+  "id": "crs_028",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الحساب هيبقى قد إيه تقريباً؟",
+  "tr": "el-Hesaab hayebʾa ʾadd eh taʾriiban?",
+  "en": "About how much will the bill be?"
+ },
+ {
+  "id": "crs_029",
+  "level": 82,
+  "type": "sentence",
+  "ar": "لسه الأكل ما جاش",
+  "tr": "lessa el-akl ma gaash",
+  "en": "The food hasn't come yet"
+ },
+ {
+  "id": "crs_030",
+  "level": 82,
+  "type": "sentence",
+  "ar": "بقالنا كتير مستنيين",
+  "tr": "baʾaalna ketiir mestanneyyiin",
+  "en": "We've been waiting a long time"
+ },
+ {
+  "id": "crs_031",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن تستعجل الطلب؟",
+  "tr": "momken testaʿgel eT-Talab?",
+  "en": "Can you hurry the order?"
+ },
+ {
+  "id": "crs_032",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الأكل وصل أخيراً",
+  "tr": "el-akl weSel akhiiran",
+  "en": "The food finally arrived"
+ },
+ {
+  "id": "crs_033",
+  "level": 82,
+  "type": "sentence",
+  "ar": "بالهنا والشفا",
+  "tr": "bel-hana wesh-shefa",
+  "en": "Bon appétit!"
+ },
+ {
+  "id": "crs_034",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الله يهنيك",
+  "tr": "allah yehanniik",
+  "en": "Reply to bon appétit (to m)"
+ },
+ {
+  "id": "crs_035",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الأكل ده تحفة",
+  "tr": "el-akl da toHfa",
+  "en": "This food is amazing"
+ },
+ {
+  "id": "crs_036",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الطعم جميل أوي",
+  "tr": "eT-Taʿm gamiil awi",
+  "en": "The taste is wonderful"
+ },
+ {
+  "id": "crs_037",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ده أحلى كشري كلته",
+  "tr": "da aHla koshari kalto",
+  "en": "This is the best koshari I've eaten"
+ },
+ {
+  "id": "crs_038",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الأكل بارد شوية",
+  "tr": "el-akl baared shwayya",
+  "en": "The food is a bit cold"
+ },
+ {
+  "id": "crs_039",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن تسخنه تاني؟",
+  "tr": "momken tesakhkhano taani?",
+  "en": "Can you heat it up again?"
+ },
+ {
+  "id": "crs_040",
+  "level": 82,
+  "type": "sentence",
+  "ar": "في حاجة غلط في الطلب",
+  "tr": "fi Haaga ghalaT feT-Talab",
+  "en": "There's something wrong with the order"
+ },
+ {
+  "id": "crs_041",
+  "level": 82,
+  "type": "sentence",
+  "ar": "أنا ما طلبتش ده",
+  "tr": "ana ma Talabtesh da",
+  "en": "I didn't order this"
+ },
+ {
+  "id": "crs_042",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن تغيرهولي؟",
+  "tr": "momken tghayyarhooli?",
+  "en": "Can you change it for me?"
+ },
+ {
+  "id": "crs_043",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن شوية عيش كمان؟",
+  "tr": "momken shwayyet ʿeish kamaan?",
+  "en": "Can I have some more bread?"
+ },
+ {
+  "id": "crs_044",
+  "level": 82,
+  "type": "sentence",
+  "ar": "هاتلي معلقة نضيفة",
+  "tr": "haatli maʿlaʾa neDiifa",
+  "en": "Bring me a clean spoon"
+ },
+ {
+  "id": "crs_045",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن شوكة وسكينة؟",
+  "tr": "momken shooka we-sekkiina?",
+  "en": "Can I have a fork and knife?"
+ },
+ {
+  "id": "crs_046",
+  "level": 82,
+  "type": "sentence",
+  "ar": "فين الحمام لو سمحت؟",
+  "tr": "fein el-Hammaam law samaHt?",
+  "en": "Where's the bathroom, please?"
+ },
+ {
+  "id": "crs_047",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن الملح والفلفل؟",
+  "tr": "momken el-malH wel-felfel?",
+  "en": "Can I have salt and pepper?"
+ },
+ {
+  "id": "crs_048",
+  "level": 82,
+  "type": "sentence",
+  "ar": "شبعت خلاص",
+  "tr": "shebeʿt khalaaS",
+  "en": "I'm full now"
+ },
+ {
+  "id": "crs_049",
+  "level": 82,
+  "type": "sentence",
+  "ar": "مش قادر أكمل",
+  "tr": "mesh ʾaader akammel",
+  "en": "I can't finish (m)"
+ },
+ {
+  "id": "crs_050",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن تلفلي الباقي؟",
+  "tr": "momken telefli el-baaʾi?",
+  "en": "Can you wrap the rest for me?"
+ },
+ {
+  "id": "crs_051",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عايزين حلو بعد الأكل",
+  "tr": "ʿayziin Helw baʿd el-akl",
+  "en": "We want dessert after the meal"
+ },
+ {
+  "id": "crs_052",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عندكم أم علي؟",
+  "tr": "ʿandoko omm ʿali?",
+  "en": "Do you have Om Ali?"
+ },
+ {
+  "id": "crs_053",
+  "level": 82,
+  "type": "sentence",
+  "ar": "واحد رز بلبن",
+  "tr": "waaHed rozz be-laban",
+  "en": "One rice pudding"
+ },
+ {
+  "id": "crs_054",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الكنافة عندكم طازة؟",
+  "tr": "el-konaafa ʿandoko Taaza?",
+  "en": "Is your kunafa fresh?"
+ },
+ {
+  "id": "crs_055",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الحساب لو سمحت يا ريس",
+  "tr": "el-Hesaab law samaHt ya rayyes",
+  "en": "The bill please, chief"
+ },
+ {
+  "id": "crs_056",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الحساب كله على بعضه كام؟",
+  "tr": "el-Hesaab kollo ʿala baʿDo kaam?",
+  "en": "How much is the bill altogether?"
+ },
+ {
+  "id": "crs_057",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الحساب عليا النهاردة",
+  "tr": "el-Hesaab ʿalayya en-naharda",
+  "en": "The bill is on me today"
+ },
+ {
+  "id": "crs_058",
+  "level": 82,
+  "type": "sentence",
+  "ar": "لا خالص، أنا اللي هدفع",
+  "tr": "laʾ khaaleS, ana elli hadfaʿ",
+  "en": "No way, I'm the one paying"
+ },
+ {
+  "id": "crs_059",
+  "level": 82,
+  "type": "sentence",
+  "ar": "نقسمه بينا",
+  "tr": "neʾsemo beina",
+  "en": "Let's split it between us"
+ },
+ {
+  "id": "crs_060",
+  "level": 82,
+  "type": "sentence",
+  "ar": "بتاخدوا فيزا؟",
+  "tr": "betaakhdo visa?",
+  "en": "Do you take Visa?"
+ },
+ {
+  "id": "crs_061",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الدفع كاش بس؟",
+  "tr": "ed-dafʿ cash bass?",
+  "en": "Is payment cash only?"
+ },
+ {
+  "id": "crs_062",
+  "level": 82,
+  "type": "sentence",
+  "ar": "اتفضل الباقي",
+  "tr": "etfaDDal el-baaʾi",
+  "en": "Here's your change (to m)"
+ },
+ {
+  "id": "crs_063",
+  "level": 82,
+  "type": "sentence",
+  "ar": "خلي الباقي ليك",
+  "tr": "khalli el-baaʾi liik",
+  "en": "Keep the change (to m)"
+ },
+ {
+  "id": "crs_064",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الخدمة كانت ممتازة",
+  "tr": "el-khedma kaanet momtaaza",
+  "en": "The service was excellent"
+ },
+ {
+  "id": "crs_065",
+  "level": 82,
+  "type": "sentence",
+  "ar": "هنرجع تاني أكيد",
+  "tr": "hanergaʿ taani akiid",
+  "en": "We'll definitely come back"
+ },
+ {
+  "id": "crs_066",
+  "level": 82,
+  "type": "sentence",
+  "ar": "المكان ده نضيف",
+  "tr": "el-makaan da neDiif",
+  "en": "This place is clean"
+ },
+ {
+  "id": "crs_067",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الريحة هنا حلوة",
+  "tr": "er-riiHa hena Helwa",
+  "en": "It smells good here"
+ },
+ {
+  "id": "crs_068",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عايزين نحجز ترابيزة بكرة",
+  "tr": "ʿayziin neHgez Tarabeiza bokra",
+  "en": "We want to reserve a table for tomorrow"
+ },
+ {
+  "id": "crs_069",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الحجز باسم مين؟",
+  "tr": "el-Hagz be-esm miin?",
+  "en": "Under what name is the reservation?"
+ },
+ {
+  "id": "crs_070",
+  "level": 82,
+  "type": "sentence",
+  "ar": "إحنا أربعة أفراد",
+  "tr": "eHna arbaʿa afraad",
+  "en": "We are four people"
+ },
+ {
+  "id": "crs_071",
+  "level": 82,
+  "type": "sentence",
+  "ar": "المطعم بيقفل الساعة كام؟",
+  "tr": "el-maTʿam beyeʾfel es-saaʿa kaam?",
+  "en": "What time does the restaurant close?"
+ },
+ {
+  "id": "crs_072",
+  "level": 82,
+  "type": "sentence",
+  "ar": "لسه فاتحين؟",
+  "tr": "lessa fatHiin?",
+  "en": "Are you still open?"
+ },
+ {
+  "id": "crs_073",
+  "level": 82,
+  "type": "sentence",
+  "ar": "بتوصلوا أوردرات للبيت؟",
+  "tr": "betwaSSalo orderaat lel-beit?",
+  "en": "Do you deliver to homes?"
+ },
+ {
+  "id": "crs_074",
+  "level": 82,
+  "type": "sentence",
+  "ar": "التوصيل بياخد قد إيه؟",
+  "tr": "et-tawSiil beyaakhod ʾadd eh?",
+  "en": "How long does delivery take?"
+ },
+ {
+  "id": "crs_075",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عايز أطلب تيك أواي",
+  "tr": "ʿaayez aTlob take away",
+  "en": "I want to order takeaway (m)"
+ },
+ {
+  "id": "crs_076",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الأوردر جاهز إمتى؟",
+  "tr": "el-order gaahez emta?",
+  "en": "When will the order be ready?"
+ },
+ {
+  "id": "crs_077",
+  "level": 82,
+  "type": "sentence",
+  "ar": "استنى خمس دقايق بس",
+  "tr": "estanna khamas daʾaayeʾ bass",
+  "en": "Wait just five minutes (to m)"
+ },
+ {
+  "id": "crs_078",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الفطار بيبدأ الساعة كام؟",
+  "tr": "el-feTaar beyebdaʾ es-saaʿa kaam?",
+  "en": "What time does breakfast start?"
+ },
+ {
+  "id": "crs_079",
+  "level": 82,
+  "type": "sentence",
+  "ar": "بتعملوا فطار بلدي؟",
+  "tr": "betaʿmelo feTaar baladi?",
+  "en": "Do you make traditional breakfast?"
+ },
+ {
+  "id": "crs_080",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الجبنة دي إيه؟",
+  "tr": "el-gebna di eh?",
+  "en": "What cheese is this?"
+ },
+ {
+  "id": "crs_081",
+  "level": 82,
+  "type": "sentence",
+  "ar": "عايز بيض بالبسطرمة",
+  "tr": "ʿaayez beiD bel-basTerma",
+  "en": "I want eggs with basterma (m)"
+ },
+ {
+  "id": "crs_082",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الشوربة سخنة؟",
+  "tr": "esh-shorba sokhna?",
+  "en": "Is the soup hot?"
+ },
+ {
+  "id": "crs_083",
+  "level": 82,
+  "type": "sentence",
+  "ar": "السلطة طازة النهاردة؟",
+  "tr": "es-salaTa Taaza en-naharda?",
+  "en": "Is the salad fresh today?"
+ },
+ {
+  "id": "crs_084",
+  "level": 82,
+  "type": "sentence",
+  "ar": "زود الطحينة شوية",
+  "tr": "zawwed eT-TeHiina shwayya",
+  "en": "Add more tahini"
+ },
+ {
+  "id": "crs_085",
+  "level": 82,
+  "type": "sentence",
+  "ar": "السمك طازة ولا مجمد؟",
+  "tr": "es-samak Taaza walla megammed?",
+  "en": "Is the fish fresh or frozen?"
+ },
+ {
+  "id": "crs_086",
+  "level": 82,
+  "type": "sentence",
+  "ar": "اشوي السمك من غير قلي",
+  "tr": "eshwi es-samak men gheir ʾali",
+  "en": "Grill the fish without frying"
+ },
+ {
+  "id": "crs_087",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الجمبري بكام النهاردة؟",
+  "tr": "el-gambari be-kaam en-naharda?",
+  "en": "How much is the shrimp today?"
+ },
+ {
+  "id": "crs_088",
+  "level": 82,
+  "type": "sentence",
+  "ar": "قسمنا الطبق اتنين",
+  "tr": "ʾassemna eT-Tabaʾ etnein",
+  "en": "We split the dish in two"
+ },
+ {
+  "id": "crs_089",
+  "level": 82,
+  "type": "sentence",
+  "ar": "طبق صغير كفاية ليا",
+  "tr": "Tabaʾ Soghayyar kefaaya leyya",
+  "en": "A small plate is enough for me"
+ },
+ {
+  "id": "crs_090",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الكمية كبيرة أوي",
+  "tr": "el-kemmeyya kebiira awi",
+  "en": "The portion is very big"
+ },
+ {
+  "id": "crs_091",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن كرسي أطفال؟",
+  "tr": "momken korsi aTfaal?",
+  "en": "Can we have a highchair?"
+ },
+ {
+  "id": "crs_092",
+  "level": 82,
+  "type": "sentence",
+  "ar": "في ركن للعيلة؟",
+  "tr": "fi rokn lel-ʿeila?",
+  "en": "Is there a family section?"
+ },
+ {
+  "id": "crs_093",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الموسيقى عالية شوية",
+  "tr": "el-mosiiʾa ʿalya shwayya",
+  "en": "The music is a bit loud"
+ },
+ {
+  "id": "crs_094",
+  "level": 82,
+  "type": "sentence",
+  "ar": "ممكن نغير الترابيزة؟",
+  "tr": "momken neghayyar eT-Tarabeiza?",
+  "en": "Can we change tables?"
+ },
+ {
+  "id": "crs_095",
+  "level": 82,
+  "type": "sentence",
+  "ar": "في تكييف هنا؟",
+  "tr": "fi takyiif hena?",
+  "en": "Is there air conditioning here?"
+ },
+ {
+  "id": "crs_096",
+  "level": 82,
+  "type": "sentence",
+  "ar": "القهوة دي محوجة حلو",
+  "tr": "el-ʾahwa di meHawwega Helw",
+  "en": "This coffee is nicely spiced"
+ },
+ {
+  "id": "crs_097",
+  "level": 82,
+  "type": "sentence",
+  "ar": "الشاي تقيل ولا خفيف؟",
+  "tr": "esh-shaay teʾiil walla khafiif?",
+  "en": "Strong tea or light?"
+ },
+ {
+  "id": "crs_098",
+  "level": 82,
+  "type": "sentence",
+  "ar": "سكر زيادة لو سمحت",
+  "tr": "sokkar zeyaada law samaHt",
+  "en": "Extra sugar, please"
+ },
+ {
+  "id": "crs_099",
+  "level": 82,
+  "type": "sentence",
+  "ar": "من غير سكر خالص",
+  "tr": "men gheir sokkar khaaleS",
+  "en": "No sugar at all"
+ },
+ {
+  "id": "crs_100",
+  "level": 82,
+  "type": "sentence",
+  "ar": "تسلم إيد اللي طبخ",
+  "tr": "teslam iid elli Tabakh",
+  "en": "Bless the hands of whoever cooked"
+ },
+ {
+  "id": "csh_001",
+  "level": 83,
+  "type": "sentence",
+  "ar": "بكام ده لو سمحت؟",
+  "tr": "be-kaam da law samaHt?",
+  "en": "How much is this, please?"
+ },
+ {
+  "id": "csh_002",
+  "level": 83,
+  "type": "sentence",
+  "ar": "بكام الكيلو؟",
+  "tr": "be-kaam el-kilo?",
+  "en": "How much per kilo?"
+ },
+ {
+  "id": "csh_003",
+  "level": 83,
+  "type": "sentence",
+  "ar": "غالي أوي ليه؟",
+  "tr": "ghaali awi leih?",
+  "en": "Why is it so expensive?"
+ },
+ {
+  "id": "csh_004",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ده سعر كبير أوي",
+  "tr": "da seʿr kebiir awi",
+  "en": "That's a very high price"
+ },
+ {
+  "id": "csh_005",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ممكن تنزل في السعر شوية؟",
+  "tr": "momken tenzel fes-seʿr shwayya?",
+  "en": "Can you lower the price a bit?"
+ },
+ {
+  "id": "csh_006",
+  "level": 83,
+  "type": "sentence",
+  "ar": "آخر كلام بكام؟",
+  "tr": "aakher kalaam be-kaam?",
+  "en": "What's your final price?"
+ },
+ {
+  "id": "csh_007",
+  "level": 83,
+  "type": "sentence",
+  "ar": "قول سعر معقول",
+  "tr": "ʾool seʿr maʿʾool",
+  "en": "Give me a reasonable price"
+ },
+ {
+  "id": "csh_008",
+  "level": 83,
+  "type": "sentence",
+  "ar": "هاخد اتنين، اعملي سعر حلو",
+  "tr": "haakhod etnein, eʿmeli seʿr Helw",
+  "en": "I'll take two, give me a good price (to f)"
+ },
+ {
+  "id": "csh_009",
+  "level": 83,
+  "type": "sentence",
+  "ar": "لو خدت تلاتة بكام؟",
+  "tr": "law khadt talaata be-kaam?",
+  "en": "If I take three, how much?"
+ },
+ {
+  "id": "csh_010",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ده آخر سعر عندي",
+  "tr": "da aakher seʿr ʿandi",
+  "en": "That's my final price"
+ },
+ {
+  "id": "csh_011",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ماشي، اتفقنا",
+  "tr": "maashi, ettafaʾna",
+  "en": "Okay, deal"
+ },
+ {
+  "id": "csh_012",
+  "level": 83,
+  "type": "sentence",
+  "ar": "لا، كده كتير عليا",
+  "tr": "laʾ, keda ketiir ʿalayya",
+  "en": "No, that's too much for me"
+ },
+ {
+  "id": "csh_013",
+  "level": 83,
+  "type": "sentence",
+  "ar": "هلف وأرجعلك",
+  "tr": "haleff wa-argaʿlak",
+  "en": "I'll look around and come back to you"
+ },
+ {
+  "id": "csh_014",
+  "level": 83,
+  "type": "sentence",
+  "ar": "شفت أرخص من كده هناك",
+  "tr": "shoft arkhaS men keda henaak",
+  "en": "I saw cheaper over there"
+ },
+ {
+  "id": "csh_015",
+  "level": 83,
+  "type": "sentence",
+  "ar": "عشان خاطري خليها كذا",
+  "tr": "ʿashaan khaTri khalliiha keza",
+  "en": "For my sake, make it such-and-such"
+ },
+ {
+  "id": "csh_016",
+  "level": 83,
+  "type": "sentence",
+  "ar": "افتحلي بيعة",
+  "tr": "eftaHli beiʿa",
+  "en": "Give me the opening-sale price"
+ },
+ {
+  "id": "csh_017",
+  "level": 83,
+  "type": "sentence",
+  "ar": "أنا زبون قديم عندك",
+  "tr": "ana zeboon ʾadiim ʿandak",
+  "en": "I'm an old customer of yours"
+ },
+ {
+  "id": "csh_018",
+  "level": 83,
+  "type": "sentence",
+  "ar": "عايز أشوف حاجة تانية",
+  "tr": "ʿaayez ashoof Haaga tanya",
+  "en": "I want to see something else (m)"
+ },
+ {
+  "id": "csh_019",
+  "level": 83,
+  "type": "sentence",
+  "ar": "وريني اللون الأزرق",
+  "tr": "warriini el-loon el-azraʾ",
+  "en": "Show me the blue color"
+ },
+ {
+  "id": "csh_020",
+  "level": 83,
+  "type": "sentence",
+  "ar": "في ألوان تانية؟",
+  "tr": "fi alwaan tanya?",
+  "en": "Are there other colors?"
+ },
+ {
+  "id": "csh_021",
+  "level": 83,
+  "type": "sentence",
+  "ar": "في مقاس أكبر؟",
+  "tr": "fi maʾaas akbar?",
+  "en": "Is there a bigger size?"
+ },
+ {
+  "id": "csh_022",
+  "level": 83,
+  "type": "sentence",
+  "ar": "في مقاس أصغر؟",
+  "tr": "fi maʾaas aSghar?",
+  "en": "Is there a smaller size?"
+ },
+ {
+  "id": "csh_023",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ممكن أقيسه؟",
+  "tr": "momken aʾiiso?",
+  "en": "Can I try it on?"
+ },
+ {
+  "id": "csh_024",
+  "level": 83,
+  "type": "sentence",
+  "ar": "فين أوضة القياس؟",
+  "tr": "fein oDet el-ʾeyaas?",
+  "en": "Where's the fitting room?"
+ },
+ {
+  "id": "csh_025",
+  "level": 83,
+  "type": "sentence",
+  "ar": "المقاس ده ظبط معايا",
+  "tr": "el-maʾaas da ZabaT maʿaaya",
+  "en": "This size fits me"
+ },
+ {
+  "id": "csh_026",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ضيق عليا شوية",
+  "tr": "Dayyaʾ ʿalayya shwayya",
+  "en": "It's a bit tight on me"
+ },
+ {
+  "id": "csh_027",
+  "level": 83,
+  "type": "sentence",
+  "ar": "واسع أوي عليا",
+  "tr": "waaseʿ awi ʿalayya",
+  "en": "It's too loose on me"
+ },
+ {
+  "id": "csh_028",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الخامة دي قطن؟",
+  "tr": "el-khaama di ʾoTn?",
+  "en": "Is this material cotton?"
+ },
+ {
+  "id": "csh_029",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الخامة حلوة أوي",
+  "tr": "el-khaama Helwa awi",
+  "en": "The material is very nice"
+ },
+ {
+  "id": "csh_030",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ده صناعة مصرية؟",
+  "tr": "da Senaaʿa maSreyya?",
+  "en": "Is this made in Egypt?"
+ },
+ {
+  "id": "csh_031",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ده أصلي ولا تقليد؟",
+  "tr": "da aSli walla taʾliid?",
+  "en": "Is this original or fake?"
+ },
+ {
+  "id": "csh_032",
+  "level": 83,
+  "type": "sentence",
+  "ar": "عليه ضمان؟",
+  "tr": "ʿaleih Damaan?",
+  "en": "Does it have a warranty?"
+ },
+ {
+  "id": "csh_033",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الضمان لمدة قد إيه؟",
+  "tr": "eD-Damaan le-moddet ʾadd eh?",
+  "en": "How long is the warranty?"
+ },
+ {
+  "id": "csh_034",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ممكن أرجعه لو مش عاجبني؟",
+  "tr": "momken aragaʿo law mesh ʿagebni?",
+  "en": "Can I return it if I don't like it?"
+ },
+ {
+  "id": "csh_035",
+  "level": 83,
+  "type": "sentence",
+  "ar": "سياسة الاسترجاع إيه؟",
+  "tr": "seyaset el-estergaaʿ eh?",
+  "en": "What's the return policy?"
+ },
+ {
+  "id": "csh_036",
+  "level": 83,
+  "type": "sentence",
+  "ar": "هاتلي الفاتورة لو سمحت",
+  "tr": "haatli el-fatoora law samaHt",
+  "en": "Give me the receipt, please"
+ },
+ {
+  "id": "csh_037",
+  "level": 83,
+  "type": "sentence",
+  "ar": "احتفظ بالفاتورة",
+  "tr": "eHtafeZ bel-fatoora",
+  "en": "Keep the receipt (to m)"
+ },
+ {
+  "id": "csh_038",
+  "level": 83,
+  "type": "sentence",
+  "ar": "في خصم النهاردة؟",
+  "tr": "fi khaSm en-naharda?",
+  "en": "Is there a discount today?"
+ },
+ {
+  "id": "csh_039",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الأوكازيون لحد إمتى؟",
+  "tr": "el-okazyoon le-Hadd emta?",
+  "en": "Until when is the sale?"
+ },
+ {
+  "id": "csh_040",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الخصم على كل حاجة؟",
+  "tr": "el-khaSm ʿala koll Haaga?",
+  "en": "Is the discount on everything?"
+ },
+ {
+  "id": "csh_041",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ده بالخصم ولا من غيره؟",
+  "tr": "da bel-khaSm walla men gheiro?",
+  "en": "Is this price with or without the discount?"
+ },
+ {
+  "id": "csh_042",
+  "level": 83,
+  "type": "sentence",
+  "ar": "عايز هدية لصاحبي",
+  "tr": "ʿaayez hedeyya le-SaHbi",
+  "en": "I want a gift for my friend (m)"
+ },
+ {
+  "id": "csh_043",
+  "level": 83,
+  "type": "sentence",
+  "ar": "عايزة هدية لماما",
+  "tr": "ʿayza hedeyya le-mama",
+  "en": "I want a gift for my mom (f)"
+ },
+ {
+  "id": "csh_044",
+  "level": 83,
+  "type": "sentence",
+  "ar": "تنصحني أجيب إيه؟",
+  "tr": "tenSaHni agiib eh?",
+  "en": "What do you advise me to get?"
+ },
+ {
+  "id": "csh_045",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ممكن تغلفهولي هدية؟",
+  "tr": "momken teghallefhooli hedeyya?",
+  "en": "Can you gift-wrap it for me?"
+ },
+ {
+  "id": "csh_046",
+  "level": 83,
+  "type": "sentence",
+  "ar": "التغليف ببلاش؟",
+  "tr": "et-taghliif be-balaash?",
+  "en": "Is the wrapping free?"
+ },
+ {
+  "id": "csh_047",
+  "level": 83,
+  "type": "sentence",
+  "ar": "فين قسم الرجالي؟",
+  "tr": "fein ʾesm er-regaali?",
+  "en": "Where's the men's section?"
+ },
+ {
+  "id": "csh_048",
+  "level": 83,
+  "type": "sentence",
+  "ar": "فين قسم الحريمي؟",
+  "tr": "fein ʾesm el-Hariimi?",
+  "en": "Where's the women's section?"
+ },
+ {
+  "id": "csh_049",
+  "level": 83,
+  "type": "sentence",
+  "ar": "فين قسم الأطفال؟",
+  "tr": "fein ʾesm el-aTfaal?",
+  "en": "Where's the kids' section?"
+ },
+ {
+  "id": "csh_050",
+  "level": 83,
+  "type": "sentence",
+  "ar": "المحل بيفتح الساعة كام؟",
+  "tr": "el-maHall beyeftaH es-saaʿa kaam?",
+  "en": "What time does the shop open?"
+ },
+ {
+  "id": "csh_051",
+  "level": 83,
+  "type": "sentence",
+  "ar": "بتقفلوا يوم الجمعة؟",
+  "tr": "beteʾfelo yoom el-gomʿa?",
+  "en": "Do you close on Fridays?"
+ },
+ {
+  "id": "csh_052",
+  "level": 83,
+  "type": "sentence",
+  "ar": "السوق ده مشهور بإيه؟",
+  "tr": "es-sooʾ da mashhoor be-eh?",
+  "en": "What is this market famous for?"
+ },
+ {
+  "id": "csh_053",
+  "level": 83,
+  "type": "sentence",
+  "ar": "خان الخليلي بعيد من هنا؟",
+  "tr": "khaan el-khaliili beʿiid men hena?",
+  "en": "Is Khan el-Khalili far from here?"
+ },
+ {
+  "id": "csh_054",
+  "level": 83,
+  "type": "sentence",
+  "ar": "عايز سوفنير من مصر",
+  "tr": "ʿaayez souvenir men maSr",
+  "en": "I want a souvenir from Egypt (m)"
+ },
+ {
+  "id": "csh_055",
+  "level": 83,
+  "type": "sentence",
+  "ar": "البازار ده كله تحف",
+  "tr": "el-bazaar da kollo toHaf",
+  "en": "This bazaar is full of treasures"
+ },
+ {
+  "id": "csh_056",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الفضة دي شغل إيد؟",
+  "tr": "el-faDDa di shoghl iid?",
+  "en": "Is this silver handmade?"
+ },
+ {
+  "id": "csh_057",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الدهب عيار كام؟",
+  "tr": "ed-dahab ʿeyaar kaam?",
+  "en": "What karat is the gold?"
+ },
+ {
+  "id": "csh_058",
+  "level": 83,
+  "type": "sentence",
+  "ar": "اوزنهولي لو سمحت",
+  "tr": "eweznhooli law samaHt",
+  "en": "Weigh it for me, please"
+ },
+ {
+  "id": "csh_059",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الجرام بكام النهاردة؟",
+  "tr": "el-geraam be-kaam en-naharda?",
+  "en": "How much per gram today?"
+ },
+ {
+  "id": "csh_060",
+  "level": 83,
+  "type": "sentence",
+  "ar": "عايز فاكهة طازة",
+  "tr": "ʿaayez fakha Taaza",
+  "en": "I want fresh fruit (m)"
+ },
+ {
+  "id": "csh_061",
+  "level": 83,
+  "type": "sentence",
+  "ar": "المانجا دي حلوة؟",
+  "tr": "el-manga di Helwa?",
+  "en": "Are these mangoes sweet?"
+ },
+ {
+  "id": "csh_062",
+  "level": 83,
+  "type": "sentence",
+  "ar": "دوقني واحدة",
+  "tr": "dawwaʾni waHda",
+  "en": "Let me taste one"
+ },
+ {
+  "id": "csh_063",
+  "level": 83,
+  "type": "sentence",
+  "ar": "اديني كيلو طماطم",
+  "tr": "eddiini kilo TamaaTem",
+  "en": "Give me a kilo of tomatoes"
+ },
+ {
+  "id": "csh_064",
+  "level": 83,
+  "type": "sentence",
+  "ar": "نقيلي الحلو منهم",
+  "tr": "naʾʾiili el-Helw menhom",
+  "en": "Pick the good ones for me"
+ },
+ {
+  "id": "csh_065",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ده مش طازة خالص",
+  "tr": "da mesh Taaza khaaleS",
+  "en": "This isn't fresh at all"
+ },
+ {
+  "id": "csh_066",
+  "level": 83,
+  "type": "sentence",
+  "ar": "غيرهولي بواحد أحسن",
+  "tr": "ghayyarhooli be-waaHed aHsan",
+  "en": "Replace it with a better one"
+ },
+ {
+  "id": "csh_067",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الميزان ظابط؟",
+  "tr": "el-miizaan ZaabeT?",
+  "en": "Is the scale accurate?"
+ },
+ {
+  "id": "csh_068",
+  "level": 83,
+  "type": "sentence",
+  "ar": "زود شوية كمان",
+  "tr": "zawwed shwayya kamaan",
+  "en": "Add a bit more"
+ },
+ {
+  "id": "csh_069",
+  "level": 83,
+  "type": "sentence",
+  "ar": "كفاية كده شكراً",
+  "tr": "kefaaya keda shokran",
+  "en": "That's enough, thanks"
+ },
+ {
+  "id": "csh_070",
+  "level": 83,
+  "type": "sentence",
+  "ar": "حطهم في كيس لو سمحت",
+  "tr": "HoTTohom fi kiis law samaHt",
+  "en": "Put them in a bag, please"
+ },
+ {
+  "id": "csh_071",
+  "level": 83,
+  "type": "sentence",
+  "ar": "كيس تاني لو سمحت",
+  "tr": "kiis taani law samaHt",
+  "en": "Another bag, please"
+ },
+ {
+  "id": "csh_072",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الكيس ده هيتقطع",
+  "tr": "el-kiis da hayetʾeTeʿ",
+  "en": "This bag is going to tear"
+ },
+ {
+  "id": "csh_073",
+  "level": 83,
+  "type": "sentence",
+  "ar": "المجموع كام كده؟",
+  "tr": "el-magmooʿ kaam keda?",
+  "en": "What's the total?"
+ },
+ {
+  "id": "csh_074",
+  "level": 83,
+  "type": "sentence",
+  "ar": "معايا فكة كفاية",
+  "tr": "maʿaaya fakka kefaaya",
+  "en": "I have enough change"
+ },
+ {
+  "id": "csh_075",
+  "level": 83,
+  "type": "sentence",
+  "ar": "معنديش فكة خالص",
+  "tr": "maʿandiish fakka khaaleS",
+  "en": "I don't have any change"
+ },
+ {
+  "id": "csh_076",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الباقي مش مظبوط",
+  "tr": "el-baaʾi mesh mazbooT",
+  "en": "The change isn't right"
+ },
+ {
+  "id": "csh_077",
+  "level": 83,
+  "type": "sentence",
+  "ar": "اتأكد من الباقي",
+  "tr": "etʾakked men el-baaʾi",
+  "en": "Check the change (to m)"
+ },
+ {
+  "id": "csh_078",
+  "level": 83,
+  "type": "sentence",
+  "ar": "بتاخدوا دفع بالموبايل؟",
+  "tr": "betaakhdo dafʿ bel-mobile?",
+  "en": "Do you take mobile payment?"
+ },
+ {
+  "id": "csh_079",
+  "level": 83,
+  "type": "sentence",
+  "ar": "الماكينة مش شغالة",
+  "tr": "el-makana mesh shaghghaala",
+  "en": "The card machine isn't working"
+ },
+ {
+  "id": "csh_080",
+  "level": 83,
+  "type": "sentence",
+  "ar": "في صراف آلي قريب؟",
+  "tr": "fi Sarraaf aali ʾorayyeb?",
+  "en": "Is there an ATM nearby?"
+ },
+ {
+  "id": "csh_081",
+  "level": 83,
+  "type": "sentence",
+  "ar": "هسحب فلوس وأرجع",
+  "tr": "hasHab feloos wa-argaʿ",
+  "en": "I'll withdraw money and come back"
+ },
+ {
+  "id": "csh_082",
+  "level": 83,
+  "type": "sentence",
+  "ar": "احجزلي الحاجة دي",
+  "tr": "eHgezli el-Haaga di",
+  "en": "Reserve this item for me"
+ },
+ {
+  "id": "csh_083",
+  "level": 83,
+  "type": "sentence",
+  "ar": "هرجع أخدها بكرة",
+  "tr": "hargaʿ akhod-ha bokra",
+  "en": "I'll come back for it tomorrow"
+ },
+ {
+  "id": "csh_084",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ممكن توصلوها للبيت؟",
+  "tr": "momken tewaSSalooha lel-beit?",
+  "en": "Can you deliver it to my home?"
+ },
+ {
+  "id": "csh_085",
+  "level": 83,
+  "type": "sentence",
+  "ar": "التوصيل بفلوس؟",
+  "tr": "et-tawSiil be-feloos?",
+  "en": "Is delivery paid?"
+ },
+ {
+  "id": "csh_086",
+  "level": 83,
+  "type": "sentence",
+  "ar": "اكتبلي العنوان هنا",
+  "tr": "ektebli el-ʿenwaan hena",
+  "en": "Write the address for me here"
+ },
+ {
+  "id": "csh_087",
+  "level": 83,
+  "type": "sentence",
+  "ar": "المحل ده أسعاره حلوة",
+  "tr": "el-maHall da asʿaaro Helwa",
+  "en": "This shop has good prices"
+ },
+ {
+  "id": "csh_088",
+  "level": 83,
+  "type": "sentence",
+  "ar": "المكان ده أسعاره نار",
+  "tr": "el-makaan da asʿaaro naar",
+  "en": "This place's prices are on fire (expensive)"
+ },
+ {
+  "id": "csh_089",
+  "level": 83,
+  "type": "sentence",
+  "ar": "البضاعة عندهم ممتازة",
+  "tr": "el-beDaaʿa ʿandohom momtaaza",
+  "en": "Their merchandise is excellent"
+ },
+ {
+  "id": "csh_090",
+  "level": 83,
+  "type": "sentence",
+  "ar": "اشتريت بأكتر من اللازم",
+  "tr": "eshtareit be-aktar men el-laazem",
+  "en": "I bought more than I should have"
+ },
+ {
+  "id": "csh_091",
+  "level": 83,
+  "type": "sentence",
+  "ar": "صرفت كل فلوسي النهاردة",
+  "tr": "Saraft koll feloosi en-naharda",
+  "en": "I spent all my money today"
+ },
+ {
+  "id": "csh_092",
+  "level": 83,
+  "type": "sentence",
+  "ar": "التسوق هنا متعة",
+  "tr": "et-tasawwoʾ hena motʿa",
+  "en": "Shopping here is a delight"
+ },
+ {
+  "id": "csh_093",
+  "level": 83,
+  "type": "sentence",
+  "ar": "زحمة أوي في السوق",
+  "tr": "zaHma awi fes-sooʾ",
+  "en": "The market is very crowded"
+ },
+ {
+  "id": "csh_094",
+  "level": 83,
+  "type": "sentence",
+  "ar": "خد بالك من حاجتك",
+  "tr": "khod baalak men Hagtak",
+  "en": "Watch your belongings (to m)"
+ },
+ {
+  "id": "csh_095",
+  "level": 83,
+  "type": "sentence",
+  "ar": "فين أقرب سوبر ماركت؟",
+  "tr": "fein aʾrab super market?",
+  "en": "Where's the nearest supermarket?"
+ },
+ {
+  "id": "csh_096",
+  "level": 83,
+  "type": "sentence",
+  "ar": "عندكم توصيل أونلاين؟",
+  "tr": "ʿandoko tawSiil online?",
+  "en": "Do you have online delivery?"
+ },
+ {
+  "id": "csh_097",
+  "level": 83,
+  "type": "sentence",
+  "ar": "السعر ده نهائي؟",
+  "tr": "es-seʿr da nehaaʾi?",
+  "en": "Is this price final?"
+ },
+ {
+  "id": "csh_098",
+  "level": 83,
+  "type": "sentence",
+  "ar": "ربنا يبارك في تجارتك",
+  "tr": "rabbena ybaarek fi tegartak",
+  "en": "May God bless your business (to m)"
+ },
+ {
+  "id": "csh_099",
+  "level": 83,
+  "type": "sentence",
+  "ar": "بيع وشرا مبارك",
+  "tr": "beiʿ we-shera mubaarak",
+  "en": "Blessed buying and selling"
+ },
+ {
+  "id": "csh_100",
+  "level": 83,
+  "type": "sentence",
+  "ar": "اتفضل فلوسك، تسلم",
+  "tr": "etfaDDal feloosak, teslam",
+  "en": "Here's your money, bless you (to m)"
  }
 ]

@@ -10,7 +10,7 @@ home screen.
 ## Features
 
 ### Vocabulary (WaniKani-style)
-- **1,024 items across 79 levels** — words, phrases, and full sentences, grouped by
+- **1,424 items across 83 levels** — words, phrases, and full sentences, grouped by
   theme and difficulty (greetings → grammar → daily life → dialogues → slang), with
   **male and female forms side by side**: every gendered word, phrase, and sentence
   (adjectives, commands, questions, endearments) appears in both forms, the feminine
@@ -209,7 +209,28 @@ home screen.
 
 ---
 
-*Last updated (v1.6.1 · 7/25/2026): every word's detail page now shows its **exact
+*Last updated (v2.0.0 · 7/25/2026): a huge one. **Conversations** — a new
+always-unlocked section (Home → 🗣 Conversations) with four themed categories of 100
+real exchanges each (Greetings & Small Talk, Meeting New People, Restaurant & Café,
+Shopping & Bargaining; 400 new items, 1,024 → 1,424), learned and reviewed with the
+exact same SRS, mastery tiers, audio, recording, and stats as everything else.
+**Choose which voice plays** — on any word with an own-voice recording, pick
+"Original" or "My voice" and the app plays your choice everywhere (no repo changes;
+the GitHub-commit feature was removed). **Edit any item** — ✎ Edit on the detail page
+corrects Arabic/transliteration/English app-wide, saved with your data. **Reorder
+items** — a reorder mode in Items moves items up/down within their level to set your
+learning priority (lessons follow your order). **Add cards to any level** — the
+add-card form now has a level picker, including Conversation categories. Audio for
+the new items: batches 31–47.*
+
+*Earlier (v1.7.0 · 7/25/2026): **make your own recording the official audio,
+straight from the app** — after recording your voice on a word, a "⬆ Make official"
+button converts it to MP3 in the browser and commits it to `audio/<id>.mp3` in the
+GitHub repo (updating the audio manifest too), replacing the pushed file. Needs a
+fine-grained GitHub token pasted once into Home → settings; the token stays on the
+device and is never included in backups.*
+
+*Earlier (v1.6.1 · 7/25/2026): every word's detail page now shows its **exact
 audio filename** (e.g. `audio/shokran.mp3`), so replacing an individual recording
 with a better one is a simple overwrite-and-push.*
 
