@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.0.1";
+const APP_VERSION = "2.1.0";
 const APP_UPDATED = "7/25/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -2810,9 +2810,9 @@ function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "
 }
 
 /* ===================== LEARN SESSION (teach N, then quiz them) ===================== */
-function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, onConv, quizType = "inapp", onQuizType, autoPlay = true }) {
+function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, onConv, autoStart = false, quizType = "inapp", onQuizType, autoPlay = true }) {
   const [queue] = useState(() => pool.slice(0, batch));
-  const [phase, setPhase] = useState("menu");
+  const [phase, setPhase] = useState(() => (autoStart && pool.length ? "teach" : "menu"));
   const [i, setI] = useState(0);
   const [peek, setPeek] = useState(null);
   const teachItem = queue[i];
@@ -2829,6 +2829,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
           </div>
         </div>
 
+        <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 8px" }}>Vocabulary</div>
         {/* Learn new words — primary */}
         <button className="tap" onClick={() => canLearn && setPhase("teach")} disabled={!canLearn} style={{ width: "100%", padding: 16, borderRadius: 14, marginBottom: 10, textAlign: "left", background: canLearn ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.panel, color: canLearn ? "#fff" : T.textDim, border: canLearn ? "none" : `1px solid ${T.line}`, boxShadow: canLearn ? "0 8px 20px rgba(128,29,92,.18)" : "none" }}>
           <div style={{ fontSize: 15, fontWeight: 700 }}>{canLearn ? `Learn ${queue.length} new word${queue.length === 1 ? "" : "s"} →` : "No new words right now"}</div>
@@ -2842,6 +2843,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
         </button>
 
         {/* Conversations */}
+        {onConv && <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "14px 2px 8px" }}>Conversations</div>}
         {onConv && (
           <button className="tap" onClick={onConv} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 10, textAlign: "left", border: `1px solid ${T.gold}55`, background: `${T.gold}0d`, color: T.gold }}>
             <div style={{ fontSize: 14, fontWeight: 700 }}>🗣 Conversation lessons →</div>
@@ -3762,13 +3764,18 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
   const [tr, setTr] = useState("");
   const [en, setEn] = useState("");
   const now = Date.now();
-  const levels = ["all", "conv", ...Array.from({ length: MAX_LEVEL }, (_, k) => k + 1)];
+  const vocabLevels = Array.from({ length: CONV_START - 1 }, (_, k) => k + 1);
+  const convLevels = [];
+  for (let l = CONV_START; l <= MAX_LEVEL; l++) if (allItems.some((x) => x.level === l)) convLevels.push(l);
+  const convTitle = (l) => (LEVEL_TITLES[l] || `Lv ${l}`).replace(/^Conversations: /, "");
+  const vocabCount = allItems.filter((x) => x.level < CONV_START).length;
+  const convCount = allItems.filter((x) => x.level >= CONV_START).length;
   const raw = query.trim();
   const ql = raw.toLowerCase();
   const qar = normAr(raw);
   const qtr = normTr(raw);
   const shown = allItems.filter((it) => {
-    if (!raw) return filter === "all" || (filter === "conv" ? it.level >= CONV_START : it.level === filter);
+    if (!raw) return filter === "all" || (filter === "conv" ? it.level >= CONV_START : filter === "vocab" ? it.level < CONV_START : it.level === filter);
     const enHit = it.en.toLowerCase().includes(ql);
     const trHit = qtr.length > 0 && (normTr(it.tr).includes(qtr) || (it.alts || []).some((a) => normTr(a).includes(qtr)));
     const arHit = qar.length > 0 && (normAr(it.ar).includes(qar) || (it.alts || []).some((a) => normAr(a).includes(qar)));
@@ -3815,10 +3822,22 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
           {shown.length} match{shown.length === 1 ? "" : "es"} across all levels
         </div>
       ) : (
-        <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8, marginBottom: 4 }}>
-          {levels.map((l) => (
-            <button key={l} className="tap" onClick={() => setFilter(l)} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === l ? T.gold : T.line}`, background: filter === l ? `${T.gold}18` : "transparent", color: filter === l ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>{l === "all" ? `All (${totalCount})` : l === "conv" ? `🗣 Conv (${allItems.filter((x) => x.level >= CONV_START).length})` : `Lv ${l} (${countByLevel[l] || 0})`}</button>
-          ))}
+        <div style={{ marginBottom: 4 }}>
+          <button className="tap" onClick={() => setFilter("all")} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === "all" ? T.gold : T.line}`, background: filter === "all" ? `${T.gold}18` : "transparent", color: filter === "all" ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600, marginBottom: 6 }}>All ({totalCount})</button>
+          <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 5px" }}>Vocabulary</div>
+          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 6 }}>
+            <button className="tap" onClick={() => setFilter("vocab")} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === "vocab" ? T.gold : T.line}`, background: filter === "vocab" ? `${T.gold}18` : "transparent", color: filter === "vocab" ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>All vocabulary ({vocabCount})</button>
+            {vocabLevels.map((l) => (
+              <button key={l} className="tap" onClick={() => setFilter(l)} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === l ? T.gold : T.line}`, background: filter === l ? `${T.gold}18` : "transparent", color: filter === l ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>Lv {l} ({countByLevel[l] || 0})</button>
+            ))}
+          </div>
+          <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "6px 2px 5px" }}>🗣 Conversations</div>
+          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8 }}>
+            <button className="tap" onClick={() => setFilter("conv")} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === "conv" ? T.gold : T.line}`, background: filter === "conv" ? `${T.gold}18` : "transparent", color: filter === "conv" ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>All conversations ({convCount})</button>
+            {convLevels.map((l) => (
+              <button key={l} className="tap" onClick={() => setFilter(l)} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === l ? T.gold : T.line}`, background: filter === l ? `${T.gold}18` : "transparent", color: filter === l ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>{convTitle(l)} ({countByLevel[l] || 0})</button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -4545,7 +4564,7 @@ function App() {
         {view === "script" && <ScriptView scriptState={state.script} setScript={(next) => persist({ ...state, script: next })} autoReview={scriptAuto} onAutoConsumed={() => setScriptAuto(false)} customLetters={state.customLetters || []} onCustomLetters={onCustomLetters} />}
         {view === "conv" && <ConvHub state={state} allItems={allItems} onBack={() => setView("lessons")} onLearn={startConvLearn} onQuiz={startConvQuiz} onItems={(l) => { setItemsFilter(l); setView("items"); }} />}
         {view === "convlearn" && convCat && (
-          <LearnSession pool={allItems.filter((it) => it.level === convCat && !state.progress[it.id])} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("conv")} learnedCount={allItems.filter((it) => it.level === convCat && state.progress[it.id]).length} onQuizLearned={() => startConvQuiz(convCat)} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
+          <LearnSession pool={allItems.filter((it) => it.level === convCat && !state.progress[it.id])} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("conv")} autoStart={true} learnedCount={allItems.filter((it) => it.level === convCat && state.progress[it.id]).length} onQuizLearned={() => startConvQuiz(convCat)} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}
         {view === "items" && (
           <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onAddByStage={onAddItemsToCustom} audioIds={audioIds} onReorder={onReorderLevel} initialFilter={itemsFilter} onOpenDetail={setDetailItem} />

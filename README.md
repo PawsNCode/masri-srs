@@ -209,7 +209,14 @@ home screen.
 
 ---
 
-*Last updated (v2.0.1 · 7/27/2026): **Conversations now lives inside Lessons** —
+*Last updated (v2.1.0 · 7/27/2026): **grouped Vocabulary vs Conversations
+everywhere** — the Lessons menu now has clear "Vocabulary" and "Conversations"
+sections, and the Items filter is reorganized into an All chip, a **Vocabulary row**
+(all vocabulary + Lv 1–79) and a **Conversations row** with each category by name
+(no more "Lv 80"). Plus, tapping **Learn new** in a Conversation category now jumps
+straight into the first item — no intermediate menu.*
+
+*Earlier (v2.0.1 · 7/27/2026): **Conversations now lives inside Lessons** —
 the Lessons menu has a "🗣 Conversation lessons" card (the Home shortcut is gone).
 Each conversation category gained a **"View all items"** button that jumps straight
 to the Items list filtered to that category — every conversation line shows there
