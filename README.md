@@ -209,7 +209,11 @@ home screen.
 
 ---
 
-*Last updated (v1.6.0 · 7/25/2026): **record your own pronunciation** — a 🎤
+*Last updated (v1.6.1 · 7/25/2026): every word's detail page now shows its **exact
+audio filename** (e.g. `audio/shokran.mp3`), so replacing an individual recording
+with a better one is a simple overwrite-and-push.*
+
+*Earlier (v1.6.0 · 7/25/2026): **record your own pronunciation** — a 🎤
 recorder on every word's detail page saves your voice beside the original audio,
 marks the word with 🎤 in Items, and rides along in backup export/import.*
 

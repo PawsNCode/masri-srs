@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.6.1";
 const APP_UPDATED = "7/25/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -2757,6 +2757,7 @@ function ItemDetail({ item, onClose, autoPlay }) {
           {AUDIO_SET && AUDIO_SET.has(item.id) && (
             <div style={{ fontSize: 11, color: T.textDim, marginTop: 8 }}>🎙 recorded Egyptian audio</div>
           )}
+          <div style={{ fontSize: 10.5, color: T.textDim, marginTop: 6, fontFamily: "ui-monospace, Menlo, Consolas, monospace" }}>audio/{item.id}.mp3</div>
           <VoiceRecorder itemId={item.id} />
         </div>
 
