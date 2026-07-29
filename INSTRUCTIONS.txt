@@ -25,7 +25,7 @@ DAILY ROUTINE (about 2 minutes, ~1-2 batches per day on free characters)
    There are 25 batches in total.
 
 WHENEVER YOU'VE DOWNLOADED SOME BATCHES
-1) In your repo folder run:      python3 split_audio.py
+1) In your repo folder run:      python split_audio.py
    It cuts each batch into word files in audio/ and verifies the count.
    Already-done batches are skipped; failed ones are reported, never
    half-saved.
