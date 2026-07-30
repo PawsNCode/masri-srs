@@ -31,7 +31,7 @@ WHENEVER YOU'VE DOWNLOADED SOME BATCHES
    half-saved.
 2) Push:
      git add .
-     git commit -m "add recorded Egyptian audio"
+     git commit -m "add recorded Egyptian audio - Batch 3"
      git push
 3) Tap "Refresh to latest version" in the app. Words with audio play
    the real recording; the rest keep the fallback voice until their
