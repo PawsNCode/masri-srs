@@ -31,8 +31,8 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.1.0";
-const APP_UPDATED = "7/25/2026";
+const APP_VERSION = "2.2.0";
+const APP_UPDATED = "7/30/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
 // makes the home-screen shortcut go stale). Progress lives in localStorage,
@@ -411,12 +411,21 @@ function playDataURL(url) {
     a.play().catch(() => {});
   } catch {}
 }
+/* Own-voice clips live in IndexedDB, which is async — and Safari will refuse to
+   start audio that begins after an await, because by then it no longer counts as
+   a response to your tap. So they're pulled into memory once at startup and
+   played straight from here. */
+const MY_REC = {};
+function primeMyRecordings(ids) {
+  (ids || []).forEach((id) => { if (!(id in MY_REC)) recGet(id).then((v) => { if (v) MY_REC[id] = v; }); });
+}
 function speak(text) {
   const id = AUDIO_ID_BY_AR[text];
-  // Per-word choice: if the user picked their own recording for this word, play that.
+  // Per-word choice: if you picked your own recording for this word, play that.
   if (id && REC_API && REC_API.pref(id) === "mine") {
-    const rec = REC_API.get(id);
-    if (rec) { playDataURL(rec); return; }
+    if (MY_REC[id]) { playDataURL(MY_REC[id]); return; }
+    recGet(id).then((v) => { if (v) { MY_REC[id] = v; playDataURL(v); } else speakTTS(text); });
+    return;
   }
   if (SPEECH_PREFS.recorded && id) playRecorded(id, () => speakTTS(text));
   else speakTTS(text);
@@ -699,6 +708,95 @@ const STROKE_GUIDE = {
 
 /* ---- Content: leveled words, phrases & sentences ---- */
 /* [id, level, type, arabic, translit, english, alts?] */
+/* ===================== ARABIZI / FRANCO-ARABIC =====================
+   Arabizi is how Egyptians actually text: Latin letters plus digits that stand
+   in for the Arabic sounds with no Latin equivalent — 3 = ع, 7 = ح, 5 = خ,
+   2 = the glottal stop (ء, and ق in Cairo speech).
+
+   Every card's Arabizi is generated from its Arabic spelling + transliteration
+   rather than stored by hand, so it stays correct when a card is edited.
+   The transliteration marks ح with a capital H (and ص ط ض ظ with S T D Z), which
+   is what lets us tell ح apart from ه; where a card uses a plain lowercase h we
+   fall back to lining the h's up against the Arabic spelling, in order.        */
+
+// The h-class letters in the Arabic spelling, in order: ح -> "7", ه -> "h".
+function hClassOf(ar) {
+  const out = [];
+  for (const ch of ar || "") {
+    if (ch === "\u062D") out.push("7");
+    else if (ch === "\u0647") out.push("h");
+  }
+  return out;
+}
+
+function toArabizi(ar, tr) {
+  if (!tr || tr === "\u2014" || tr === "-") return "";
+  const src = String(tr);
+  const toks = [];
+  let i = 0;
+  while (i < src.length) {
+    // A digraph only counts when the second letter is a lowercase h — a capital H
+    // is the marker for ح, so "betHebb" is bet+7ebb, not be+th+ebb.
+    const two = src[i + 1] === "h" ? src.slice(i, i + 2).toLowerCase() : "";
+    if (two === "kh") { toks.push({ t: "5" }); i += 2; continue; }
+    if (two === "sh") { toks.push({ t: "sh" }); i += 2; continue; }
+    if (two === "gh") { toks.push({ t: "gh" }); i += 2; continue; }
+    if (two === "th") { toks.push({ t: "th" }); i += 2; continue; }
+    if (two === "dh") { toks.push({ t: "dh" }); i += 2; continue; }
+    const c = src[i];
+    if (c === "\u02BF" || c === "\u02BB" || c === "\u02D5") { toks.push({ t: "3" }); i++; continue; }              // ʿ ayin
+    if (c === "\u02BE" || c === "\u02BC" || c === "'" || c === "\u2019") { toks.push({ t: "2" }); i++; continue; } // ʾ hamza
+    if (c === "H") { toks.push({ t: "7", hc: true }); i++; continue; }                                             // ح
+    if (c === "h") { toks.push({ hc: true }); i++; continue; }                                                     // ح or ه — resolved below
+    if (c === "S" || c === "T" || c === "D" || c === "Z") { toks.push({ t: c.toLowerCase() }); i++; continue; }    // ص ط ض ظ
+    toks.push({ t: c.toLowerCase() });
+    i++;
+  }
+  const hs = hClassOf(ar);
+  const idx = toks.map((t, k) => (t.hc ? k : -1)).filter((k) => k >= 0);
+  const hasHa = hs.includes("7"), hasHe = hs.includes("h");
+  const aligned = hs.length === idx.length;
+  idx.forEach((k, n) => {
+    if (toks[k].t === "7") return;                 // a capital H is already certain
+    let v;
+    if (aligned) v = hs[n];
+    else if (hasHa && !hasHe) v = "7";
+    else if (hasHe && !hasHa) v = "h";
+    else v = "h";
+    toks[k] = { t: v };
+  });
+  return toks.map((t) => t.t).join("");
+}
+
+/* Canonical Arabizi, used for grading. Franco spelling is personal — one person
+   writes "7abibi", another "habibi", another "habeebe" — so both the expected
+   answer and what you typed get folded down to the same skeleton before they're
+   compared. Anything that's genuinely the same word counts as right. */
+function normAz(s) {
+  if (!s) return "";
+  let x = String(s).toLowerCase();
+  x = x.replace(/[\u02BF\u02BB\u02BE\u02BC\u2019\u02D5`]/g, "'");
+  x = x.replace(/7'/g, "kh").replace(/5/g, "kh").replace(/x/g, "kh");
+  x = x.replace(/3'/g, "gh").replace(/8'/g, "gh");
+  x = x.replace(/9'/g, "d").replace(/6'/g, "z").replace(/9/g, "s").replace(/6/g, "t");
+  x = x.replace(/7/g, "h");
+  x = x.replace(/[2q8]/g, "");        // glottal stop — often just left out when texting
+  x = x.replace(/[^a-z0-9 ]/g, "");   // apostrophes, hyphens, question marks
+  x = x.replace(/e/g, "i").replace(/o/g, "u");
+  x = x.replace(/(.)\1+/g, "$1");     // collapse doubles
+  x = x.replace(/\s+/g, " ").trim();
+  return x;
+}
+
+// Does a typed Arabizi answer match this card? Accepts the card's own Arabizi,
+// its transliteration read as Arabizi, and any alternate spellings it carries.
+function azMatches(input, item) {
+  const g = normAz(input);
+  if (!g || !item) return false;
+  const forms = [item.az || toArabizi(item.ar, item.tr), item.tr, ...(item.azAlts || []), ...(item.alts || [])];
+  return forms.some((f) => f && normAz(f) === g);
+}
+
 const RAW = [
   // ===== L1 — Greetings & courtesy =====
   ["ahlan", 1, "word", "أهلاً", "ahlan", "Hello / hi"],
@@ -2281,20 +2379,168 @@ const RAW = [
   ["csh_098", 83, "sentence", "ربنا يبارك في تجارتك", "rabbena ybaarek fi tegartak", "May God bless your business (to m)"],
   ["csh_099", 83, "sentence", "بيع وشرا مبارك", "beiʿ we-shera mubaarak", "Blessed buying and selling"],
   ["csh_100", 83, "sentence", "اتفضل فلوسك، تسلم", "etfaDDal feloosak, teslam", "Here's your money, bless you (to m)"],
+
+  // ===== L84 — Verbs in Action (example sentences for the Verbs tab) =====
+  ["vs_akal_1", 84, "sentence", "أنا أكلت فطار", "ana akalt feTaar", "I ate breakfast"],
+  ["vs_akal_2", 84, "sentence", "بتاكل إيه؟", "betaakol eh?", "What are you eating?"],
+  ["vs_akal_3", 84, "sentence", "عايز آكل حاجة", "ʿaayez aakol Haaga", "I want to eat something"],
+  ["vs_shereb_1", 84, "sentence", "بشرب قهوة كل يوم", "bashrab ʾahwa koll yoom", "I drink coffee every day"],
+  ["vs_shereb_2", 84, "sentence", "تشرب إيه؟", "teshrab eh?", "What will you drink?"],
+  ["vs_shereb_3", 84, "sentence", "شربت المية كلها", "sherebt el-mayya kollaha", "I drank all the water"],
+  ["vs_rah_1", 84, "sentence", "رحت الشغل بدري", "roHt el-shoghl badri", "I went to work early"],
+  ["vs_rah_2", 84, "sentence", "رايح فين؟", "raayeH feen?", "Where are you going?"],
+  ["vs_rah_3", 84, "sentence", "هروح البيت دلوقتي", "haruuH el-beet delwaʾti", "I'll go home now"],
+  ["vs_geh_1", 84, "sentence", "جه امبارح", "geh embaareH", "He came yesterday"],
+  ["vs_geh_2", 84, "sentence", "تعالى هنا", "taʿaala hena", "Come here"],
+  ["vs_geh_3", 84, "sentence", "هاجي بعد شوية", "haagi baʿd shwayya", "I'll come in a bit"],
+  ["vs_amal_1", 84, "sentence", "بتعمل إيه؟", "betaʿmel eh?", "What are you doing?"],
+  ["vs_amal_2", 84, "sentence", "عملت الواجب", "ʿamalt el-waageb", "I did the homework"],
+  ["vs_amal_3", 84, "sentence", "ممكن تعملي شاي؟", "momken teʿmelli shaay?", "Can you make me tea?"],
+  ["vs_katab_1", 84, "sentence", "كتبت رسالة", "katabt resaala", "I wrote a letter"],
+  ["vs_katab_2", 84, "sentence", "اكتب اسمك هنا", "ektob esmak hena", "Write your name here"],
+  ["vs_katab_3", 84, "sentence", "بيكتب كويس", "beyektob kwayyes", "He writes well"],
+  ["vs_ara_1", 84, "sentence", "بقرا كتاب", "baʾra ketaab", "I'm reading a book"],
+  ["vs_ara_2", 84, "sentence", "قريت الخبر", "ʾareet el-khabar", "I read the news"],
+  ["vs_ara_3", 84, "sentence", "بتقرا عربي؟", "beteʾra ʿarabi?", "Do you read Arabic?"],
+  ["vs_shaf_1", 84, "sentence", "شفت الفيلم ده", "shoft el-film da", "I saw this film"],
+  ["vs_shaf_2", 84, "sentence", "بشوفك بكرة", "bashoofak bokra", "See you tomorrow"],
+  ["vs_shaf_3", 84, "sentence", "مش شايف حاجة", "mesh shaayef Haaga", "I can't see anything"],
+  ["vs_semeh_1", 84, "sentence", "بسمع موسيقى", "basmaʿ mosiiʾa", "I'm listening to music"],
+  ["vs_semeh_2", 84, "sentence", "سمعت الخبر؟", "semeʿt el-khabar?", "Did you hear the news?"],
+  ["vs_semeh_3", 84, "sentence", "اسمعني كويس", "esmaʿni kwayyes", "Listen to me carefully"],
+  ["vs_aal_1", 84, "sentence", "قال إيه؟", "ʾaal eh?", "What did he say?"],
+  ["vs_aal_2", 84, "sentence", "قوللي الحقيقة", "ʾolli el-Haʾiiʾa", "Tell me the truth"],
+  ["vs_aal_3", 84, "sentence", "مقلتش حاجة", "maʾoltesh Haaga", "I didn't say anything"],
+  ["vs_eshtara_1", 84, "sentence", "اشتريت هدوم جديدة", "eshtareet hedoom gediida", "I bought new clothes"],
+  ["vs_eshtara_2", 84, "sentence", "هشتري عيش", "hashteri ʿeesh", "I'll buy bread"],
+  ["vs_eshtara_3", 84, "sentence", "بتشتري منين؟", "beteshteri mneen?", "Where do you buy from?"],
+  ["vs_bah_1", 84, "sentence", "باع العربية", "baaʿ el-ʿarabeyya", "He sold the car"],
+  ["vs_bah_2", 84, "sentence", "بتبيع إيه هنا؟", "betbiiʿ eh hena?", "What do you sell here?"],
+  ["vs_bah_3", 84, "sentence", "مش هبيع بيتي", "mesh habiiʿ beeti", "I won't sell my house"],
+  ["vs_khad_1", 84, "sentence", "خد الفلوس", "khod el-feloos", "Take the money"],
+  ["vs_khad_2", 84, "sentence", "خدت تاكسي", "khadt taksi", "I took a taxi"],
+  ["vs_khad_3", 84, "sentence", "هاخد ده لو سمحت", "haakhod da law samaHt", "I'll take this, please"],
+  ["vs_edda_1", 84, "sentence", "إديني كتاب", "eddiini ketaab", "Give me a book"],
+  ["vs_edda_2", 84, "sentence", "إديته الفلوس", "eddeeto el-feloos", "I gave him the money"],
+  ["vs_edda_3", 84, "sentence", "هيديك العنوان", "haydiik el-ʿenwaan", "He'll give you the address"],
+  ["vs_fatah_1", 84, "sentence", "افتح الشباك", "eftaH el-shebbaak", "Open the window"],
+  ["vs_fatah_2", 84, "sentence", "المحل فاتح؟", "el-maHall faateH?", "Is the shop open?"],
+  ["vs_fatah_3", 84, "sentence", "فتحت الباب", "fataHt el-baab", "I opened the door"],
+  ["vs_afal_1", 84, "sentence", "اقفل الباب", "eʾfel el-baab", "Close the door"],
+  ["vs_afal_2", 84, "sentence", "المحل قافل", "el-maHall ʾaafel", "The shop is closed"],
+  ["vs_afal_3", 84, "sentence", "قفلت التليفون", "ʾafalt el-telefoon", "I hung up the phone"],
+  ["vs_nam_1", 84, "sentence", "نمت بدري", "nemt badri", "I slept early"],
+  ["vs_nam_2", 84, "sentence", "عايز أنام", "ʿaayez anaam", "I want to sleep"],
+  ["vs_nam_3", 84, "sentence", "بينام كتير", "beynaam ketiir", "He sleeps a lot"],
+  ["vs_sehi_1", 84, "sentence", "صحيت الساعة سبعة", "SeHiit el-saaʿa sabʿa", "I woke up at seven"],
+  ["vs_sehi_2", 84, "sentence", "اصحى بقى", "eSHa baʾa", "Wake up already"],
+  ["vs_sehi_3", 84, "sentence", "بيصحى بدري", "beyeSHa badri", "He wakes up early"],
+  ["vs_meshi_1", 84, "sentence", "مشيت من الشغل", "masheet men el-shoghl", "I left work"],
+  ["vs_meshi_2", 84, "sentence", "بمشي كل يوم", "bamshi koll yoom", "I walk every day"],
+  ["vs_meshi_3", 84, "sentence", "يلا نمشي", "yalla nemshi", "Come on, let's go"],
+  ["vs_aad_1", 84, "sentence", "اقعد هنا", "oʾʿod hena", "Sit here"],
+  ["vs_aad_2", 84, "sentence", "قعدت ساعة", "ʾaʿadt saaʿa", "I stayed an hour"],
+  ["vs_aad_3", 84, "sentence", "هقعد شوية", "haʾʿod shwayya", "I'll sit for a bit"],
+  ["vs_leheb_1", 84, "sentence", "بيلعب كورة", "beyelʿab koora", "He plays football"],
+  ["vs_leheb_2", 84, "sentence", "لعبنا كتير", "leʿebna ketiir", "We played a lot"],
+  ["vs_leheb_3", 84, "sentence", "تحب تلعب؟", "teHebb telʿab?", "Do you want to play?"],
+  ["vs_zaker_1", 84, "sentence", "بذاكر عربي", "bazaaker ʿarabi", "I study Arabic"],
+  ["vs_zaker_2", 84, "sentence", "ذاكرت امبارح", "zaakert embaareH", "I studied yesterday"],
+  ["vs_zaker_3", 84, "sentence", "لازم تذاكر", "laazem tezaaker", "You have to study"],
+  ["vs_eshtaghal_1", 84, "sentence", "بشتغل في شركة", "bashtaghal fi shirka", "I work at a company"],
+  ["vs_eshtaghal_2", 84, "sentence", "بتشتغل إيه؟", "beteshtaghal eh?", "What do you do for a living?"],
+  ["vs_eshtaghal_3", 84, "sentence", "اشتغلت امبارح", "eshtaghalt embaareH", "I worked yesterday"],
+  ["vs_safer_1", 84, "sentence", "سافرت مصر", "saafert maSr", "I traveled to Egypt"],
+  ["vs_safer_2", 84, "sentence", "هسافر بكرة", "hasaafer bokra", "I'll travel tomorrow"],
+  ["vs_safer_3", 84, "sentence", "بتسافر كتير؟", "betsaafer ketiir?", "Do you travel a lot?"],
+  ["vs_regeh_1", 84, "sentence", "رجعت البيت", "regeʿt el-beet", "I went back home"],
+  ["vs_regeh_2", 84, "sentence", "هرجع حالاً", "hargaʿ Haalan", "I'll be right back"],
+  ["vs_regeh_3", 84, "sentence", "رجع امبارح", "regeʿ embaareH", "He came back yesterday"],
+  ["vs_eref_1", 84, "sentence", "معرفش", "maʿrafsh", "I don't know"],
+  ["vs_eref_2", 84, "sentence", "بتعرف ده فين؟", "betʿraf da feen?", "Do you know where this is?"],
+  ["vs_eref_3", 84, "sentence", "عرفت الإجابة", "ʿereft el-egaaba", "I knew the answer"],
+  ["vs_fehem_1", 84, "sentence", "مش فاهم", "mesh faahem", "I don't understand"],
+  ["vs_fehem_2", 84, "sentence", "فهمت قصدك", "fehemt ʾaSdak", "I understood what you mean"],
+  ["vs_fehem_3", 84, "sentence", "بتفهم عربي؟", "betefham ʿarabi?", "Do you understand Arabic?"],
+  ["vs_habb_1", 84, "sentence", "بحب الأكل ده", "baHebb el-akl da", "I love this food"],
+  ["vs_habb_2", 84, "sentence", "تحب قهوة؟", "teHebb ʾahwa?", "Would you like coffee?"],
+  ["vs_habb_3", 84, "sentence", "حبيت المكان", "Habbeet el-makaan", "I liked the place"],
+  ["vs_tabakh_1", 84, "sentence", "بطبخ كل يوم", "baTbokh koll yoom", "I cook every day"],
+  ["vs_tabakh_2", 84, "sentence", "طبخت مكرونة", "Tabakht makaroona", "I cooked pasta"],
+  ["vs_tabakh_3", 84, "sentence", "بتطبخ حلو", "betoTbokh Helw", "You cook well"],
+  ["vs_etkallem_1", 84, "sentence", "بتكلم عربي شوية", "batkallem ʿarabi shwayya", "I speak a little Arabic"],
+  ["vs_etkallem_2", 84, "sentence", "ممكن نتكلم؟", "momken netkallem?", "Can we talk?"],
+  ["vs_etkallem_3", 84, "sentence", "اتكلمت معاه", "etkallemt maʿaah", "I spoke with him"],
+
+  // ===== L90 — Verbs (each links to its example sentences above) =====
+  ["v_akal", 90, "word", "أكل", "akal", "to eat", [], ["vs_akal_1", "vs_akal_2", "vs_akal_3"]],
+  ["v_shereb", 90, "word", "شرب", "shereb", "to drink", [], ["vs_shereb_1", "vs_shereb_2", "vs_shereb_3"]],
+  ["v_rah", 90, "word", "راح", "raaH", "to go", [], ["vs_rah_1", "vs_rah_2", "vs_rah_3"]],
+  ["v_geh", 90, "word", "جه", "geh", "to come", [], ["vs_geh_1", "vs_geh_2", "vs_geh_3"]],
+  ["v_amal", 90, "word", "عمل", "ʿamal", "to do / to make", [], ["vs_amal_1", "vs_amal_2", "vs_amal_3"]],
+  ["v_katab", 90, "word", "كتب", "katab", "to write", [], ["vs_katab_1", "vs_katab_2", "vs_katab_3"]],
+  ["v_ara", 90, "word", "قرا", "ʾara", "to read", [], ["vs_ara_1", "vs_ara_2", "vs_ara_3"]],
+  ["v_shaf", 90, "word", "شاف", "shaaf", "to see", [], ["vs_shaf_1", "vs_shaf_2", "vs_shaf_3"]],
+  ["v_semeh", 90, "word", "سمع", "semeʿ", "to hear / to listen", [], ["vs_semeh_1", "vs_semeh_2", "vs_semeh_3"]],
+  ["v_aal", 90, "word", "قال", "ʾaal", "to say", [], ["vs_aal_1", "vs_aal_2", "vs_aal_3"]],
+  ["v_eshtara", 90, "word", "اشترى", "eshtara", "to buy", [], ["vs_eshtara_1", "vs_eshtara_2", "vs_eshtara_3"]],
+  ["v_bah", 90, "word", "باع", "baaʿ", "to sell", [], ["vs_bah_1", "vs_bah_2", "vs_bah_3"]],
+  ["v_khad", 90, "word", "خد", "khad", "to take", [], ["vs_khad_1", "vs_khad_2", "vs_khad_3"]],
+  ["v_edda", 90, "word", "إدى", "edda", "to give", [], ["vs_edda_1", "vs_edda_2", "vs_edda_3"]],
+  ["v_fatah", 90, "word", "فتح", "fataH", "to open", [], ["vs_fatah_1", "vs_fatah_2", "vs_fatah_3"]],
+  ["v_afal", 90, "word", "قفل", "ʾafal", "to close", [], ["vs_afal_1", "vs_afal_2", "vs_afal_3"]],
+  ["v_nam", 90, "word", "نام", "naam", "to sleep", [], ["vs_nam_1", "vs_nam_2", "vs_nam_3"]],
+  ["v_sehi", 90, "word", "صحي", "SeHi", "to wake up", [], ["vs_sehi_1", "vs_sehi_2", "vs_sehi_3"]],
+  ["v_meshi", 90, "word", "مشي", "meshi", "to walk / to leave", [], ["vs_meshi_1", "vs_meshi_2", "vs_meshi_3"]],
+  ["v_aad", 90, "word", "قعد", "ʾaʿad", "to sit / to stay", [], ["vs_aad_1", "vs_aad_2", "vs_aad_3"]],
+  ["v_leheb", 90, "word", "لعب", "leʿeb", "to play", [], ["vs_leheb_1", "vs_leheb_2", "vs_leheb_3"]],
+  ["v_zaker", 90, "word", "ذاكر", "zaaker", "to study", [], ["vs_zaker_1", "vs_zaker_2", "vs_zaker_3"]],
+  ["v_eshtaghal", 90, "word", "اشتغل", "eshtaghal", "to work", [], ["vs_eshtaghal_1", "vs_eshtaghal_2", "vs_eshtaghal_3"]],
+  ["v_safer", 90, "word", "سافر", "saafer", "to travel", [], ["vs_safer_1", "vs_safer_2", "vs_safer_3"]],
+  ["v_regeh", 90, "word", "رجع", "regeʿ", "to return / to come back", [], ["vs_regeh_1", "vs_regeh_2", "vs_regeh_3"]],
+  ["v_eref", 90, "word", "عرف", "ʿeref", "to know", [], ["vs_eref_1", "vs_eref_2", "vs_eref_3"]],
+  ["v_fehem", 90, "word", "فهم", "fehem", "to understand", [], ["vs_fehem_1", "vs_fehem_2", "vs_fehem_3"]],
+  ["v_habb", 90, "word", "حب", "Habb", "to like / to love", [], ["vs_habb_1", "vs_habb_2", "vs_habb_3"]],
+  ["v_tabakh", 90, "word", "طبخ", "Tabakh", "to cook", [], ["vs_tabakh_1", "vs_tabakh_2", "vs_tabakh_3"]],
+  ["v_etkallem", 90, "word", "اتكلم", "etkallem", "to speak / to talk", [], ["vs_etkallem_1", "vs_etkallem_2", "vs_etkallem_3"]],
 ];
-const ITEMS = RAW.map(([id, level, type, ar, tr, en, alts]) => ({
+const ITEMS = RAW.map(([id, level, type, ar, tr, en, alts, ex]) => ({
   id,
   level,
   type,
   ar,
   tr,
   en,
+  az: toArabizi(ar, tr), // Franco-Arabic, generated — see toArabizi above
   alts: alts || [],
+  ex: ex || [],          // ids of example sentences (used by the verb cards)
   custom: false,
 }));
 const MAX_LEVEL = Math.max(...ITEMS.map((i) => i.level));
-const CONV_START = 80; // levels ≥ this are Conversation categories — always unlocked, outside the level ladder
+/* The level number doubles as the category. 1–79 are the vocabulary ladder you
+   climb; 80–89 are Conversation sets; 90+ are Verbs. Everything at CONV_START
+   and above sits outside the ladder and is always unlocked. */
+const CONV_START = 80;
+const CONV_END = 89;
+const VERB_START = 90;
 const CORE_MAX_LEVEL = CONV_START - 1;
+const isConvLevel = (l) => l >= CONV_START && l <= CONV_END;
+const isVerbLevel = (l) => l >= VERB_START;
+
+/* ---- Live item lookup ----
+   A lesson or quiz keeps its queue in component state, so the item objects it
+   captured when the session started would otherwise go stale the instant you
+   correct a card mid-session. App rebuilds this map on every render from the
+   edited item list; anything that displays or grades a card passes it through
+   live() first. That's what makes an edit show up immediately — in the lesson
+   you're in, the review you're in, the custom quiz, the item list, everywhere. */
+let LIVE_ITEMS = new Map();
+function live(it) {
+  if (!it) return it;
+  return LIVE_ITEMS.get(it.id) || it;
+}
+function liveAll(list) { return (list || []).map(live); }
+function itemById(id) { return LIVE_ITEMS.get(id) || null; }
 // Map every dictionary spelling to its Egyptian transliteration for the speech engine.
 SPEECH_BY_AR = {};
 ITEMS.forEach((it) => { if (it.ar && it.tr && it.tr !== "—") SPEECH_BY_AR[it.ar] = it.tr; });
@@ -2317,6 +2563,8 @@ const LEVEL_TITLES = {
   81: "Conversations: Meeting New People",
   82: "Conversations: Restaurant & Café",
   83: "Conversations: Shopping & Bargaining",
+  84: "Conversations: Verbs in Action",
+  90: "Verbs — Everyday Actions",
   1: "Greetings & Courtesy",
   2: "Pronouns & Questions",
   3: "Numbers & Adjectives",
@@ -2515,14 +2763,83 @@ function fmtUntil(due, now) {
   return Math.round(d / DAY) + "d";
 }
 
-/* ---- Storage (localStorage) ---- */
+/* ===================== STORAGE =====================
+   Two stores, on purpose.
+
+   Progress, edits and settings are small, so they live in localStorage as one
+   JSON blob. Voice recordings are not small — a 10-second clip is ~40 KB once
+   it's base64'd, so a few dozen of them will blow past the ~5 MB localStorage
+   limit. They used to sit in the same blob, which meant that once you'd recorded
+   enough, every save threw QuotaExceededError and the app quietly dropped
+   everything you did afterwards, corrections included. So recordings now live in
+   IndexedDB (no practical size limit) and the state blob only keeps a list of
+   which items have one. Backups still bundle both together. */
+
+const IDB_NAME = "masri-media", IDB_STORE = "recordings";
+let _idb = null;
+function idb() {
+  if (_idb) return _idb;
+  _idb = new Promise((resolve) => {
+    try {
+      const req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = () => { const db = req.result; if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE); };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch { resolve(null); }
+  });
+  return _idb;
+}
+function idbRun(mode, fn) {
+  return idb().then((db) => {
+    if (!db) return null;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction(IDB_STORE, mode);
+        const req = fn(tx.objectStore(IDB_STORE));
+        tx.onabort = tx.onerror = () => resolve(null);
+        if (req) req.onsuccess = () => resolve(req.result);
+        else tx.oncomplete = () => resolve(true);
+      } catch { resolve(null); }
+    });
+  });
+}
+const recGet = (id) => idbRun("readonly", (s) => s.get(id));
+const recPut = (id, url) => idbRun("readwrite", (s) => s.put(url, id));
+const recDel = (id) => idbRun("readwrite", (s) => s.delete(id));
+const recKeys = () => idbRun("readonly", (s) => s.getAllKeys()).then((k) => k || []);
+// Pull every recording out as {id: dataURL} — used when building a backup.
+async function recDump(ids) {
+  const out = {};
+  for (const id of ids || await recKeys()) { const v = await recGet(id); if (v) out[id] = v; }
+  return out;
+}
+async function recLoad(map) {
+  for (const [id, url] of Object.entries(map || {})) { if (url) await recPut(id, url); }
+}
+
+/* ---- App state (localStorage) ---- */
+let SAVE_ERR = null; // last save failure, surfaced in Backup & restore
 async function loadState(){ try{ const v=localStorage.getItem(STORE_KEY); return v?JSON.parse(v):null; }catch{ return null; } }
-async function saveState(state){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch{} }
-// Backups include everything (progress, recordings, settings) EXCEPT the GitHub token.
-function exportState(state){ const c = JSON.parse(JSON.stringify(state)); if (c.settings) delete c.settings.ghToken; return c; }
+async function saveState(state){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); SAVE_ERR = null; return true; }
+  catch(e){ SAVE_ERR = (e && e.name === "QuotaExceededError") ? "Storage is full — recent changes may not have been saved. Download a backup, then use Reset." : "Couldn't save to this browser's storage."; return false; }
+}
+// A backup carries everything — progress, corrections, custom cards, settings and
+// your recordings — except the GitHub token. Recordings live in IndexedDB, so this
+// has to be async: it reads them back out and inlines them in the file.
+async function exportState(state, withVoice = true){
+  const c = JSON.parse(JSON.stringify(state));
+  if (c.settings) delete c.settings.ghToken;
+  c.recordings = withVoice ? await recDump(state.recordingIds || await recKeys()) : {};
+  c.recordingIds = state.recordingIds || Object.keys(c.recordings);
+  c.appVersion = APP_VERSION;
+  c.exportedAt = new Date().toISOString();
+  return c;
+}
 
 const DEFAULT_STATE = {
-  recordings: {},
+  recordingIds: [],   // which items have a voice recording (audio itself is in IndexedDB)
+  recordings: {},     // legacy home for recordings — migrated to IndexedDB on load
   voicePref: {},
   itemEdits: {},
   itemOrder: {},
@@ -2590,25 +2907,30 @@ function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "
   const [feedback, setFeedback] = useState(null);
   const [leveled, setLeveled] = useState(null);
   const [done, setDone] = useState(items.length === 0);
-  const [qtype, setQtype] = useState(quizType === "mc" ? "mc" : "type"); // type | mc
+  const [qtype, setQtype] = useState(quizType === "mc" || quizType === "az" ? quizType : "type"); // type | az | mc
   const [showKeys, setShowKeys] = useState(false); // in-app keyboard hidden until toggled on
   const [mcPick, setMcPick] = useState(null);
   const [peek, setPeek] = useState(null);       // letter trace overlay
   const [detailOpen, setDetailOpen] = useState(false); // full word-detail overlay
   const inputRef = useRef(null);
 
-  const item = queue[0];
+  // The queue is captured when the session starts, so every card is re-resolved
+  // through live() at render time — that way a correction made from the detail
+  // sheet mid-quiz shows up on the very next frame, and grades against the fix.
+  const item = live(queue[0]);
   const total = items.length;
   const masteredCount = items.filter((it) => (streak[it.id] || 0) >= 2).length;
   const curStreak = item ? streak[item.id] || 0 : 0;
   const isMc = qtype === "mc";
+  const isAz = qtype === "az";
 
   // multiple-choice options: the answer + 3 distractors (prefer same type), deduped by spelling
   const mcOptions = useMemo(() => {
     if (!item || !isMc) return [];
     const seen = new Set([normAr(item.ar)]);
     const distract = [];
-    for (const pool of [ITEMS.filter((x) => x.type === item.type), ITEMS]) {
+    const all = LIVE_ITEMS.size ? Array.from(LIVE_ITEMS.values()) : ITEMS;
+    for (const pool of [all.filter((x) => x.type === item.type), all]) {
       for (const x of shuffle(pool)) {
         const k = normAr(x.ar);
         if (!seen.has(k)) { seen.add(k); distract.push(x); }
@@ -2652,7 +2974,7 @@ function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "
   };
   const submit = () => {
     if (feedback) { next(); return; }
-    grade(answerMatches(answer, item));
+    grade(isAz ? azMatches(answer, item) : answerMatches(answer, item));
   };
   const chooseMc = (opt) => {
     if (feedback) return;
@@ -2700,13 +3022,13 @@ function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "
 
       {/* answer-mode selector */}
       <div style={{ display: "flex", gap: 5, background: T.panelHi, border: `1px solid ${T.line}`, padding: 4, borderRadius: 12, marginBottom: 12 }}>
-        {[["type", "✍️ Type"], ["mc", "🔘 Multiple choice"]].map(([k, label]) => (
+        {[["type", "✍️ Arabic"], ["az", "🔤 Arabizi"], ["mc", "🔘 Choice"]].map(([k, label]) => (
           <button key={k} className="tap" onClick={() => setType(k)} style={{ flex: 1, border: "none", borderRadius: 8, padding: "8px 2px", fontSize: 12.5, fontWeight: 600, color: qtype === k ? "#fff" : T.textDim, background: qtype === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>{label}</button>
         ))}
       </div>
 
       <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "22px 18px", textAlign: "center", boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
-        <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>{isMc ? "Pick the Arabic" : "Type in Arabic"} · {item.type}</div>
+        <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>{isMc ? "Pick the Arabic" : isAz ? "Type it in Arabizi" : "Type in Arabic"} · {item.type}</div>
         <div style={{ fontFamily: displayFont, fontSize: 24, color: T.text, marginTop: 8 }}>{item.en}</div>
         <div style={{ marginTop: 8, fontSize: 11, color: curStreak >= 1 ? OK_GREEN : T.textDim, fontWeight: 600 }}>{curStreak >= 1 ? "✓ 1/2 in a row — one more to clear" : "Get this right twice in a row to clear it"}</div>
       </div>
@@ -2734,23 +3056,31 @@ function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "
             value={answer}
             onChange={(e) => !feedback && setAnswer(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && submit()}
-            placeholder="اكتب بالعربي…"
-            dir="rtl"
+            placeholder={isAz ? "type it in Franco… e.g. 7abibi" : "اكتب بالعربي…"}
+            dir={isAz ? "ltr" : "rtl"}
             readOnly={!!feedback}
-            inputMode={showKeys ? "none" : undefined}
-            style={{ width: "100%", marginTop: 12, padding: "14px 16px", borderRadius: 14, border: `2px solid ${correct ? OK_GREEN : wrong ? BAD_RED : T.line}`, background: correct ? `${OK_GREEN}12` : wrong ? `${BAD_RED}12` : T.panel, color: T.text, fontFamily: arFont, fontSize: 26, outline: "none", textAlign: "right" }}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            inputMode={!isAz && showKeys ? "none" : undefined}
+            style={{ width: "100%", marginTop: 12, padding: "14px 16px", borderRadius: 14, border: `2px solid ${correct ? OK_GREEN : wrong ? BAD_RED : T.line}`, background: correct ? `${OK_GREEN}12` : wrong ? `${BAD_RED}12` : T.panel, color: T.text, fontFamily: isAz ? uiFont : arFont, fontSize: isAz ? 20 : 26, outline: "none", textAlign: isAz ? "left" : "right", letterSpacing: isAz ? 0.3 : 0 }}
           />
+          {isAz && !feedback && (
+            <div style={{ fontSize: 11, color: T.textDim, marginTop: 7, lineHeight: 1.5 }}>
+              Numbers stand in for the sounds Latin letters don't have — <b style={{ color: T.gold }}>3</b> = ع, <b style={{ color: T.gold }}>7</b> = ح, <b style={{ color: T.gold }}>5</b> = خ, <b style={{ color: T.gold }}>2</b> = the catch in your throat. Spell it however you'd text it — <i>7abibi</i>, <i>habibi</i>, <i>habeebi</i> all count.
+            </div>
+          )}
           {!feedback && (
             <button className="tap" onClick={submit} style={{ width: "100%", marginTop: 10, padding: 14, borderRadius: 14, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 15, fontWeight: 700 }}>Check answer</button>
           )}
-          {!feedback && (
+          {!feedback && !isAz && (
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
               <button className="tap" onClick={() => setShowKeys((s) => !s)} style={{ padding: "8px 14px", borderRadius: 999, border: `1px solid ${showKeys ? T.gold : T.line}`, background: showKeys ? `${T.gold}12` : T.panel, color: showKeys ? T.gold : T.textDim, fontSize: 12, fontWeight: 600 }}>
                 {showKeys ? "⌨️ Hide in-app keys" : "⌨️ Show in-app keys"}
               </button>
             </div>
           )}
-          {!feedback && showKeys && (
+          {!feedback && !isAz && showKeys && (
             <ArabicKeyboard
               onKey={(ch) => setAnswer((a) => a + ch)}
               onSpace={() => setAnswer((a) => a + " ")}
@@ -2770,6 +3100,7 @@ function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "
             <span style={{ fontSize: 10, color: T.gold, fontWeight: 700 }}>tap for full details ›</span>
           </button>
           <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 14, marginTop: 2 }}>{item.tr}</div>
+          {item.az && <div style={{ fontSize: 13, color: T.gold, fontWeight: 700, marginTop: 3, letterSpacing: 0.3 }}>{item.az}</div>}
           <div style={{ marginTop: 8 }}><Speaker text={item.ar} color={T.terra} /></div>
           <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${T.line}` }}>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.8, color: T.goldSoft, marginBottom: 8 }}>How it's written · tap a letter</div>
@@ -2810,12 +3141,12 @@ function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "
 }
 
 /* ===================== LEARN SESSION (teach N, then quiz them) ===================== */
-function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, onConv, autoStart = false, quizType = "inapp", onQuizType, autoPlay = true }) {
+function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, onConv, onVerbs, autoStart = false, quizType = "inapp", onQuizType, autoPlay = true }) {
   const [queue] = useState(() => pool.slice(0, batch));
   const [phase, setPhase] = useState(() => (autoStart && pool.length ? "teach" : "menu"));
   const [i, setI] = useState(0);
   const [peek, setPeek] = useState(null);
-  const teachItem = queue[i];
+  const teachItem = live(queue[i]);
   useEffect(() => { if (phase === "teach" && autoPlay && teachItem) speak(teachItem.ar); /* eslint-disable-next-line */ }, [phase, teachItem && teachItem.id]);
 
   if (phase === "menu") {
@@ -2851,6 +3182,15 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
           </button>
         )}
 
+        {/* Verbs */}
+        {onVerbs && <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "14px 2px 8px" }}>Verbs</div>}
+        {onVerbs && (
+          <button className="tap" onClick={onVerbs} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 10, textAlign: "left", border: `1px solid ${T.gold}55`, background: `${T.gold}0d`, color: T.gold }}>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>⚡ Verb lessons →</div>
+            <div style={{ fontSize: 11.5, marginTop: 2, color: T.textDim }}>Core Egyptian verbs, each with three sentences that put it to work</div>
+          </button>
+        )}
+
         {/* Custom quiz */}
         <button className="tap" onClick={() => (customCount ? onCustom && onCustom() : onGotoItems && onGotoItems())} style={{ width: "100%", padding: 14, borderRadius: 13, textAlign: "left", border: `1px solid ${T.line}`, background: T.panel, color: T.text }}>
           <div style={{ fontSize: 14, fontWeight: 700 }}>{customCount ? `★ Start custom quiz (${customCount})` : "★ Create a custom quiz →"}</div>
@@ -2868,13 +3208,14 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
         <div style={{ textAlign: "center", fontSize: 12.5, color: T.textDim, margin: "0 0 12px", lineHeight: 1.5 }}>
           Now type each one in Arabic to lock it in 👇
         </div>
-        <TypedQuiz items={queue} mode="srs" onGrade={onGrade} onAnswer={onAnswer} onExit={() => setPhase("menu")} title="Lesson quiz" quizType={quizType} onQuizType={onQuizType} autoPlay={autoPlay} />
+        <TypedQuiz items={liveAll(queue)} mode="srs" onGrade={onGrade} onAnswer={onAnswer} onExit={() => setPhase("menu")} title="Lesson quiz" quizType={quizType} onQuizType={onQuizType} autoPlay={autoPlay} />
       </div>
     );
   }
 
-  // teach phase
-  const item = queue[i];
+  // teach phase — re-resolved each render so a correction made from this card
+  // (or from the detail sheet) is reflected right away.
+  const item = live(queue[i]);
   return (
     <div className="fade">
       <div style={{ height: 4, background: T.line, borderRadius: 4, overflow: "hidden", marginBottom: 14 }}>
@@ -2884,6 +3225,7 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
         <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft }}>New {item.type} · Level {item.level}</div>
         <div style={{ fontFamily: arFont, fontSize: item.type === "sentence" ? 32 : 48, color: T.text, direction: "rtl", margin: "14px 0", lineHeight: 1.4 }}>{item.ar}</div>
         <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 16 }}>{item.tr}</div>
+        {item.az && <div style={{ fontSize: 14.5, color: T.gold, fontWeight: 700, marginTop: 3, letterSpacing: 0.3 }}>{item.az}<span style={{ fontSize: 10, fontWeight: 600, color: T.textDim, marginLeft: 6, letterSpacing: 0 }}>arabizi</span></div>}
         <div style={{ fontFamily: displayFont, fontSize: 20, marginTop: 6 }}>{item.en}</div>
         <div style={{ marginTop: 14 }}><Speaker text={item.ar} size={20} color={T.gold} /></div>
       </div>
@@ -2936,12 +3278,21 @@ let REC_API = null;
 // Record-your-own-pronunciation widget: mic capture → base64 in app state, so it
 // persists locally and rides along in backup export/import automatically.
 function VoiceRecorder({ itemId }) {
-  const [rec, setRec] = useState(() => (REC_API ? REC_API.get(itemId) : null));
+  const [rec, setRec] = useState(null);
   const [prefV, setPrefV] = useState(() => (REC_API ? REC_API.pref(itemId) : "original"));
   const [phase, setPhase] = useState("idle"); // idle | recording | denied
   const mrRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
+
+  // The clip itself lives in IndexedDB, so fetch it when the card opens.
+  useEffect(() => {
+    let alive = true;
+    setRec(null);
+    setPrefV(REC_API ? REC_API.pref(itemId) : "original");
+    recGet(itemId).then((v) => { if (alive) setRec(v || null); });
+    return () => { alive = false; };
+  }, [itemId]);
 
   useEffect(() => () => { // cleanup if closed mid-recording
     if (mrRef.current && mrRef.current.state === "recording") { try { mrRef.current.stop(); } catch {} }
@@ -2970,7 +3321,7 @@ function VoiceRecorder({ itemId }) {
       };
       mr.start();
       setPhase("recording");
-      timerRef.current = setTimeout(() => { if (mr.state === "recording") mr.stop(); }, 10000); // 10s cap keeps storage small
+      timerRef.current = setTimeout(() => { if (mr.state === "recording") mr.stop(); }, 15000); // 15s cap — plenty for a sentence
     } catch {
       setPhase("denied");
     }
@@ -3017,7 +3368,7 @@ function VoiceRecorder({ itemId }) {
         </div>
       )}
       {phase === "denied" && <div style={{ fontSize: 11, color: BAD_RED, textAlign: "center", marginTop: 6 }}>Microphone blocked — allow mic access for this site in your browser settings.</div>}
-      {phase === "recording" && <div style={{ fontSize: 11, color: T.textDim, textAlign: "center", marginTop: 6 }}>Say the word, then tap stop (10s max).</div>}
+      {phase === "recording" && <div style={{ fontSize: 11, color: T.textDim, textAlign: "center", marginTop: 6 }}>Say the word, then tap stop (15s max).</div>}
     </div>
   );
 }
@@ -3096,31 +3447,43 @@ function TypeTry({ item, compact }) {
   const [val, setVal] = useState("");
   const [res, setRes] = useState(null); // "ok" | "no" | null
   const [showKb, setShowKb] = useState(false);
-  useEffect(() => { setVal(""); setRes(null); }, [item && item.id]);
-  const check = () => setRes(answerMatches(val, item) ? "ok" : "no");
+  const [mode, setMode] = useState("ar"); // ar | az
+  const az = mode === "az";
+  useEffect(() => { setVal(""); setRes(null); }, [item && item.id, mode]);
+  const check = () => setRes((az ? azMatches(val, item) : answerMatches(val, item)) ? "ok" : "no");
+  const expected = az ? (item.az || toArabizi(item.ar, item.tr)) : item.ar;
   return (
     <div>
+      <div style={{ display: "flex", gap: 5, background: T.panelHi, border: `1px solid ${T.line}`, padding: 3, borderRadius: 11, marginBottom: 9 }}>
+        {[["ar", "العربية Arabic"], ["az", "🔤 Arabizi"]].map(([k, label]) => (
+          <button key={k} className="tap" onClick={() => { setMode(k); setShowKb(false); }} style={{ flex: 1, border: "none", borderRadius: 8, padding: "7px 2px", fontSize: 12, fontWeight: 600, color: mode === k ? "#fff" : T.textDim, background: mode === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>{label}</button>
+        ))}
+      </div>
       <input
         value={val}
         onChange={(e) => { setVal(e.target.value); setRes(null); }}
         onKeyDown={(e) => e.key === "Enter" && check()}
-        placeholder="try typing it…"
-        dir="rtl"
-        inputMode={showKb ? "none" : undefined}
-        style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `2px solid ${res === "ok" ? OK_GREEN : res === "no" ? BAD_RED : T.line}`, background: res === "ok" ? `${OK_GREEN}12` : res === "no" ? `${BAD_RED}12` : T.panel, color: T.text, fontFamily: arFont, fontSize: 24, outline: "none", textAlign: "right" }}
+        placeholder={az ? "try it in Franco… e.g. 7abibi" : "try typing it…"}
+        dir={az ? "ltr" : "rtl"}
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        inputMode={!az && showKb ? "none" : undefined}
+        style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `2px solid ${res === "ok" ? OK_GREEN : res === "no" ? BAD_RED : T.line}`, background: res === "ok" ? `${OK_GREEN}12` : res === "no" ? `${BAD_RED}12` : T.panel, color: T.text, fontFamily: az ? uiFont : arFont, fontSize: az ? 18 : 24, outline: "none", textAlign: az ? "left" : "right" }}
       />
       <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-        <button className="tap" onClick={() => setShowKb((s) => !s)} style={{ padding: "11px 14px", borderRadius: 12, border: `1px solid ${showKb ? T.gold : T.line}`, background: showKb ? `${T.gold}12` : T.panel, color: showKb ? T.gold : T.textDim, fontSize: 12.5, fontWeight: 600 }}>{showKb ? "⌨️ Hide keys" : "⌨️ Keys"}</button>
+        {!az && <button className="tap" onClick={() => setShowKb((s) => !s)} style={{ padding: "11px 14px", borderRadius: 12, border: `1px solid ${showKb ? T.gold : T.line}`, background: showKb ? `${T.gold}12` : T.panel, color: showKb ? T.gold : T.textDim, fontSize: 12.5, fontWeight: 600 }}>{showKb ? "⌨️ Hide keys" : "⌨️ Keys"}</button>}
         <button className="tap" onClick={check} style={{ flex: 1, padding: "12px 16px", borderRadius: 12, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700, fontSize: 14 }}>Check</button>
       </div>
+      {az && res === null && <div style={{ fontSize: 11, color: T.textDim, marginTop: 8, lineHeight: 1.5 }}><b style={{ color: T.gold }}>3</b> = ع · <b style={{ color: T.gold }}>7</b> = ح · <b style={{ color: T.gold }}>5</b> = خ · <b style={{ color: T.gold }}>2</b> = glottal stop. Any common spelling counts.</div>}
       {res === "ok" && <div className="fade" style={{ marginTop: 10, textAlign: "center", color: OK_GREEN, fontWeight: 700, fontSize: 14 }}>✓ Perfect — that's it!</div>}
       {res === "no" && (
         <div className="fade" style={{ marginTop: 10, textAlign: "center" }}>
-          <div style={{ color: BAD_RED, fontWeight: 700, fontSize: 13 }}>Not quite — the spelling is:</div>
-          <div style={{ fontFamily: arFont, fontSize: 26, color: T.text, direction: "rtl", marginTop: 2 }}>{item.ar}</div>
+          <div style={{ color: BAD_RED, fontWeight: 700, fontSize: 13 }}>Not quite — {az ? "one way to write it is:" : "the spelling is:"}</div>
+          <div style={{ fontFamily: az ? uiFont : arFont, fontSize: az ? 20 : 26, fontWeight: az ? 700 : 400, color: az ? T.gold : T.text, direction: az ? "ltr" : "rtl", marginTop: 2 }}>{expected}</div>
         </div>
       )}
-      {showKb && (
+      {showKb && !az && (
         <ArabicKeyboard
           onKey={(ch) => { setVal((a) => a + ch); setRes(null); }}
           onSpace={() => { setVal((a) => a + " "); setRes(null); }}
@@ -3182,21 +3545,75 @@ function ScriptPeek({ peek, onClose }) {
 }
 
 // Full-screen item detail: breakdown of letters, all info, sound, and a type-it-yourself box.
+/* One example sentence under a verb. Shows where it stands in the SRS, and lets
+   you learn it right here — the moment you do, it enters the normal review queue
+   alongside everything else. */
+function ExampleRow({ ex, onOpen }) {
+  const [, force] = useState(0);
+  const prog = REC_API ? REC_API.prog(ex.id) : null;
+  const learned = !!prog;
+  const pct = learned ? masteryPct(prog) : null;
+  const learn = (e) => {
+    e.stopPropagation();
+    if (REC_API && REC_API.learn) { REC_API.learn(ex.id); force((n) => n + 1); }
+  };
+  return (
+    <div style={{ background: T.panel, border: `1px solid ${learned ? masteryColor(prog) + "66" : T.line}`, borderLeft: `4px solid ${learned ? masteryColor(prog) : T.line}`, borderRadius: 13, padding: "12px 13px" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+        <button className="tap" onClick={onOpen} style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", padding: 0, cursor: "pointer", textAlign: "right" }}>
+          <div style={{ fontFamily: arFont, fontSize: 21, color: T.text, direction: "rtl", lineHeight: 1.5 }}>{ex.ar}</div>
+        </button>
+        <Speaker text={ex.ar} size={14} color={T.terra} />
+      </div>
+      <div style={{ fontSize: 12, color: T.goldSoft, fontStyle: "italic", marginTop: 5 }}>{ex.tr}</div>
+      {ex.az && <div style={{ fontSize: 11.5, color: T.gold, fontWeight: 600, letterSpacing: 0.2 }}>{ex.az}</div>}
+      <div style={{ fontSize: 13, color: T.text, marginTop: 3 }}>{ex.en}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 9 }}>
+        {learned ? (
+          <>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: masteryColor(prog), border: `1px solid ${masteryColor(prog)}55`, borderRadius: 7, padding: "2px 8px" }}>{stageMeta(prog.stage).short} · {pct}%</span>
+            <span style={{ fontSize: 11, color: T.textDim }}>in your reviews</span>
+          </>
+        ) : (
+          <button className="tap" onClick={learn} style={{ padding: "8px 14px", borderRadius: 10, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 12.5, fontWeight: 700 }}>Learn this sentence ✓</button>
+        )}
+        <button className="tap" onClick={onOpen} style={{ marginLeft: "auto", background: "transparent", border: "none", color: T.gold, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>details ›</button>
+      </div>
+    </div>
+  );
+}
+
 function ItemDetail({ item: itemProp, onClose, autoPlay }) {
   const [peek, setPeek] = useState(null);
-  const [patch, setPatch] = useState(null); // local edits, applied live
+  const [peekItem, setPeekItem] = useState(null); // an example sentence opened from a verb
+  const [patch, setPatch] = useState(null); // local echo, so a save shows instantly
   const [editing, setEditing] = useState(false);
-  const [eAr, setEAr] = useState(""); const [eTr, setETr] = useState(""); const [eEn, setEEn] = useState("");
-  const item = patch ? { ...itemProp, ...patch } : itemProp;
+  const [eAr, setEAr] = useState(""); const [eTr, setETr] = useState(""); const [eEn, setEEn] = useState(""); const [eAz, setEAz] = useState("");
+  // Always start from the live (edited) copy, so opening this from a quiz shows
+  // the corrected card rather than whatever the quiz captured at its start.
+  const base = live(itemProp);
+  const item = patch ? { ...base, ...patch } : base;
   useEffect(() => { if (autoPlay && item) speak(item.ar); /* eslint-disable-next-line */ }, [item && item.id]);
+  useEffect(() => { setPatch(null); setEditing(false); }, [itemProp && itemProp.id]);
   if (!item) return null;
-  const startEdit = () => { setEAr(item.ar); setETr(item.tr); setEEn(item.en); setEditing(true); };
+  const autoAz = toArabizi(item.ar, item.tr);
+  const startEdit = () => {
+    setEAr(item.ar); setETr(item.tr); setEEn(item.en);
+    setEAz((item.az || "") === autoAz ? "" : item.az || "");
+    setEditing(true);
+  };
   const saveEdit = () => {
-    const p = { ar: eAr.trim() || item.ar, tr: eTr.trim() || item.tr, en: eEn.trim() || item.en };
+    const ar = eAr.trim() || item.ar, tr = eTr.trim() || item.tr;
+    const p = { ar, tr, en: eEn.trim() || item.en };
+    // Blank Arabizi means "keep generating it for me" — it's recomputed from the
+    // Arabic and transliteration, so it follows any correction automatically.
+    if (eAz.trim()) p.az = eAz.trim(); else { p.az = ""; }
     if (REC_API) REC_API.editItem(item.id, p);
-    setPatch(p);
+    setPatch({ ...p, az: p.az || toArabizi(ar, tr) });
     setEditing(false);
   };
+  const resetEdit = () => { if (REC_API) REC_API.resetItem(item.id); setPatch(null); setEditing(false); };
+  const exItems = (item.ex || []).map(itemById).filter(Boolean);
   return ReactDOM.createPortal(
     <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: T.bg, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "12px 18px calc(40px + env(safe-area-inset-bottom))" }}>
@@ -3211,16 +3628,26 @@ function ItemDetail({ item: itemProp, onClose, autoPlay }) {
             <div className="fade" style={{ margin: "12px 0 4px", textAlign: "left" }}>
               <input value={eAr} onChange={(e) => setEAr(e.target.value)} placeholder="Arabic" style={{ width: "100%", boxSizing: "border-box", marginBottom: 6, padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontFamily: arFont, fontSize: 20, textAlign: "right", outline: "none" }} />
               <input value={eTr} onChange={(e) => setETr(e.target.value)} placeholder="Transliteration" style={{ width: "100%", boxSizing: "border-box", marginBottom: 6, padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 14, outline: "none" }} />
-              <input value={eEn} onChange={(e) => setEEn(e.target.value)} placeholder="English" style={{ width: "100%", boxSizing: "border-box", marginBottom: 8, padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 14, outline: "none" }} />
+              <input value={eEn} onChange={(e) => setEEn(e.target.value)} placeholder="English" style={{ width: "100%", boxSizing: "border-box", marginBottom: 6, padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 14, outline: "none" }} />
+              <input value={eAz} onChange={(e) => setEAz(e.target.value)} placeholder={`Arabizi — leave blank for auto (${autoAz || "—"})`} autoCapitalize="none" autoCorrect="off" spellCheck={false} style={{ width: "100%", boxSizing: "border-box", marginBottom: 8, padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: T.panelHi, color: T.gold, fontSize: 14, fontWeight: 700, outline: "none" }} />
               <div style={{ display: "flex", gap: 8 }}>
                 <button className="tap" onClick={saveEdit} style={{ flex: 1, padding: 10, borderRadius: 10, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontWeight: 700, fontSize: 13 }}>Save</button>
                 <button className="tap" onClick={() => setEditing(false)} style={{ flex: 1, padding: 10, borderRadius: 10, border: `1px solid ${T.line}`, background: "transparent", color: T.textDim, fontWeight: 700, fontSize: 13 }}>Cancel</button>
               </div>
-              <div style={{ fontSize: 10.5, color: T.textDim, marginTop: 6, lineHeight: 1.5 }}>Corrections apply everywhere (lists, lessons, quizzes) and are saved with your data. The word's progress and audio file stay linked.</div>
+              {(item.edited || patch) && (
+                <button className="tap" onClick={resetEdit} style={{ width: "100%", marginTop: 8, padding: 9, borderRadius: 10, border: `1px solid ${BAD_RED}55`, background: "transparent", color: BAD_RED, fontWeight: 700, fontSize: 12 }}>↺ Reset to the original card</button>
+              )}
+              <div style={{ fontSize: 10.5, color: T.textDim, marginTop: 6, lineHeight: 1.5 }}>Corrections apply everywhere straight away — item lists, lessons, reviews, custom quizzes, even a quiz you're in the middle of. They're saved with your data and included in backups. Progress and audio stay attached to the card.</div>
             </div>
           )}
           <div style={{ fontFamily: arFont, fontSize: item.type === "sentence" ? 34 : 50, color: T.text, direction: "rtl", margin: "12px 0", lineHeight: 1.4 }}>{item.ar}</div>
           <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 16 }}>{item.tr}</div>
+          {item.az && (
+            <div style={{ marginTop: 5 }}>
+              <span style={{ fontSize: 16, color: T.gold, fontWeight: 700, letterSpacing: 0.3 }}>{item.az}</span>
+              <span style={{ fontSize: 10, color: T.textDim, marginLeft: 6, textTransform: "uppercase", letterSpacing: 1 }}>arabizi</span>
+            </div>
+          )}
           <div style={{ fontFamily: displayFont, fontSize: 20, marginTop: 4 }}>{item.en}</div>
           <div style={{ marginTop: 14 }}><Speaker text={item.ar} size={22} color={T.gold} /></div>
           {AUDIO_SET && AUDIO_SET.has(item.id) && (
@@ -3246,6 +3673,18 @@ function ItemDetail({ item: itemProp, onClose, autoPlay }) {
           </>
         )}
 
+        {exItems.length > 0 && (
+          <>
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "22px 2px 10px" }}>Used in a sentence</div>
+            <div style={{ fontSize: 11.5, color: T.textDim, margin: "0 2px 10px", lineHeight: 1.5 }}>
+              Learn these the same way you learn anything else — once you tap Learn, a sentence joins your reviews and comes back on the normal SRS schedule.
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+              {exItems.map((ex) => <ExampleRow key={ex.id} ex={ex} onOpen={() => setPeekItem(ex)} />)}
+            </div>
+          </>
+        )}
+
         <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "22px 2px 10px" }}>Now try it yourself</div>
         <TypeTry item={item} />
 
@@ -3255,6 +3694,7 @@ function ItemDetail({ item: itemProp, onClose, autoPlay }) {
 
         <ScriptPeek peek={peek} onClose={() => setPeek(null)} />
       </div>
+      {peekItem && <ItemDetail item={peekItem} onClose={() => setPeekItem(null)} autoPlay={autoPlay} />}
     </div>,
     document.body
   );
@@ -3480,9 +3920,67 @@ function HarakatQuiz({ marks, onDone, onSet, harakat = {} }) {
 /* ===================== HOME ===================== */
 // Conversation lessons hub: always-unlocked themed categories (levels ≥ CONV_START)
 // that ride the exact same SRS, mastery, audio, recording, and editing machinery.
+/* The Verbs tab. Each verb owns three example sentences that live in the
+   Conversations set, so learning a verb and learning it *in use* are the same
+   flow — and every sentence you take on joins the normal review queue. */
+function VerbHub({ state, allItems, onBack, onLearn, onQuiz, onOpenDetail, onItems }) {
+  const verbs = allItems.filter((it) => isVerbLevel(it.level));
+  const learnedVerbs = verbs.filter((it) => state.progress[it.id]);
+  const allEx = verbs.reduce((a, v) => a.concat(v.ex || []), []);
+  const learnedEx = allEx.filter((id) => state.progress[id]).length;
+  const unlearned = verbs.filter((it) => !state.progress[it.id]);
+
+  return (
+    <div className="fade">
+      <button className="tap" onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "8px 14px", borderRadius: 999, border: `1px solid ${T.line}`, background: T.panel, color: T.gold, fontSize: 13, fontWeight: 700 }}>‹ Lessons</button>
+      <div style={{ fontFamily: displayFont, fontSize: 24, marginBottom: 2 }}>⚡ Verbs</div>
+      <div style={{ fontSize: 12.5, color: T.textDim, marginBottom: 14, lineHeight: 1.5 }}>
+        The engine of the language. Open any verb to see three short sentences that put it to work — learn those and they'll come back in your reviews like everything else.
+      </div>
+
+      <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 18, padding: "15px 17px", marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          <div style={{ fontSize: 13.5, fontWeight: 700 }}>{learnedVerbs.length}/{verbs.length} verbs learned</div>
+          <div style={{ fontSize: 11.5, color: T.goldSoft, fontWeight: 700 }}>{learnedEx}/{allEx.length} sentences</div>
+        </div>
+        <div style={{ margin: "10px 0 2px" }}><Bar pct={verbs.length ? learnedVerbs.length / verbs.length : 0} /></div>
+        <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+          <button className="tap" disabled={!unlearned.length} onClick={() => onLearn()} style={{ flex: 1, padding: 11, borderRadius: 11, border: "none", background: unlearned.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: unlearned.length ? "#fff" : T.textDim, fontWeight: 700, fontSize: 13 }}>{unlearned.length ? `Learn ${unlearned.length} new` : "All learned ✓"}</button>
+          <button className="tap" disabled={!learnedVerbs.length && !learnedEx} onClick={() => onQuiz()} style={{ flex: 1, padding: 11, borderRadius: 11, border: `1.5px solid ${learnedVerbs.length || learnedEx ? T.gold : T.line}`, background: learnedVerbs.length || learnedEx ? `${T.gold}12` : "transparent", color: learnedVerbs.length || learnedEx ? T.gold : T.textDim, fontWeight: 700, fontSize: 13 }}>Quiz verbs + sentences</button>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        {verbs.map((v) => {
+          const p = state.progress[v.id];
+          const ex = v.ex || [];
+          const exDone = ex.filter((id) => state.progress[id]).length;
+          const mc = p ? masteryColor(p) : null;
+          return (
+            <button key={v.id} className="tap" onClick={() => onOpenDetail(v)} style={{ width: "100%", textAlign: "left", background: T.panel, border: `1px solid ${T.line}`, borderLeft: mc ? `5px solid ${mc}` : `1px solid ${T.line}`, borderRadius: 14, padding: "12px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontFamily: arFont, fontSize: 26, color: T.text, direction: "rtl", minWidth: 62, textAlign: "right" }}>{v.ar}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: "block", fontSize: 14, color: T.text }}>{v.en}</span>
+                <span style={{ display: "block", fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{v.tr}</span>
+                {v.az && <span style={{ display: "block", fontSize: 11, color: T.gold, fontWeight: 600 }}>{v.az}</span>}
+              </span>
+              <span style={{ textAlign: "right" }}>
+                <span style={{ display: "block", fontSize: 10, fontWeight: 700, color: p ? stageMeta(p.stage).color : T.pink, border: `1px solid ${(p ? stageMeta(p.stage).color : T.pink)}55`, borderRadius: 7, padding: "2px 7px", whiteSpace: "nowrap" }}>{p ? stageMeta(p.stage).short : "new"}</span>
+                <span style={{ display: "block", fontSize: 10, color: exDone === ex.length && ex.length ? OK_GREEN : T.textDim, marginTop: 4, fontWeight: 600 }}>{exDone}/{ex.length} sent.</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <button className="tap" onClick={onItems} style={{ width: "100%", marginTop: 12, padding: 10, borderRadius: 11, border: `1px dashed ${T.line}`, background: "transparent", color: T.textDim, fontSize: 12, fontWeight: 600 }}>📋 Browse all verbs in Items</button>
+    </div>
+  );
+}
+
 function ConvHub({ state, allItems, onBack, onLearn, onQuiz, onItems }) {
   const cats = [];
-  for (let l = CONV_START; l <= MAX_LEVEL; l++) {
+  for (let l = CONV_START; l <= CONV_END; l++) {
     const items = allItems.filter((it) => it.level === l);
     if (!items.length) continue;
     const learned = items.filter((it) => state.progress[it.id]);
@@ -3552,27 +4050,62 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
   const [backupOpen, setBackupOpen] = useState(false);
   const [importText, setImportText] = useState("");
   const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [recCount, setRecCount] = useState(0);
   const fileRef = useRef(null);
 
-  const downloadBackup = () => {
+  useEffect(() => { if (backupOpen) recKeys().then((k) => setRecCount((k || []).length)); }, [backupOpen]);
+
+  const saveBlob = (obj, name) => {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+    return blob.size;
+  };
+  const fmtSize = (n) => (n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB");
+
+  // Full backup: progress, your corrections, custom cards, settings and every
+  // voice recording, all in one file.
+  const downloadBackup = async (withVoice = true) => {
+    setBusy(true);
     try {
-      const blob = new Blob([JSON.stringify(exportState(state), null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `masri-srs-backup-${todayStr()}.json`;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
-      setMsg("✓ Backup file downloaded.");
-    } catch (e) { setMsg("Couldn't download here — use Copy instead."); }
+      const obj = await exportState(state, withVoice);
+      const size = saveBlob(obj, `masri-srs-backup-${todayStr()}.json`);
+      setMsg(`✓ Backup downloaded (${fmtSize(size)})${withVoice ? ` — includes ${Object.keys(obj.recordings || {}).length} voice recording${Object.keys(obj.recordings || {}).length === 1 ? "" : "s"}` : " — progress only, no voice"}.`);
+    } catch (e) { setMsg("Couldn't download here — try Copy instead."); }
+    setBusy(false);
+  };
+  // Voice only — a smaller file, handy for moving recordings to another device.
+  const downloadVoice = async () => {
+    setBusy(true);
+    try {
+      const recordings = await recDump();
+      const n = Object.keys(recordings).length;
+      if (!n) { setMsg("No voice recordings yet — record one from any word's page first."); setBusy(false); return; }
+      const size = saveBlob({ masriVoiceBackup: true, appVersion: APP_VERSION, exportedAt: new Date().toISOString(), voicePref: state.voicePref || {}, recordings }, `masri-srs-voice-${todayStr()}.json`);
+      setMsg(`✓ ${n} voice recording${n === 1 ? "" : "s"} downloaded (${fmtSize(size)}).`);
+    } catch (e) { setMsg("Couldn't export your recordings here."); }
+    setBusy(false);
   };
   const copyBackup = async () => {
-    const text = JSON.stringify(exportState(state));
-    try { await navigator.clipboard.writeText(text); setMsg("✓ Backup copied to clipboard."); }
+    setBusy(true);
+    // Recordings are far too big for the clipboard — this copies everything else.
+    const text = JSON.stringify(await exportState(state, false));
+    try { await navigator.clipboard.writeText(text); setMsg("✓ Copied (progress + corrections; voice recordings need the file download)."); }
     catch (e) { setImportText(text); setMsg("Select the text below and copy it manually."); }
+    setBusy(false);
   };
-  const showBackupText = () => { setImportText(JSON.stringify(exportState(state))); setMsg("Here's your backup text — copy and keep it safe."); };
+  const showBackupText = async () => {
+    setBusy(true);
+    setImportText(JSON.stringify(await exportState(state, false)));
+    setMsg("Here's your backup text (without voice) — copy and keep it safe.");
+    setBusy(false);
+  };
   const onFile = (e) => {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
@@ -3580,12 +4113,33 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
     r.onload = () => { setImportText(String(r.result || "")); setMsg("File loaded — tap Restore to apply."); };
     r.readAsText(f);
   };
-  const doImport = () => {
+  const doImport = async () => {
     let obj;
     try { obj = JSON.parse(importText.trim()); }
     catch (e) { setMsg("⚠ Invalid backup text — make sure you copied all of it."); return; }
-    if (!obj || typeof obj !== "object" || !("progress" in obj)) { setMsg("⚠ That doesn't look like a Masri backup."); return; }
-    if (onImport(obj)) { setMsg("✓ Progress restored!"); setImportText(""); }
+    if (!obj || typeof obj !== "object") { setMsg("⚠ That doesn't look like a Masri backup."); return; }
+    setBusy(true);
+    // A voice-only file just tops up your recordings and leaves progress alone.
+    if (obj.masriVoiceBackup) {
+      const n = Object.keys(obj.recordings || {}).length;
+      await recLoad(obj.recordings);
+      const ids = await recKeys();
+      primeMyRecordings(ids);
+      onImport({ ...state, recordingIds: ids, voicePref: { ...(state.voicePref || {}), ...(obj.voicePref || {}) } });
+      setMsg(`✓ Restored ${n} voice recording${n === 1 ? "" : "s"}. Your progress was left as it is.`);
+      setImportText(""); setBusy(false); setRecCount(ids.length);
+      return;
+    }
+    if (!("progress" in obj)) { setMsg("⚠ That doesn't look like a Masri backup."); setBusy(false); return; }
+    if (obj.recordings && Object.keys(obj.recordings).length) await recLoad(obj.recordings);
+    const ids = await recKeys();
+    primeMyRecordings(ids);
+    if (onImport({ ...obj, recordings: {}, recordingIds: ids })) {
+      setMsg(`✓ Restored — progress, corrections${ids.length ? ` and ${ids.length} voice recording${ids.length === 1 ? "" : "s"}` : ""}.`);
+      setImportText("");
+      setRecCount(ids.length);
+    }
+    setBusy(false);
   };
 
   return (
@@ -3639,21 +4193,32 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
         {backupOpen && (
           <div className="fade" style={{ marginTop: 12 }}>
             <div style={{ fontSize: 11.5, color: T.textDim, lineHeight: 1.6, marginBottom: 10 }}>
-              Save a copy of all your progress (levels, SRS, custom quizzes, settings). Keep the file or text somewhere safe, then restore it any time — even on a new phone.
+              Saves everything: your levels and SRS progress, every correction you've made to a card, your custom cards and quizzes, your settings — and your voice recordings. Keep the file somewhere safe and restore it any time, even on a new phone.
             </div>
+            {SAVE_ERR && (
+              <div style={{ fontSize: 11.5, color: BAD_RED, fontWeight: 600, lineHeight: 1.5, background: `${BAD_RED}12`, border: `1px solid ${BAD_RED}55`, borderRadius: 10, padding: "9px 11px", marginBottom: 10 }}>⚠ {SAVE_ERR}</div>
+            )}
             <div style={{ fontSize: 12, color: T.gold, fontWeight: 700, marginBottom: 6 }}>Export</div>
+            <button className="tap" disabled={busy} onClick={() => downloadBackup(true)} style={{ width: "100%", padding: 12, borderRadius: 11, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 13.5, fontWeight: 700, marginBottom: 8, opacity: busy ? 0.6 : 1 }}>
+              {busy ? "Working…" : "⬇ Download full backup"}
+              <span style={{ display: "block", fontSize: 11, fontWeight: 500, opacity: 0.9, marginTop: 2 }}>progress + corrections + {recCount} voice recording{recCount === 1 ? "" : "s"}</span>
+            </button>
             <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-              <button className="tap" onClick={downloadBackup} style={{ flex: 1, padding: 11, borderRadius: 11, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 13, fontWeight: 700 }}>Download file</button>
-              <button className="tap" onClick={copyBackup} style={{ flex: 1, padding: 11, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 13, fontWeight: 600 }}>Copy</button>
-              <button className="tap" onClick={showBackupText} style={{ flex: 1, padding: 11, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 13, fontWeight: 600 }}>Show text</button>
+              <button className="tap" disabled={busy} onClick={downloadVoice} style={{ flex: 1, padding: 11, borderRadius: 11, border: `1px solid ${T.gold}`, background: `${T.gold}0d`, color: T.gold, fontSize: 12.5, fontWeight: 700 }}>🎤 Voice only</button>
+              <button className="tap" disabled={busy} onClick={() => downloadBackup(false)} style={{ flex: 1, padding: 11, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 12.5, fontWeight: 600 }}>Progress only</button>
             </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <button className="tap" disabled={busy} onClick={copyBackup} style={{ flex: 1, padding: 10, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 12.5, fontWeight: 600 }}>Copy</button>
+              <button className="tap" disabled={busy} onClick={showBackupText} style={{ flex: 1, padding: 10, borderRadius: 11, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 12.5, fontWeight: 600 }}>Show text</button>
+            </div>
+            <div style={{ fontSize: 11, color: T.textDim, lineHeight: 1.5, marginBottom: 4 }}>Copy and Show text leave the recordings out — audio is far too big for the clipboard, so use a file download to keep your voice.</div>
             <div style={{ fontSize: 12, color: T.gold, fontWeight: 700, margin: "12px 0 6px" }}>Import</div>
             <input ref={fileRef} type="file" accept=".json,application/json" onChange={onFile} style={{ display: "none" }} />
             <button className="tap" onClick={() => fileRef.current && fileRef.current.click()} style={{ width: "100%", padding: 11, borderRadius: 11, border: `1px dashed ${T.gold}`, background: `${T.gold}0d`, color: T.gold, fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Choose backup file…</button>
             <textarea value={importText} onChange={(e) => setImportText(e.target.value)} placeholder="…or paste your backup text here" rows={3} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: T.panelHi, color: T.text, fontSize: 11.5, fontFamily: "ui-monospace, monospace", outline: "none", resize: "vertical" }} />
-            <button className="tap" disabled={!importText.trim()} onClick={doImport} style={{ width: "100%", marginTop: 8, padding: 12, borderRadius: 11, border: "none", background: importText.trim() ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: importText.trim() ? "#fff" : T.textDim, fontSize: 14, fontWeight: 700 }}>Restore this backup</button>
-            <div style={{ fontSize: 11, color: T.textDim, marginTop: 8, lineHeight: 1.5 }}>Restoring replaces your current progress with the backup.</div>
-            {msg && <div style={{ fontSize: 12, color: msg[0] === "⚠" ? T.red : T.gold, fontWeight: 600, marginTop: 8 }}>{msg}</div>}
+            <button className="tap" disabled={!importText.trim() || busy} onClick={doImport} style={{ width: "100%", marginTop: 8, padding: 12, borderRadius: 11, border: "none", background: importText.trim() && !busy ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: importText.trim() && !busy ? "#fff" : T.textDim, fontSize: 14, fontWeight: 700 }}>{busy ? "Working…" : "Restore this backup"}</button>
+            <div style={{ fontSize: 11, color: T.textDim, marginTop: 8, lineHeight: 1.5 }}>Restoring a full backup replaces your current progress. A voice-only file just adds the recordings back and leaves your progress alone.</div>
+            {msg && <div style={{ fontSize: 12, color: msg[0] === "⚠" ? T.red : T.gold, fontWeight: 600, marginTop: 8, lineHeight: 1.5 }}>{msg}</div>}
           </div>
         )}
       </div>
@@ -3766,20 +4331,35 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
   const now = Date.now();
   const vocabLevels = Array.from({ length: CONV_START - 1 }, (_, k) => k + 1);
   const convLevels = [];
-  for (let l = CONV_START; l <= MAX_LEVEL; l++) if (allItems.some((x) => x.level === l)) convLevels.push(l);
+  for (let l = CONV_START; l <= CONV_END; l++) if (allItems.some((x) => x.level === l)) convLevels.push(l);
+  const verbLevels = [];
+  for (let l = VERB_START; l <= MAX_LEVEL; l++) if (allItems.some((x) => x.level === l)) verbLevels.push(l);
   const convTitle = (l) => (LEVEL_TITLES[l] || `Lv ${l}`).replace(/^Conversations: /, "");
   const vocabCount = allItems.filter((x) => x.level < CONV_START).length;
-  const convCount = allItems.filter((x) => x.level >= CONV_START).length;
+  const convCount = allItems.filter((x) => isConvLevel(x.level)).length;
+  const verbCount = allItems.filter((x) => isVerbLevel(x.level)).length;
   const raw = query.trim();
   const ql = raw.toLowerCase();
   const qar = normAr(raw);
   const qtr = normTr(raw);
+  const qaz = normAz(raw);
+  const myVoice = new Set(state.recordingIds || []);
   const shown = allItems.filter((it) => {
-    if (!raw) return filter === "all" || (filter === "conv" ? it.level >= CONV_START : filter === "vocab" ? it.level < CONV_START : it.level === filter);
+    if (!raw) {
+      if (filter === "all") return true;
+      if (filter === "conv") return isConvLevel(it.level);
+      if (filter === "verbs") return isVerbLevel(it.level);
+      if (filter === "vocab") return it.level < CONV_START;
+      if (filter === "rec") return !!(audioIds && audioIds.has(it.id));      // has studio audio
+      if (filter === "mine") return myVoice.has(it.id);                      // has my own recording
+      return it.level === filter;
+    }
     const enHit = it.en.toLowerCase().includes(ql);
     const trHit = qtr.length > 0 && (normTr(it.tr).includes(qtr) || (it.alts || []).some((a) => normTr(a).includes(qtr)));
     const arHit = qar.length > 0 && (normAr(it.ar).includes(qar) || (it.alts || []).some((a) => normAr(a).includes(qar)));
-    return enHit || trHit || arHit;
+    // Searching also matches how you'd text it — "7abibi" finds حبيبي.
+    const azHit = qaz.length > 0 && normAz(it.az || toArabizi(it.ar, it.tr)).includes(qaz);
+    return enHit || trHit || arHit || azHit;
   });
   const countByLevel = {};
   allItems.forEach((it) => { countByLevel[it.level] = (countByLevel[it.level] || 0) + 1; });
@@ -3791,6 +4371,9 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
   allItems.forEach((it) => { const p = state.progress[it.id]; if (p) { const g = stageMeta(p.stage).group; groupCounts[g] = (groupCounts[g] || 0) + 1; } });
   const stageIds = stageSel.length ? allItems.filter((it) => { const p = state.progress[it.id]; return p && stageSel.includes(stageMeta(p.stage).group); }).map((it) => it.id) : [];
   const toggleStage = (g) => setStageSel((sel) => sel.includes(g) ? sel.filter((x) => x !== g) : [...sel, g]);
+  // Custom-quiz sets built from what you can hear, not from how well you know it.
+  const audioRecIds = audioIds ? allItems.filter((it) => audioIds.has(it.id)).map((it) => it.id) : [];
+  const myVoiceIds = allItems.filter((it) => myVoice.has(it.id)).map((it) => it.id);
 
   const badge = (it) => {
     const p = state.progress[it.id];
@@ -3837,6 +4420,22 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
             {convLevels.map((l) => (
               <button key={l} className="tap" onClick={() => setFilter(l)} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === l ? T.gold : T.line}`, background: filter === l ? `${T.gold}18` : "transparent", color: filter === l ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>{convTitle(l)} ({countByLevel[l] || 0})</button>
             ))}
+          </div>
+          {verbCount > 0 && (
+            <>
+              <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "6px 2px 5px" }}>⚡ Verbs</div>
+              <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8 }}>
+                <button className="tap" onClick={() => setFilter("verbs")} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === "verbs" ? T.gold : T.line}`, background: filter === "verbs" ? `${T.gold}18` : "transparent", color: filter === "verbs" ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>All verbs ({verbCount})</button>
+                {verbLevels.map((l) => (
+                  <button key={l} className="tap" onClick={() => setFilter(l)} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === l ? T.gold : T.line}`, background: filter === l ? `${T.gold}18` : "transparent", color: filter === l ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>{(LEVEL_TITLES[l] || `Lv ${l}`).replace(/^Verbs — /, "")} ({countByLevel[l] || 0})</button>
+                ))}
+              </div>
+            </>
+          )}
+          <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "6px 2px 5px" }}>🔊 By audio</div>
+          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8 }}>
+            <button className="tap" onClick={() => setFilter("rec")} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === "rec" ? T.gold : T.line}`, background: filter === "rec" ? `${T.gold}18` : "transparent", color: filter === "rec" ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>🎙 Has recorded audio ({audioIds ? allItems.filter((x) => audioIds.has(x.id)).length : 0})</button>
+            <button className="tap" onClick={() => setFilter("mine")} style={{ whiteSpace: "nowrap", border: `1px solid ${filter === "mine" ? T.gold : T.line}`, background: filter === "mine" ? `${T.gold}18` : "transparent", color: filter === "mine" ? T.gold : T.textDim, borderRadius: 20, padding: "6px 13px", fontSize: 12.5, fontWeight: 600 }}>🎤 My voice ({myVoice.size})</button>
           </div>
         </div>
       )}
@@ -3891,6 +4490,22 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
             })}
           </div>
           <button className="tap" disabled={!stageIds.length} onClick={() => { onAddByStage && onAddByStage(stageIds); setStageSel([]); setShowStage(false); }} style={{ width: "100%", padding: 12, borderRadius: 11, border: "none", background: stageIds.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: stageIds.length ? "#fff" : T.textDim, fontWeight: 700, fontSize: 14 }}>{stageIds.length ? `Add ${stageIds.length} item${stageIds.length === 1 ? "" : "s"} to custom quiz` : "Select a level above"}</button>
+
+          {/* Build a listening set instead: everything that has audio to hear. */}
+          <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px dashed ${T.line}` }}>
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, marginBottom: 6 }}>Or build it by audio</div>
+            <div style={{ fontSize: 12, color: T.textDim, lineHeight: 1.5, marginBottom: 10 }}>Drill only the cards you can actually hear — the studio recordings, or the ones you've said in your own voice.</div>
+            {[
+              ["🎙 Cards with recorded audio", audioRecIds, "Every card that has an Egyptian studio recording"],
+              ["🎤 Cards in my own voice", myVoiceIds, "Every card you've recorded yourself"],
+              ["🎧 Everything with any audio", Array.from(new Set([...audioRecIds, ...myVoiceIds])), "Both sets combined"],
+            ].map(([label, ids, sub]) => (
+              <button key={label} className="tap" disabled={!ids.length} onClick={() => { onAddByStage && onAddByStage(ids); setShowStage(false); }} style={{ width: "100%", marginBottom: 8, padding: "11px 13px", borderRadius: 11, textAlign: "left", border: `1px solid ${ids.length ? T.gold : T.line}`, background: ids.length ? `${T.gold}0d` : "transparent", color: ids.length ? T.gold : T.textDim, fontWeight: 700, fontSize: 13 }}>
+                <div>{label} ({ids.length})</div>
+                <div style={{ fontSize: 11, fontWeight: 500, color: T.textDim, marginTop: 2 }}>{sub}</div>
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -3903,6 +4518,7 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
         ))}
         <span style={{ color: T.textDim }}>🎙 recorded audio</span>
         <span style={{ color: T.textDim }}>🎤 my voice</span>
+        <span style={{ color: T.textDim }}>gold line = arabizi</span>
         <span style={{ color: T.textDim, marginLeft: "auto" }}>★ adds to custom quiz</span>
       </div>
 
@@ -3929,7 +4545,8 @@ function ItemsView({ allItems, state, level, leeches, onAdd, onStartPractice, cu
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, color: T.text }}>{it.en}</div>
-                <div style={{ fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}{audioIds && audioIds.has(it.id) && <span title="Recorded Egyptian audio (speechgen)" style={{ fontStyle: "normal", marginLeft: 5 }}>🎙</span>}{state.recordings && state.recordings[it.id] && <span title="My own recording" style={{ fontStyle: "normal", marginLeft: 5 }}>🎤</span>}</div>
+                <div style={{ fontSize: 11.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}{audioIds && audioIds.has(it.id) && <span title="Recorded Egyptian audio (speechgen)" style={{ fontStyle: "normal", marginLeft: 5 }}>🎙</span>}{myVoice.has(it.id) && <span title="My own recording" style={{ fontStyle: "normal", marginLeft: 5 }}>🎤</span>}</div>
+                {it.az && <div style={{ fontSize: 11, color: T.gold, fontWeight: 600, letterSpacing: 0.2, marginTop: 1 }}>{it.az}</div>}
               </div>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
                 <div style={{ fontSize: 10, color: b.c, border: `1px solid ${b.c}55`, borderRadius: 7, padding: "2px 7px", fontWeight: 700, whiteSpace: "nowrap" }}>{b.t}</div>
@@ -4217,6 +4834,19 @@ function App() {
       s = { ...DEFAULT_STATE, ...s, settings: { ...DEFAULT_STATE.settings, ...(s.settings || {}) } };
       // Apply the "unlock when fully learned" rule to existing progress on load.
       s = { ...s, currentLevel: nextUnlockedLevel(s.progress || {}, s.currentLevel || 1) };
+
+      /* One-time move of voice recordings out of the state blob and into
+         IndexedDB. Keeping them in localStorage is what used to fill it up and
+         make every later save fail silently, so this runs before anything else
+         gets written. Whatever survived in the old blob is copied across, then
+         dropped from state so the blob shrinks back to a sane size. */
+      const legacy = s.recordings && Object.keys(s.recordings).length ? s.recordings : null;
+      if (legacy) { await recLoad(legacy); }
+      const ids = await recKeys();
+      s = { ...s, recordings: {}, recordingIds: ids };
+      primeMyRecordings(ids);
+      if (legacy) await saveState(s); // reclaim the space immediately
+
       applyTheme(s.settings.theme || "rose");
       if (mounted) setState(s);
     })();
@@ -4234,7 +4864,15 @@ function App() {
   const allItems = useMemo(() => {
     const base = [...ITEMS, ...((state && state.custom) || [])];
     const ed = (state && state.itemEdits) || {};
-    const eff = base.map((it) => (ed[it.id] ? { ...it, ...ed[it.id], edited: true } : it));
+    const eff = base.map((it) => {
+      const e = ed[it.id];
+      if (!e) return it.az === undefined ? { ...it, az: toArabizi(it.ar, it.tr) } : it;
+      const m = { ...it, ...e, edited: true };
+      // Arabizi is derived, so a correction to the Arabic or the transliteration
+      // rewrites it too — unless you typed your own Arabizi, which always wins.
+      if (!e.az) m.az = toArabizi(m.ar, m.tr);
+      return m;
+    });
     // Apply per-level manual ordering (saved from the Items reorder mode)
     const ord = (state && state.itemOrder) || {};
     const byLevel = {};
@@ -4249,6 +4887,9 @@ function App() {
         list.forEach((it) => { if (map.has(it.id)) { out.push(it); map.delete(it.id); } });
       } else out.push(...list);
     });
+    // Publish the edited list for live() — this runs during render, so every
+    // child below (including a quiz holding a stale queue) reads fresh cards.
+    LIVE_ITEMS = new Map(out.map((it) => [it.id, it]));
     return out;
   }, [state]);
 
@@ -4258,7 +4899,9 @@ function App() {
     persist({ ...s, itemOrder: { ...(s.itemOrder || {}), [level]: ids } });
   }, [persist]);
 
-  // Own-voice recordings live in state → saved locally and included in backup export/import.
+  /* Bridge for components that are rendered in several places (item detail inside
+     a quiz, the recorder, the verb example list) so they can reach app state
+     without threading props through every level. Reassigned on each render. */
   REC_API = {
     pref: (id) => (stateRef.current && stateRef.current.voicePref ? stateRef.current.voicePref[id] || "original" : "original"),
     setPref: (id, v) => { const s = stateRef.current; persist({ ...s, voicePref: { ...(s.voicePref || {}), [id]: v } }); },
@@ -4268,9 +4911,31 @@ function App() {
       if (custIdx >= 0) { const custom = s.custom.slice(); custom[custIdx] = { ...custom[custIdx], ...patch }; persist({ ...s, custom }); }
       else persist({ ...s, itemEdits: { ...(s.itemEdits || {}), [id]: { ...((s.itemEdits || {})[id] || {}), ...patch } } });
     },
-    get: (id) => (stateRef.current && stateRef.current.recordings ? stateRef.current.recordings[id] || null : null),
-    save: (id, url) => { const s = stateRef.current; persist({ ...s, recordings: { ...(s.recordings || {}), [id]: url } }); },
-    del: (id) => { const s = stateRef.current; const r = { ...(s.recordings || {}) }; delete r[id]; persist({ ...s, recordings: r }); },
+    // Reset a card back to how it shipped.
+    resetItem: (id) => {
+      const s = stateRef.current;
+      const e = { ...(s.itemEdits || {}) };
+      delete e[id];
+      persist({ ...s, itemEdits: e });
+    },
+    prog: (id) => (stateRef.current && stateRef.current.progress ? stateRef.current.progress[id] || null : null),
+    learn: (id) => commitLearn(id),
+    // The clip itself is in IndexedDB; state only remembers which ids have one.
+    save: (id, url) => {
+      MY_REC[id] = url;
+      recPut(id, url).then(() => {
+        const s = stateRef.current;
+        const ids = Array.from(new Set([...(s.recordingIds || []), id]));
+        persist({ ...s, recordingIds: ids });
+      });
+    },
+    del: (id) => {
+      delete MY_REC[id];
+      recDel(id).then(() => {
+        const s = stateRef.current;
+        persist({ ...s, recordingIds: (s.recordingIds || []).filter((x) => x !== id) });
+      });
+    },
   };
 
   // Keep the speech engine in sync with settings, and cover user-added cards too.
@@ -4381,6 +5046,17 @@ function App() {
     if (items.length) { setPracticeItems(shuffle(items)); setView("practice"); }
   }, [allItems]);
 
+  // Verbs: learning runs over the verb cards themselves; the quiz mixes the verbs
+  // together with whichever of their example sentences you've picked up.
+  const startVerbLearn = useCallback(() => setView("verblearn"), []);
+  const startVerbQuiz = useCallback(() => {
+    const s = stateRef.current;
+    const verbs = allItems.filter((it) => isVerbLevel(it.level));
+    const exIds = new Set(verbs.reduce((a, v) => a.concat(v.ex || []), []));
+    const items = allItems.filter((it) => s.progress[it.id] && (isVerbLevel(it.level) || exIds.has(it.id)));
+    if (items.length) { setPracticeItems(shuffle(items)); setView("practice"); }
+  }, [allItems]);
+
   const startPractice = useCallback((itemsOrLeech) => {
     const items = itemsOrLeech === "leeches" ? (derived ? derived.leechList : []) : itemsOrLeech;
     if (items && items.length) { setPracticeItems(items); setView("practice"); }
@@ -4446,17 +5122,15 @@ function App() {
   const startCustomItems = useCallback(() => {
     const s = stateRef.current;
     const ids = s.customItems || [];
-    const all = [...ITEMS, ...(s.custom || [])];
-    const items = all.filter((it) => ids.includes(it.id));
+    const items = allItems.filter((it) => ids.includes(it.id));
     if (items.length) { setPracticeItems(items); setView("practice"); }
-  }, []);
+  }, [allItems]);
 
   const startLearnedQuiz = useCallback(() => {
     const s = stateRef.current;
-    const all = [...ITEMS, ...(s.custom || [])];
-    const items = shuffle(all.filter((it) => s.progress[it.id]));
+    const items = shuffle(allItems.filter((it) => s.progress[it.id]));
     if (items.length) { setPracticeItems(items); setView("practice"); }
-  }, []);
+  }, [allItems]);
 
   const onQuizType = useCallback((t) => {
     const s = stateRef.current;
@@ -4545,7 +5219,7 @@ function App() {
           />
         )}
         {view === "lessons" && (
-          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} onConv={() => setView("conv")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
+          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} onConv={() => setView("conv")} onVerbs={() => setView("verbs")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}
         {view === "reviews" && (
           <ReviewsHub
@@ -4563,6 +5237,10 @@ function App() {
         {view === "practice" && <TypedQuiz items={practiceItems} mode="practice" onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("items")} title="Practice" quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />}
         {view === "script" && <ScriptView scriptState={state.script} setScript={(next) => persist({ ...state, script: next })} autoReview={scriptAuto} onAutoConsumed={() => setScriptAuto(false)} customLetters={state.customLetters || []} onCustomLetters={onCustomLetters} />}
         {view === "conv" && <ConvHub state={state} allItems={allItems} onBack={() => setView("lessons")} onLearn={startConvLearn} onQuiz={startConvQuiz} onItems={(l) => { setItemsFilter(l); setView("items"); }} />}
+        {view === "verbs" && <VerbHub state={state} allItems={allItems} onBack={() => setView("lessons")} onLearn={startVerbLearn} onQuiz={startVerbQuiz} onOpenDetail={setDetailItem} onItems={() => { setItemsFilter("verbs"); setView("items"); }} />}
+        {view === "verblearn" && (
+          <LearnSession pool={allItems.filter((it) => isVerbLevel(it.level) && !state.progress[it.id])} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("verbs")} autoStart={true} learnedCount={allItems.filter((it) => isVerbLevel(it.level) && state.progress[it.id]).length} onQuizLearned={startVerbQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
+        )}
         {view === "convlearn" && convCat && (
           <LearnSession pool={allItems.filter((it) => it.level === convCat && !state.progress[it.id])} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("conv")} autoStart={true} learnedCount={allItems.filter((it) => it.level === convCat && state.progress[it.id]).length} onQuizLearned={() => startConvQuiz(convCat)} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}

@@ -10,7 +10,7 @@ home screen.
 ## Features
 
 ### Vocabulary (WaniKani-style)
-- **1,424 items across 83 levels** — words, phrases, and full sentences, grouped by
+- **1,544 items across 85 levels** — words, phrases, and full sentences, grouped by
   theme and difficulty (greetings → grammar → daily life → dialogues → slang), with
   **male and female forms side by side**: every gendered word, phrase, and sentence
   (adjectives, commands, questions, endearments) appears in both forms, the feminine
@@ -83,6 +83,42 @@ home screen.
   once per session (counted as a miss if you slipped on it at all), so spacing stays
   intact. The finish screen offers a one-tap **Retake**.
 
+### Arabizi (Franco-Arabic)
+- **Every item now carries its Arabizi** — the way Egyptians actually text, with
+  numbers standing in for the sounds Latin letters don't have: **3** = ع, **7** = ح,
+  **5** = خ, **2** = the glottal stop. It shows on lesson cards, quiz feedback, the
+  Items list and every detail page (صباح الخير → *sabaa7 el-5eer*, قهوة → *2ahwa*).
+- **Generated, not hand-typed** — the Arabizi is derived from each card's Arabic
+  spelling and transliteration, so **when you correct a card, its Arabizi updates with
+  it**. You can still override it by hand in the edit form; leave that field blank and
+  the app keeps generating it for you.
+- **Type in Arabizi** — the "try typing it" box on every lesson and detail page has an
+  **العربية Arabic / 🔤 Arabizi** toggle, so you can practise either script.
+- **Quiz in Arabizi** — quizzes and reviews now offer three answer modes:
+  **✍️ Arabic**, **🔤 Arabizi**, and **🔘 Choice**. In Arabizi mode the input switches
+  to a normal Latin keyboard (the Arabic keys stay out of the way).
+- **Forgiving grading** — Franco spelling is personal, so anything that's genuinely
+  the same word counts: `7` or `h`, `5` or `kh`, `3'` or `gh`, an optional `2`, doubled
+  vowels, `e`/`i` and `o`/`u` all fold together. *7abibi*, *habibi* and *habeebi* are
+  all accepted.
+- **Search by Arabizi too** — typing `7abibi` in the Items search finds حبيبي.
+
+### Verbs
+- **A third category alongside Vocabulary and Conversations** — **30 core Egyptian
+  verbs** (Lessons → ⚡ Verb lessons, or the Verbs row in the Items filter): akal,
+  raaH, ʿamal, shaaf, ʾaal, khad, fataH, ʿeref, Habb, etkallem and more.
+- **Three example sentences per verb — 90 in all** — every verb links to three short,
+  practical sentences that put it to work (أكل → *ana akalt feTaar* / *betaakol eh?* /
+  *ʿaayez aakol Haaga*). The sentences live in the **Conversations** category
+  (Conversations: Verbs in Action), so they browse and filter with everything else.
+- **Learn them from the verb itself** — open a verb and its three sentences are right
+  there with sound, transliteration, Arabizi and a **Learn this sentence ✓** button.
+  Tap it and the sentence **joins your normal reviews immediately**, on the same SRS
+  schedule as everything else — no separate system.
+- **Progress at a glance** — the Verbs hub shows each verb's SRS stage plus an
+  **x/3 sentences** counter, and a **Quiz verbs + sentences** drill mixes the verbs
+  together with whichever of their sentences you've picked up.
+
 ### Reviews hub
 - Choose **what** to review: **letters (script), words, phrases, sentences, or all
   vocabulary** — each with its own due count.
@@ -142,8 +178,15 @@ home screen.
   a marked letter opens its trace guide *and* the explanation of the mark sitting on it.
 
 ### Dictionary, stats & looks
-- **Items** is a searchable dictionary (English / transliteration / Arabic) with a
-  count for every level.
+- **Items** is a searchable dictionary (English / transliteration / Arabic /
+  **Arabizi**) with a count for every level, organised into **Vocabulary**,
+  **🗣 Conversations**, **⚡ Verbs** and **🔊 By audio** filter rows.
+- **Your corrections apply everywhere, instantly** — edit a card's Arabic,
+  transliteration, English or Arabizi from its detail page and the change shows up in
+  every list, lesson, review and custom quiz **including a quiz you're in the middle
+  of** — and the corrected spelling is what gets graded. An **↺ Reset to the original
+  card** button puts it back the way it shipped. Corrections are saved with your data
+  and travel in your backups.
 - **Stats** dashboard: % of the whole app and current level mastered, words
   learned/mastered/burned, a review pipeline (due now / 24h / 7 days), a **mastery
   breakdown** counting how many of everything you've started sit in each tier
@@ -151,14 +194,24 @@ home screen.
   14-day activity graph, a **full-month activity calendar** you can page through
   month by month — each day shaded greener the more you studied, with today ringed —
   and per-level progress bars.
+- **Build a custom quiz from your audio** — alongside "add to custom quiz by mastery
+  level", you can now build a listening set from what you can actually *hear*:
+  **🎙 cards with recorded audio**, **🎤 cards in my own voice**, or **🎧 everything
+  with any audio**. The Items browser has matching filter chips.
 - **Themes** — six color themes (Rose, Violet, Bubblegum, Mint, Dark, Midnight),
   chosen at the bottom of the Home screen.
 - **Record your own voice** — on any word's detail page, tap **🎤 Record my voice**
-  to capture your own pronunciation (10 seconds max). A **▶ My voice** button then
+  to capture your own pronunciation (15 seconds max). A **▶ My voice** button then
   sits beside the original speaker, with re-record and delete options. Words with an
-  own-voice recording show a **🎤** in the Items list. Recordings are saved with your
-  progress on the device and are **included in backup export/import**, so they travel
-  with your data to any device.
+  own-voice recording show a **🎤** in the Items list.
+- **Recordings now live in IndexedDB** — they used to be stored inside the same
+  localStorage blob as your progress, which has a hard ~5 MB limit. Once you'd
+  recorded enough to cross it, **every save failed silently** and later changes
+  (including card corrections) were quietly dropped. Audio has moved to IndexedDB,
+  which has no practical size limit, so progress and recordings no longer compete for
+  the same space. Existing recordings are migrated automatically the first time you
+  open this version, and any future storage problem is now **reported in the Backup
+  panel instead of being swallowed**.
 - **Recorded Egyptian audio (best on iPhone)** — the app now plays a **real Egyptian
   recording** for any word that has one: drop MP3s named `audio/<word id>.mp3` into
   the repo (word ids are in `words.csv` / `words.json`) and every player button and
@@ -181,9 +234,13 @@ home screen.
   Egyptian voice when one exists.
 - **App icon** — a rose-gradient ʿain (ع) with a crescent moon, used as the
   favicon and home-screen icon.
-- **Backup & restore** — from the Home settings you can export all your progress
-  (download a file, copy it, or show it as text) and import it back on any device,
-  so your data is never stuck on one phone.
+- **Backup & restore** — from the Home settings, **⬇ Download full backup** saves
+  everything in one file: progress, **every correction you've made to a card**, your
+  custom cards and quizzes, settings, **and all your voice recordings** (the button
+  shows how many are included). There's also a **🎤 Voice only** export — a smaller
+  file for moving recordings to another device, which restores your audio *without*
+  touching your progress — and a **Progress only** option. Copy and Show text leave
+  the audio out (it's far too big for the clipboard) and say so.
 - **Progress saves on your device** and the app installs to your home screen.
 - **Refresh app** — a card in the footer with a **"Refresh to latest version"** button
   that reloads the newest version of the app straight from the web, so the home-screen
@@ -205,11 +262,36 @@ home screen.
 
 - A single HTML file using React 18.3.1 + Babel Standalone 7.26.4, pinned and loaded from the jsDelivr CDN
 - Pronunciation via the browser's Web Speech API (uses your device's Arabic voice)
-- Progress stored locally in your browser (localStorage)
+- Progress, corrections and settings in localStorage; voice recordings in IndexedDB
 
 ---
 
-*Last updated (v2.1.0 · 7/27/2026): **grouped Vocabulary vs Conversations
+*Last updated (v2.2.0 · 7/30/2026): a big one — **corrections that actually stick,
+Arabizi everywhere, and a new Verbs category.*
+
+*The bug behind disappearing edits is fixed at the root. Voice recordings were being
+base64'd into the same localStorage blob as your progress; once that blob crossed the
+browser's ~5 MB cap, **every save threw an error that the app caught and ignored**, so
+corrections looked saved but were silently discarded. Recordings have moved to
+**IndexedDB** (migrated automatically on first launch), the state blob stays small, and
+storage failures are now surfaced in the Backup panel. Two smaller causes are fixed
+too: lessons and quizzes froze their card list when the session started, so mid-session
+edits never showed — every card is now re-resolved live at render time — and Custom
+Quiz and "Quiz all learned words" were reading the original data instead of your edited
+version.*
+
+*New: **Arabizi / Franco-Arabic on all 1,544 items** (3 = ع, 7 = ح, 5 = خ, 2 = glottal
+stop), generated from each card so it follows your corrections; a **🔤 Arabizi answer
+mode** in every quiz and an Arabic/Arabizi toggle in the try-typing boxes, with
+forgiving grading that accepts any common Franco spelling; Arabizi search in Items.
+**⚡ Verbs** — 30 core Egyptian verbs, each with **three example sentences** (90 new
+sentences, filed under Conversations: Verbs in Action) that you can learn straight from
+the verb's page and that then flow into your normal reviews. **Backups now carry your
+corrections and your recordings**, with a separate 🎤 Voice-only export/restore. And you
+can **build a custom quiz from your audio** — studio recordings, your own voice, or
+both. Cards also gained an editable Arabizi field and an ↺ Reset to original button.*
+
+*Earlier (v2.1.0 · 7/27/2026): **grouped Vocabulary vs Conversations
 everywhere** — the Lessons menu now has clear "Vocabulary" and "Conversations"
 sections, and the Items filter is reorganized into an All chip, a **Vocabulary row**
 (all vocabulary + Lv 1–79) and a **Conversations row** with each category by name
