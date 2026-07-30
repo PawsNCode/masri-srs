@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.3.0";
+const APP_VERSION = "2.5.0";
 const APP_UPDATED = "7/30/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -775,7 +775,8 @@ function toArabizi(ar, tr) {
 function normAz(s) {
   if (!s) return "";
   let x = String(s).toLowerCase();
-  x = x.replace(/[\u02BF\u02BB\u02BE\u02BC\u2019\u02D5`]/g, "'");
+  x = x.replace(/[\u02BF\u02BB\u02D5]/g, "3");   // ʿ ayin-type marks read as the Arabizi 3
+  x = x.replace(/[\u02BE\u02BC\u2019`]/g, "'");  // ʾ hamza-type marks — optional, stripped below
   x = x.replace(/7'/g, "kh").replace(/5/g, "kh").replace(/x/g, "kh");
   x = x.replace(/3'/g, "gh").replace(/8'/g, "gh");
   x = x.replace(/9'/g, "d").replace(/6'/g, "z").replace(/9/g, "s").replace(/6/g, "t");
@@ -983,7 +984,7 @@ const RAW = [
   ["ashoofakinshaallah", 10, "sentence", "أشوفك بكرة إن شاء الله", "ashoofak bokra in shaaʾ allah", "See you tomorrow, God willing"],
 
   // ===== L11 — Family & people =====
-  ["eila", 11, "word", "عيلة", "ʿeila", "Family"],
+  ["eila", 11, "word", "عيلة", "ʿeila", "Family (extended, with relatives)"],
   ["om", 11, "word", "أم", "om", "Mother"],
   ["ab", 11, "word", "أب", "ab", "Father"],
   ["akh", 11, "word", "أخ", "akh", "Brother"],
@@ -1254,7 +1255,7 @@ const RAW = [
   ["tr_ticket", 31, "word", "تذكرة", "tazkara", "Ticket"],
   ["tr_hotel", 31, "word", "فندق", "fondoʾ", "Hotel"],
   ["tr_booking", 31, "word", "حجز", "Hagz", "Reservation"],
-  ["tr_passport", 31, "word", "باسبور", "basboor", "Passport"],
+  ["tr_passport", 31, "word", "باسبور", "basboor", "Passport", ["جواز سفر", "gawaaz safar"]],
   ["tr_trip", 31, "word", "رحلة", "reHla", "Trip / flight"],
   ["tr_wherehotel", 31, "sentence", "فين الفندق", "feen el-fondoʾ", "Where's the hotel?"],
   ["tr_havebooking", 31, "sentence", "عندي حجز", "ʿandi Hagz", "I have a reservation"],
@@ -2503,6 +2504,105 @@ const RAW = [
   ["v_habb", 90, "word", "حب", "Habb", "to like / to love", [], ["vs_habb_1", "vs_habb_2", "vs_habb_3"]],
   ["v_tabakh", 90, "word", "طبخ", "Tabakh", "to cook", [], ["vs_tabakh_1", "vs_tabakh_2", "vs_tabakh_3"]],
   ["v_etkallem", 90, "word", "اتكلم", "etkallem", "to speak / to talk", [], ["vs_etkallem_1", "vs_etkallem_2", "vs_etkallem_3"]],
+
+  // ===== L85 — Conversations: Survival Essentials (from spoken-Egyptian survival-phrase lessons) =====
+  ["sv_shokran_gazilan", 85, "phrase", "شكراً جزيلاً", "shokran gaziilan", "Thank you very much"],
+  ["sv_motshakker", 85, "word", "متشكر", "motshakker", "Thanks (said by a man)"],
+  ["sv_motshakkera", 85, "word", "متشكرة", "motshakkera", "Thanks (said by a woman)"],
+  ["sv_alf_shokr", 85, "phrase", "ألف شكر", "alf shokr", "A thousand thanks"],
+  ["sv_elafw", 85, "word", "العفو", "el-ʿafw", "You're welcome (reply to thanks)"],
+  ["sv_ahlan_wasahlan", 85, "phrase", "أهلاً وسهلاً", "ahlan wa-sahlan", "Welcome!"],
+  ["sv_wenti_ahlo", 85, "phrase", "وانتي من أهله", "wenti men ahlo", "And you too (reply to good night, to a woman)"],
+  ["sv_sallim", 85, "sentence", "سلم على أخوك", "sallem ʿala akhook", "Say hi to your brother (to a man)"],
+  ["sv_sallimi", 85, "sentence", "سلمي على ماما", "sallemi ʿala maama", "Say hi to mom (to a woman)"],
+  ["sv_tasharrafna", 85, "word", "تشرفنا", "tasharrafna", "Nice to meet you (we're honored)"],
+  ["sv_leyya_sharaf", 85, "phrase", "ليا الشرف", "leyya el-sharaf", "The honor is mine (reply to tasharrafna)"],
+  ["sv_etfaddal", 85, "word", "اتفضل", "etfaDDal", "Go ahead / here you go (to a man)"],
+  ["sv_etfaddali", 85, "word", "اتفضلي", "etfaDDali", "Go ahead / here you go (to a woman)"],
+  ["sv_allah_yebarek", 85, "phrase", "الله يبارك فيك", "allah yebaarek fiik", "God bless you too (reply to mabrook, to a man)"],
+  ["sv_allah_yebarek_f", 85, "phrase", "الله يبارك فيكي", "allah yebaarek fiiki", "God bless you too (reply to mabrook, to a woman)"],
+  ["sv_salamtak", 85, "word", "سلامتك", "salamtak", "Get well soon (to a man)"],
+  ["sv_salamtik", 85, "word", "سلامتِك", "salamtik", "Get well soon (to a woman)"],
+  ["sv_ana_asef", 85, "phrase", "أنا آسف", "ana aasef", "I'm sorry (said by a man)"],
+  ["sv_ana_asfa", 85, "phrase", "أنا آسفة", "ana asfa", "I'm sorry (said by a woman)"],
+  ["sv_salam_bye", 85, "word", "سلام", "salaam", "Bye (casual)"],
+  ["sv_baad_eznak", 85, "phrase", "بعد إذنك", "baʿd eznak", "Excuse me / with your permission (to a man)", ["عن إذنك", "ʿan eznak"]],
+  ["sv_baad_eznik", 85, "phrase", "بعد إذنِك", "baʿd eznik", "Excuse me / with your permission (to a woman)", ["عن إذنِك", "ʿan eznik"]],
+  ["sv_hadretak", 85, "word", "حضرتك", "HaDretak", "You (respectful, to a man)"],
+  ["sv_hadretik", 85, "word", "حضرتِك", "HaDretik", "You (respectful, to a woman)"],
+  ["sv_betetkallem", 85, "sentence", "بتتكلم عربي؟", "betetkallem ʿarabi?", "Do you speak Arabic? (to a man)"],
+  ["sv_betetkallemi", 85, "sentence", "بتتكلمي عربي؟", "betetkallemi ʿarabi?", "Do you speak Arabic? (to a woman)"],
+  ["sv_mish_batkallem", 85, "sentence", "أنا مش بتكلم عربي", "ana mesh batkallem ʿarabi", "I don't speak Arabic"],
+  ["sv_mish_fahma", 85, "phrase", "مش فاهمة", "mesh fahma", "I don't understand (said by a woman)"],
+  ["sv_etkallem_beshweesh", 85, "sentence", "اتكلم بشويش لو سمحت", "etkallem beshweesh law samaHt", "Speak slowly, please (to a man)"],
+  ["sv_etkallemi_beshweesh", 85, "sentence", "اتكلمي بشويش لو سمحتي", "etkallemi beshweesh law samaHti", "Speak slowly, please (to a woman)"],
+  ["sv_beshweesh", 85, "word", "بشويش", "beshweesh", "Slowly / gently"],
+  ["sv_engliizi", 85, "word", "إنجليزي", "engliizi", "English (language)"],
+  ["sv_faransaawi", 85, "word", "فرنساوي", "faransaawi", "French (language)"],
+  ["sv_almaani", 85, "word", "ألماني", "almaani", "German (language)"],
+  ["sv_esbaani", 85, "word", "إسباني", "esbaani", "Spanish (language)"],
+  ["sv_itaali", 85, "word", "إيطالي", "iTaali", "Italian (language)"],
+  ["sv_kwayyesa", 85, "word", "كويسة", "kwayyesa", "Good / I'm fine (said by a woman)"],
+  ["sv_lawsamahti", 85, "phrase", "لو سمحتي", "law samaHti", "Excuse me / please (to a woman)"],
+  ["sv_arabi", 85, "word", "عربي", "ʿarabi", "Arabic (language)"],
+  ["sv_masri_w", 85, "word", "مصري", "maSri", "Egyptian (Masri)"],
+  ["sv_ana_esmi", 85, "sentence", "أنا اسمي نيزا", "ana esmi Niza", "My name is Niza"],
+  ["sv_ana_men", 85, "sentence", "أنا من الفلبين", "ana men el-filibbiin", "I'm from the Philippines"],
+  ["sv_saaken_fein", 85, "sentence", "ساكن فين؟", "saaken feen?", "Where do you live? (to a man)"],
+  ["sv_sakna_fein", 85, "sentence", "ساكنة فين؟", "sakna feen?", "Where do you live? (to a woman)"],
+  ["sv_ana_saaken", 85, "sentence", "أنا ساكن في مانيلا", "ana saaken fi maniila", "I live in Manila (said by a man)"],
+  ["sv_ana_sakna", 85, "sentence", "أنا ساكنة في مانيلا", "ana sakna fi maniila", "I live in Manila (said by a woman)"],
+  ["sv_enta_fein", 85, "sentence", "انت فين؟", "enta feen?", "Where are you? (to a man)"],
+  ["sv_ana_rayha", 85, "sentence", "أنا رايحة البيت", "ana rayHa el-beit", "I'm going home (said by a woman)"],
+  ["sv_gayy_men", 85, "sentence", "أنا جاي من الشغل", "ana gayy men el-shoghl", "I'm coming from work"],
+  ["sv_gayy_mneen", 85, "sentence", "انت جاي منين؟", "enta gayy mneen?", "Where are you coming from? (to a man)"],
+  ["sv_mesaafer", 85, "sentence", "أنا مسافر بكرة", "ana mesaafer bokra", "I'm traveling tomorrow (said by a man)"],
+  ["sv_mesafra", 85, "sentence", "أنا مسافرة بكرة", "ana mesafra bokra", "I'm traveling tomorrow (said by a woman)"],
+  ["sv_mesaafer_emta", 85, "sentence", "مسافر إمتى؟", "mesaafer emta?", "When are you traveling? (to a man)"],
+  ["sv_esbooa_gayy", 85, "phrase", "الأسبوع الجاي", "el-esbooʿ el-gayy", "Next week"],
+
+  // ===== L86 — Conversations: Daily Life Phrases (from the 50-daily-phrases lesson) =====
+  ["dl_ah", 86, "word", "أه", "aah", "Yeah (casual yes)"],
+  ["dl_enti_fein", 86, "sentence", "انتي فين؟", "enti feen?", "Where are you? (to a woman)"],
+  ["dl_alaa_taksi", 86, "sentence", "ألاقي فين تاكسي؟", "alaaʾi feen taksi?", "Where can I find a taxi?"],
+  ["dl_alaa_saydaleyya", 86, "sentence", "ألاقي فين صيدلية؟", "alaaʾi feen Saydaleyya?", "Where can I find a pharmacy?"],
+  ["dl_safara", 86, "sentence", "فين السفارة بتاعتي؟", "feen es-safaara betaʿti?", "Where is my embassy?"],
+  ["dl_onsoleyya", 86, "sentence", "فين القنصلية؟", "feen el-ʾonSoleyya?", "Where is the consulate?"],
+  ["dl_da_ketab", 86, "sentence", "ده كتاب", "da ketaab", "This is a book"],
+  ["dl_lamoakhza", 86, "phrase", "لا مؤاخذة", "la moʾakhza", "Pardon me (older, very polite)"],
+  ["dl_reei", 86, "phrase", "ريقي نشف", "riiʾi neshef", "I'm parched (lit. my spit dried up)"],
+  ["dl_mehtag_taksi", 86, "sentence", "أنا محتاج تاكسي", "ana meHtaag taksi", "I need a taxi (said by a man)"],
+  ["dl_mehtag_mosaada", 86, "sentence", "أنا محتاج مساعدة", "ana meHtaag mosaʿda", "I need help (said by a man)"],
+  ["dl_yaani_eh", 86, "sentence", "يعني إيه ده؟", "yaʿni eh da?", "What does this mean?"],
+  ["dl_momken_teeed", 86, "sentence", "ممكن تعيد؟", "momken teʿiid?", "Can you repeat? (to a man)"],
+  ["dl_momken_teeedi", 86, "sentence", "ممكن تعيدي؟", "momken teʿiidi?", "Can you repeat? (to a woman)"],
+  ["dl_mish_aaref", 86, "phrase", "أنا مش عارف", "ana mesh ʿaaref", "I don't know (said by a man)"],
+  ["dl_mish_aarfa", 86, "phrase", "أنا مش عارفة", "ana mesh ʿarfa", "I don't know (said by a woman)"],
+  ["dl_da_raami", 86, "phrase", "ده رقمي", "da raʾami", "This is my number"],
+  ["dl_raam_mobayli", 86, "sentence", "ده رقم موبايلي", "da raʾam mobaayli", "This is my mobile number"],
+  ["dl_aazeb", 86, "phrase", "أنا عازب", "ana ʿaazeb", "I'm single (said by a man)"],
+  ["dl_aanesa", 86, "phrase", "أنا آنسة", "ana aanesa", "I'm single / a Miss (said by a woman)"],
+  ["dl_metgawwez", 86, "phrase", "أنا متجوز", "ana metgawwez", "I'm married (said by a man)"],
+  ["dl_metgawweza", 86, "phrase", "أنا متجوزة", "ana metgawweza", "I'm married (said by a woman)"],
+  ["dl_ana_ayyaan", 86, "phrase", "أنا عيان", "ana ʿayyaan", "I'm sick (said by a man)"],
+  ["dl_ana_ayyaana", 86, "phrase", "أنا عيانة", "ana ʿayyaana", "I'm sick (said by a woman)"],
+  ["dl_agzakhana", 86, "word", "أجزخانة", "agzakhaana", "Pharmacy (older word, from Turkish)"],
+  ["dl_ahgez", 86, "sentence", "أنا عايز أحجز ترابيزة", "ana ʿaayez aHgez tarabeeza", "I want to reserve a table (said by a man)"],
+  ["dl_ahgez_f", 86, "sentence", "أنا عايزة أحجز ترابيزة", "ana ʿayza aHgez tarabeeza", "I want to reserve a table (said by a woman)"],
+  ["dl_adfa_cash", 86, "sentence", "أنا عايز أدفع كاش", "ana ʿaayez adfaʿ kaash", "I want to pay in cash (said by a man)"],
+  ["dl_adfa_cash_f", 86, "sentence", "أنا عايزة أدفع كاش", "ana ʿayza adfaʿ kaash", "I want to pay in cash (said by a woman)"],
+  ["dl_motafaael", 86, "phrase", "أنا متفائل", "ana motafaaʾel", "I'm optimistic (said by a man)"],
+  ["dl_mish_mowaafe", 86, "phrase", "أنا مش موافق", "ana mesh mowaafeʾ", "I disagree (said by a man)"],
+  ["dl_mish_mowaafa", 86, "phrase", "أنا مش موافقة", "ana mesh mowafʾa", "I disagree (said by a woman)"],
+  ["dl_da_rawaa", 86, "phrase", "ده روعة", "da rawʿa", "This is wonderful!"],
+  ["dl_momtaaz", 86, "word", "ممتاز", "momtaaz", "Excellent!"],
+  ["dl_baba", 86, "word", "بابا", "baaba", "Dad"],
+  ["dl_mama", 86, "word", "ماما", "maama", "Mom"],
+  ["dl_okhti", 86, "word", "أختي", "okhti", "My sister"],
+  ["dl_akhuya", 86, "word", "أخويا", "akhooya", "My brother"],
+  ["dl_osra", 86, "word", "أسرة", "osra", "Family (immediate — parents and kids)"],
+  ["dl_mehtaag", 86, "word", "محتاج", "meHtaag", "Needing (I need = ana meHtaag)"],
+  ["dl_mosaada", 86, "word", "مساعدة", "mosaʿda", "Help / assistance"],
 ];
 const ITEMS = RAW.map(([id, level, type, ar, tr, en, alts, ex]) => ({
   id,
@@ -2564,6 +2664,8 @@ const LEVEL_TITLES = {
   82: "Conversations: Restaurant & Café",
   83: "Conversations: Shopping & Bargaining",
   84: "Conversations: Verbs in Action",
+  85: "Conversations: Survival Essentials",
+  86: "Conversations: Daily Life Phrases",
   90: "Verbs — Everyday Actions",
   1: "Greetings & Courtesy",
   2: "Pronouns & Questions",

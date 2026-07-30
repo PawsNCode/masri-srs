@@ -10,7 +10,7 @@ home screen.
 ## Features
 
 ### Vocabulary (WaniKani-style)
-- **1,544 items across 85 levels** — words, phrases, and full sentences, grouped by
+- **1,639 items across 87 levels** — words, phrases, and full sentences, grouped by
   theme and difficulty (greetings → grammar → daily life → dialogues → slang), with
   **male and female forms side by side**: every gendered word, phrase, and sentence
   (adjectives, commands, questions, endearments) appears in both forms, the feminine
@@ -275,7 +275,40 @@ home screen.
 
 ---
 
-*Last updated (v2.3.0 · 7/30/2026): **Stats overhaul.** The Whole-app ring is now
+*Last updated (v2.5.0 · 7/30/2026): **Daily Life Phrases** — a second video-lesson
+category (Conversations: Daily Life Phrases, 41 items, 1,598 → 1,639) from the
+"50 daily phrases" lesson: finding things (alaaʾi feen taksi/Saydaleyya?, feen
+es-safaara betaʿti?, feen el-ʾonSoleyya?), understanding (yaʿni eh da?, momken
+teʿiid/i?, ana mesh ʿaaref/ʿarfa), identity (da raʾami, da raʾam mobaayli, ana
+ʿaazeb/aanesa, ana metgawwez/a), health (ana ʿayyaan/a, agzakhaana), transactions
+(ana ʿaayez/ʿayza aHgez tarabeeza, adfaʿ kaash), opinions (ana motafaaʾel, ana mesh
+mowaafeʾ/mowafʾa, da rawʿa), the idiom riiʾi neshef ("my spit dried up" = parched),
+la moʾakhza, the casual aah, plus family words the app was missing (baaba, maama,
+okhti, akhooya, osra) and momtaaz, meHtaag, mosaʿda. Ten phrases the lesson taught
+were detected as already in the app (begad, es-saaʿa kaam, ʿandi Sodaaʿ, basboor,
+ana mowaafeʾ/a, mafiish moshkela, khalli baalak/baalik…) and skipped. Two cards were
+**enhanced** rather than duplicated: **باسبور now also accepts جواز سفر / gawaaz
+safar** as a correct answer, and **ʿeila is clarified as the extended family** now
+that osra (the immediate family) exists alongside it.*
+
+*Earlier (v2.4.0 · 7/30/2026): **Survival Essentials** — a new always-unlocked
+conversation category (Conversations: Survival Essentials, 54 items, 1,544 → 1,598)
+built from two spoken-Egyptian survival-phrase lessons: thanks and their replies
+(shokran gaziilan, motshakker/a, alf shokr, el-ʿafw), meeting people (tasharrafna →
+leyya el-sharaf), courtesy pairs (mabrook → allah yebaarek fiik/i, salamtak/ik →
+allah yesallimak), apologies (ana aasef/asfa, baʿd eznak/ik — with ʿan eznak accepted
+as an alternate answer), the respectful hadretak/hadretik, communication lifesavers
+(betetkallem ʿarabi?, ana mesh batkallem ʿarabi, mesh fahma, etkallem beshweesh law
+samaHt), five language names (engliizi, faransaawi, almaani, esbaani, iTaali) plus
+ʿarabi and maSri, and introduce-yourself Q&A (saaken feen?, ana saaken/sakna fi
+maniila, ana men el-filibbiin, enta gayy mneen?, ana mesaafer bokra, el-esbooʿ
+el-gayy…). Everything the lessons taught that the app already had (17 phrases, from
+sabah en-noor to maʿlesh to enta minein) was detected and skipped, and every new card
+follows the app's m/f side-by-side convention. Also fixed: the Arabizi grader now
+reads ʿ-style marks as the Arabizi 3, so alternate answers written in transliteration
+(like ʿan eznak) grade correctly — verified across all 1,639 items.*
+
+*Earlier (v2.3.0 · 7/30/2026): **Stats overhaul.** The Whole-app ring is now
 **mastery-weighted** — every item contributes its current mastery run (unlearned = 0),
 so the percentage climbs with every correct answer instead of only when an item
 crosses 90%. New **Progress by category** card for Vocabulary / Conversations / Verbs:
@@ -299,7 +332,7 @@ edits never showed — every card is now re-resolved live at render time — and
 Quiz and "Quiz all learned words" were reading the original data instead of your edited
 version.*
 
-*New: **Arabizi / Franco-Arabic on all 1,544 items** (3 = ع, 7 = ح, 5 = خ, 2 = glottal
+*New: **Arabizi / Franco-Arabic on all 1,639 items** (3 = ع, 7 = ح, 5 = خ, 2 = glottal
 stop), generated from each card so it follows your corrections; a **🔤 Arabizi answer
 mode** in every quiz and an Arabic/Arabizi toggle in the try-typing boxes, with
 forgiving grading that accepts any common Franco spelling; Arabizi search in Items.
