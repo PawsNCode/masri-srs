@@ -187,13 +187,22 @@ home screen.
   of** — and the corrected spelling is what gets graded. An **↺ Reset to the original
   card** button puts it back the way it shipped. Corrections are saved with your data
   and travel in your backups.
-- **Stats** dashboard: % of the whole app and current level mastered, words
-  learned/mastered/burned, a review pipeline (due now / 24h / 7 days), a **mastery
-  breakdown** counting how many of everything you've started sit in each tier
-  (Learning / Shaky / Familiar / Strong / Mastered), a 14-day "new words" graph, a
-  14-day activity graph, a **full-month activity calendar** you can page through
-  month by month — each day shaded greener the more you studied, with today ringed —
-  and per-level progress bars.
+- **Stats** dashboard: a **mastery-weighted Whole app %** (every item contributes
+  its own mastery run, unlearned counting as 0 — so the number moves with every
+  answer, not only when something crosses the 90% line), the current level's Guru
+  ring, words learned/mastered/burned, and a review pipeline (due now / 24h / 7 days).
+- **Progress by category** — a dedicated card for **📚 Vocabulary, 🗣 Conversations
+  and ⚡ Verbs**: each shows how many you've learned (count *and* %), a **stacked bar
+  of the whole category colored by mastery tier** (grey = not yet learned), per-tier
+  counts with their share of what you've learned, and the category's own
+  mastery-weighted %.
+- **Progress by level, grouped by category** — the per-level list is organised under
+  Vocabulary / Conversations / Verbs headings; every level shows **learned n/total**
+  (the bar) plus its **mastery %, colored by tier**, and includes your own added
+  cards. Plus the overall **mastery breakdown** across everything started (words,
+  letter shapes, marks), a 14-day "new words" graph, a 14-day activity graph, and a
+  **full-month activity calendar** you can page through month by month — each day
+  shaded greener the more you studied, with today ringed.
 - **Build a custom quiz from your audio** — alongside "add to custom quiz by mastery
   level", you can now build a listening set from what you can actually *hear*:
   **🎙 cards with recorded audio**, **🎤 cards in my own voice**, or **🎧 everything
@@ -266,7 +275,17 @@ home screen.
 
 ---
 
-*Last updated (v2.2.0 · 7/30/2026): a big one — **corrections that actually stick,
+*Last updated (v2.3.0 · 7/30/2026): **Stats overhaul.** The Whole-app ring is now
+**mastery-weighted** — every item contributes its current mastery run (unlearned = 0),
+so the percentage climbs with every correct answer instead of only when an item
+crosses 90%. New **Progress by category** card for Vocabulary / Conversations / Verbs:
+learned count + %, a stacked bar of the entire category colored by mastery tier (grey
+for unlearned), per-tier counts with percentages, and each category's own
+mastery-weighted %. **Progress by level** is regrouped under those three category
+headings, shows learned n/total plus each level's tier-colored mastery %, and now
+counts your own added cards (all stats do).*
+
+*Earlier (v2.2.0 · 7/30/2026): a big one — **corrections that actually stick,
 Arabizi everywhere, and a new Verbs category.*
 
 *The bug behind disappearing edits is fixed at the root. Voice recordings were being

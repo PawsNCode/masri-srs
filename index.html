@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.2.0";
+const APP_VERSION = "2.3.0";
 const APP_UPDATED = "7/30/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -4582,7 +4582,7 @@ function MiniBars({ series, color, unit }) {
 function StatsView({ state, allItems, level, streak }) {
   const now = Date.now();
   const prog = state.progress;
-  const totalApp = ITEMS.length;
+  const totalApp = allItems.length; // includes your own added cards
   const stageOf = (it) => prog[it.id]?.stage || 0;
 
   const learned = allItems.filter((it) => prog[it.id]).length;
@@ -4592,11 +4592,45 @@ function StatsView({ state, allItems, level, streak }) {
   const next24 = allItems.filter((it) => { const p = prog[it.id]; return p && p.due !== Infinity && p.due > now && p.due <= now + DAY; }).length;
   const next7 = allItems.filter((it) => { const p = prog[it.id]; return p && p.due !== Infinity && p.due > now && p.due <= now + 7 * DAY; }).length;
 
-  const levelItems = ITEMS.filter((it) => it.level === level);
+  const levelItems = allItems.filter((it) => it.level === level);
   const levelGuru = levelItems.filter((it) => stageOf(it) >= 5).length;
   const levelPct = levelItems.length ? levelGuru / levelItems.length : 0;
-  const appPct = totalApp ? mastered / totalApp : 0;
-  const startedPct = totalApp ? Math.min(learned, totalApp) / totalApp : 0;
+
+  /* Whole-app % is mastery-weighted: every item contributes its own mastery run
+     (an unlearned item counts as 0), so the number moves with every tier shift —
+     not only when something finally crosses the 90% "mastered" line. */
+  const appMasterySum = allItems.reduce((a, it) => a + masteryPct(prog[it.id]), 0);
+  const appPct = totalApp ? appMasterySum / (totalApp * 100) : 0;
+
+  /* ---- Per-category stats: Vocabulary / Conversations / Verbs ----
+     For each: how many you've learned (count + %), the mastery-tier split of what
+     you've started, and the category's own mastery-weighted completion. */
+  const EMPTY_TIERS = () => ({ Learning: 0, Shaky: 0, Familiar: 0, Strong: 0, Mastered: 0 });
+  const catStats = [
+    { key: "vocab", label: "Vocabulary", icon: "📚", test: (it) => it.level < CONV_START },
+    { key: "conv", label: "Conversations", icon: "🗣", test: (it) => isConvLevel(it.level) },
+    { key: "verbs", label: "Verbs", icon: "⚡", test: (it) => isVerbLevel(it.level) },
+  ].map((c) => {
+    const its = allItems.filter(c.test);
+    const tiers = EMPTY_TIERS();
+    let started = 0, runSum = 0;
+    its.forEach((it) => {
+      const p = prog[it.id];
+      if (!p) return;
+      started++;
+      const pct = masteryPct(p);
+      runSum += pct;
+      tiers[masteryTier(pct).label]++;
+    });
+    return {
+      ...c,
+      total: its.length,
+      learned: started,
+      learnedPct: its.length ? started / its.length : 0,
+      masteryPct: its.length ? runSum / (its.length * 100) : 0,
+      tiers,
+    };
+  });
 
   // last 14 days
   const days = [];
@@ -4652,7 +4686,7 @@ function StatsView({ state, allItems, level, streak }) {
     <div className="fade">
       {/* completion rings */}
       <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-        <Ring pct={appPct} label="Whole app" sub={`${mastered} / ${totalApp} mastered`} />
+        <Ring pct={appPct} label="Whole app" sub={`mastery-weighted · ${learned}/${totalApp} learned · ${mastered} mastered`} />
         <Ring pct={levelPct} label={`Level ${level}`} sub={`${levelGuru} / ${levelItems.length} at Guru`} />
       </div>
 
@@ -4669,6 +4703,44 @@ function StatsView({ state, allItems, level, streak }) {
         <Stat label="Due now" value={due} color={due ? T.red : T.textDim} />
         <Stat label="Next 24h" value={next24} color={T.gold} />
         <Stat label="Next 7 days" value={next7} color={T.goldSoft} />
+      </div>
+
+      {/* per-category progress: Vocabulary / Conversations / Verbs */}
+      <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px", marginBottom: 14 }}>
+        <div style={{ fontSize: 13, color: T.textDim, marginBottom: 2 }}>Progress by category</div>
+        <div style={{ fontSize: 11, color: T.textDim, lineHeight: 1.5, marginBottom: 14 }}>
+          Each bar is the whole category — colored by mastery tier, grey for what you haven't learned yet.
+        </div>
+        {catStats.map((c, ci) => (
+          <div key={c.key} style={{ marginBottom: ci < catStats.length - 1 ? 16 : 0, paddingBottom: ci < catStats.length - 1 ? 14 : 0, borderBottom: ci < catStats.length - 1 ? `1px dashed ${T.line}` : "none" }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: T.text }}>{c.icon} {c.label}</span>
+              <span style={{ fontSize: 11.5, color: T.goldSoft, fontWeight: 700, marginLeft: "auto" }}>
+                {c.learned}/{c.total} learned · {Math.round(c.learnedPct * 100)}%
+              </span>
+            </div>
+            {/* stacked tier bar over the full category */}
+            <div style={{ display: "flex", height: 10, borderRadius: 8, overflow: "hidden", background: T.line, margin: "9px 0 7px" }}>
+              {MASTERY_LEGEND.map((t) => {
+                const n = c.tiers[t.label];
+                return n > 0 ? <div key={t.label} title={`${t.label}: ${n}`} style={{ width: `${(n / Math.max(1, c.total)) * 100}%`, background: t.color }} /> : null;
+              })}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "3px 12px", alignItems: "center" }}>
+              {MASTERY_LEGEND.map((t) => (
+                <span key={t.label} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10.5, color: c.tiers[t.label] ? T.text : T.textDim }}>
+                  <span style={{ width: 8, height: 8, borderRadius: 3, background: t.color }} />
+                  {t.label} <b>{c.tiers[t.label]}</b>
+                  {c.learned > 0 && c.tiers[t.label] > 0 && <span style={{ color: T.textDim }}>({Math.round((c.tiers[t.label] / c.learned) * 100)}%)</span>}
+                </span>
+              ))}
+              <span style={{ fontSize: 10.5, color: T.textDim, marginLeft: "auto" }}>mastery {Math.round(c.masteryPct * 100)}%</span>
+            </div>
+          </div>
+        ))}
+        <div style={{ fontSize: 10.5, color: T.textDim, lineHeight: 1.5, marginTop: 12, paddingTop: 10, borderTop: `1px dashed ${T.line}` }}>
+          Tier percentages are of what you've learned in that category; the "mastery" figure weighs the whole category, unlearned items counting as 0 — the same math as the Whole app ring.
+        </div>
       </div>
 
       {/* mastery breakdown by tier */}
@@ -4746,23 +4818,48 @@ function StatsView({ state, allItems, level, streak }) {
         </div>
       </div>
 
-      {/* per-level progress */}
+      {/* per-level progress, grouped by category */}
       <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16, padding: "16px" }}>
-        <div style={{ fontSize: 13, color: T.textDim, marginBottom: 12 }}>Progress by level</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 320, overflowY: "auto" }}>
-          {Array.from({ length: MAX_LEVEL }, (_, k) => k + 1).map((l) => {
-            const its = ITEMS.filter((it) => it.level === l);
-            const g = its.filter((it) => (prog[it.id]?.stage || 0) >= 5).length;
-            const pct = its.length ? g / its.length : 0;
-            const locked = l > level && l < CONV_START;
-            const done = pct >= 0.9;
+        <div style={{ fontSize: 13, color: T.textDim, marginBottom: 2 }}>Progress by level</div>
+        <div style={{ fontSize: 11, color: T.textDim, lineHeight: 1.5, marginBottom: 12 }}>
+          Bar = share learned · % on the right = that level's mastery, colored by its tier.
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 400, overflowY: "auto" }}>
+          {[
+            ["📚 Vocabulary", Array.from({ length: CORE_MAX_LEVEL }, (_, k) => k + 1)],
+            ["🗣 Conversations", Array.from({ length: CONV_END - CONV_START + 1 }, (_, k) => CONV_START + k)],
+            ["⚡ Verbs", Array.from({ length: MAX_LEVEL - VERB_START + 1 }, (_, k) => VERB_START + k)],
+          ].map(([groupLabel, lvls]) => {
+            const rows = lvls
+              .map((l) => {
+                const its = allItems.filter((it) => it.level === l);
+                if (!its.length) return null;
+                const learnedN = its.filter((it) => prog[it.id]).length;
+                const runSum = its.reduce((a, it) => a + masteryPct(prog[it.id]), 0);
+                const mPct = Math.round(runSum / its.length); // 0–100, unlearned count as 0
+                const tier = masteryTier(mPct);
+                const locked = l > level && l < CONV_START;
+                const done = learnedN === its.length && mPct >= 90;
+                return { l, its, learnedN, mPct, tier, locked, done };
+              })
+              .filter(Boolean);
+            if (!rows.length) return null;
             return (
-              <div key={l} style={{ opacity: locked ? 0.5 : 1 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, marginBottom: 4 }}>
-                  <span style={{ color: T.text }}>{locked ? "🔒 " : done ? "✓ " : ""}Lv {l} · {LEVEL_TITLES[l] || ""}</span>
-                  <span style={{ color: T.textDim }}>{g}/{its.length}</span>
+              <div key={groupLabel}>
+                <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 0 8px", position: "sticky", top: 0, background: T.panel, paddingBottom: 2 }}>{groupLabel}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {rows.map(({ l, its, learnedN, mPct, tier, locked, done }) => (
+                    <div key={l} style={{ opacity: locked ? 0.5 : 1 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 11.5, marginBottom: 4 }}>
+                        <span style={{ color: T.text, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{locked ? "🔒 " : done ? "✓ " : ""}{l < CONV_START ? `Lv ${l} · ` : ""}{(LEVEL_TITLES[l] || `Lv ${l}`).replace(/^Conversations: /, "").replace(/^Verbs — /, "")}</span>
+                        <span style={{ color: T.textDim, whiteSpace: "nowrap" }}>
+                          {learnedN}/{its.length} · <b style={{ color: learnedN ? tier.color : T.textDim }}>{mPct}%</b>
+                        </span>
+                      </div>
+                      <Bar pct={its.length ? learnedN / its.length : 0} h={5} />
+                    </div>
+                  ))}
                 </div>
-                <Bar pct={pct} h={5} />
               </div>
             );
           })}
