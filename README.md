@@ -275,7 +275,16 @@ home screen.
 
 ---
 
-*Last updated (v2.5.0 · 7/30/2026): **Daily Life Phrases** — a second video-lesson
+*Last updated (v2.5.1 · 7/30/2026): **iPhone fix — own-voice playback.** Recordings
+are stored (and backed up) as base64 `data:` URLs, and iOS Safari silently refuses to
+play `data:` URIs in audio elements — so on the iPhone your voice saved fine but
+played as nothing at all, both from the ▶ My voice button and when a card was set to
+"Plays in app: My voice." Clips are now converted to Blob object URLs before playing
+(synchronously, so it still counts as part of your tap); storage and backup formats
+are unchanged. Verified byte-for-byte for both iOS (audio/mp4) and desktop
+(audio/webm) recordings.*
+
+*Earlier (v2.5.0 · 7/30/2026): **Daily Life Phrases** — a second video-lesson
 category (Conversations: Daily Life Phrases, 41 items, 1,598 → 1,639) from the
 "50 daily phrases" lesson: finding things (alaaʾi feen taksi/Saydaleyya?, feen
 es-safaara betaʿti?, feen el-ʾonSoleyya?), understanding (yaʿni eh da?, momken

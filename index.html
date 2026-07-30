@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.5.0";
+const APP_VERSION = "2.5.1";
 const APP_UPDATED = "7/30/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -411,20 +411,36 @@ function playDataURL(url) {
     a.play().catch(() => {});
   } catch {}
 }
-/* Own-voice clips live in IndexedDB, which is async — and Safari will refuse to
-   start audio that begins after an await, because by then it no longer counts as
-   a response to your tap. So they're pulled into memory once at startup and
-   played straight from here. */
+/* Own-voice clips are stored (and backed up) as base64 data: URLs — but iOS
+   Safari refuses to play data: URIs in audio elements, so on the iPhone the
+   recordings were saved fine and then played back as pure silence. The fix:
+   turn the base64 into a Blob object URL before playing. The conversion is
+   synchronous, so it still happens inside the tap that triggered it. */
+function playableRec(url) {
+  if (!url || typeof url !== "string" || url.slice(0, 5) !== "data:") return url;
+  try {
+    const comma = url.indexOf(",");
+    const mime = (url.slice(0, comma).match(/^data:([^;]+)/) || [])[1] || "audio/mp4";
+    const bin = atob(url.slice(comma + 1));
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return URL.createObjectURL(new Blob([arr], { type: mime }));
+  } catch { return url; }
+}
+/* Clips live in IndexedDB, which is async — and Safari also won't start audio
+   after an await, because by then it no longer counts as a response to your tap.
+   So at startup every clip is pulled into memory, already converted to a
+   playable object URL, and played straight from here. */
 const MY_REC = {};
 function primeMyRecordings(ids) {
-  (ids || []).forEach((id) => { if (!(id in MY_REC)) recGet(id).then((v) => { if (v) MY_REC[id] = v; }); });
+  (ids || []).forEach((id) => { if (!(id in MY_REC)) recGet(id).then((v) => { if (v) MY_REC[id] = playableRec(v); }); });
 }
 function speak(text) {
   const id = AUDIO_ID_BY_AR[text];
   // Per-word choice: if you picked your own recording for this word, play that.
   if (id && REC_API && REC_API.pref(id) === "mine") {
     if (MY_REC[id]) { playDataURL(MY_REC[id]); return; }
-    recGet(id).then((v) => { if (v) { MY_REC[id] = v; playDataURL(v); } else speakTTS(text); });
+    recGet(id).then((v) => { if (v) { MY_REC[id] = playableRec(v); playDataURL(MY_REC[id]); } else speakTTS(text); });
     return;
   }
   if (SPEECH_PREFS.recorded && id) playRecorded(id, () => speakTTS(text));
@@ -3429,15 +3445,8 @@ function VoiceRecorder({ itemId }) {
     }
   };
   const stop = () => { if (timerRef.current) clearTimeout(timerRef.current); if (mrRef.current && mrRef.current.state === "recording") mrRef.current.stop(); };
-  const play = () => {
-    try {
-      if (CURRENT_AUDIO) { try { CURRENT_AUDIO.pause(); } catch {} }
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
-      const a = new Audio(rec);
-      CURRENT_AUDIO = a;
-      a.play().catch(() => {});
-    } catch {}
-  };
+  // Play through the converted object URL — iOS won't play the raw data: URL.
+  const play = () => playDataURL(MY_REC[itemId] || (MY_REC[itemId] = playableRec(rec)));
   const remove = () => { if (REC_API) { REC_API.del(itemId); REC_API.setPref(itemId, "original"); } setRec(null); setPrefV("original"); };
   const btn = (label, onClick, solid) => (
     <button className="tap" onClick={onClick} style={{ padding: "8px 13px", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${T.gold}`, background: solid ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : `${T.gold}12`, color: solid ? "#fff" : T.gold }}>{label}</button>
@@ -5121,7 +5130,7 @@ function App() {
     learn: (id) => commitLearn(id),
     // The clip itself is in IndexedDB; state only remembers which ids have one.
     save: (id, url) => {
-      MY_REC[id] = url;
+      MY_REC[id] = playableRec(url);   // playable immediately; IndexedDB keeps the raw base64
       recPut(id, url).then(() => {
         const s = stateRef.current;
         const ids = Array.from(new Set([...(s.recordingIds || []), id]));
