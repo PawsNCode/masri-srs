@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.5.1";
+const APP_VERSION = "2.5.2";
 const APP_UPDATED = "7/30/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -436,7 +436,18 @@ function primeMyRecordings(ids) {
   (ids || []).forEach((id) => { if (!(id in MY_REC)) recGet(id).then((v) => { if (v) MY_REC[id] = playableRec(v); }); });
 }
 function speak(text) {
-  const id = AUDIO_ID_BY_AR[text];
+  let id = AUDIO_ID_BY_AR[text];
+  const wantsMine = (x) => !!x && REC_API && REC_API.pref(x) === "mine" && !!MY_REC[x];
+  /* The spelling→id map is first-wins, and historically didn't cover every card
+     (custom cards without a translit, or ones duplicating a built-in spelling).
+     So if the mapped id isn't set to your own voice, check whether any other
+     card with this exact spelling is — that card's recording wins. */
+  if (!wantsMine(id) && LIVE_ITEMS.size) {
+    for (const it of LIVE_ITEMS.values()) {
+      if (it.ar === text && wantsMine(it.id)) { id = it.id; break; }
+      if (id === undefined && it.ar === text) id = it.id; // at least resolve something
+    }
+  }
   // Per-word choice: if you picked your own recording for this word, play that.
   if (id && REC_API && REC_API.pref(id) === "mine") {
     if (MY_REC[id]) { playDataURL(MY_REC[id]); return; }
@@ -5152,7 +5163,15 @@ function App() {
     SPEECH_PREFS.phonetic = state.settings.phonetic !== false;
     SPEECH_PREFS.voiceURI = state.settings.voiceURI || null;
     SPEECH_PREFS.recorded = state.settings.recorded !== false;
-    (state.custom || []).forEach((it) => { if (it.ar && it.tr && it.tr !== "—") { SPEECH_BY_AR[it.ar] = it.tr; if (!(it.ar in AUDIO_ID_BY_AR)) AUDIO_ID_BY_AR[it.ar] = it.id; } });
+    // Every custom card gets an audio-id mapping — the transliteration only
+    // gates the phonetic TTS hint. This used to be one combined condition, so a
+    // card added without a translit (stored as "—") never entered the map, and
+    // its own-voice recording could never be found by the speaker buttons.
+    (state.custom || []).forEach((it) => {
+      if (!it.ar) return;
+      if (it.tr && it.tr !== "—") SPEECH_BY_AR[it.ar] = it.tr;
+      if (!(it.ar in AUDIO_ID_BY_AR)) AUDIO_ID_BY_AR[it.ar] = it.id;
+    });
     Object.entries(state.itemEdits || {}).forEach(([id, e]) => { if (e.ar) { if (e.tr || SPEECH_BY_AR[e.ar] === undefined) SPEECH_BY_AR[e.ar] = e.tr || ""; AUDIO_ID_BY_AR[e.ar] = id; } });
   }, [state]);
 

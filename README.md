@@ -275,7 +275,19 @@ home screen.
 
 ---
 
-*Last updated (v2.5.1 · 7/30/2026): **iPhone fix — own-voice playback.** Recordings
+*Last updated (v2.5.2 · 7/30/2026): **Own-voice fix for manually added cards.** The
+speaker buttons find a card's recording by looking its Arabic spelling up in a
+spelling→id map — but custom cards only entered that map if they had a
+transliteration, so a card added without one (stored as "—") was invisible to the
+lookup: your recording saved fine and the ▶ My voice preview worked, yet every
+speaker button in lessons, quizzes and lists fell back to TTS. Custom cards are now
+always registered regardless of translit, and speak() gained a safety net: if the
+mapped card isn't set to your voice, it checks whether any other card with the same
+spelling is (covering manually added cards that duplicate a built-in spelling). All
+five playback paths unit-tested, including the three pre-existing ones, which are
+unchanged.*
+
+*Earlier (v2.5.1 · 7/30/2026): **iPhone fix — own-voice playback.** Recordings
 are stored (and backed up) as base64 `data:` URLs, and iOS Safari silently refuses to
 play `data:` URIs in audio elements — so on the iPhone your voice saved fine but
 played as nothing at all, both from the ▶ My voice button and when a card was set to
