@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.8.0";
+const APP_VERSION = "2.9.0";
 const APP_UPDATED = "9/19/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -445,14 +445,46 @@ function primeMyRecordings(ids) {
    through one element that lives OUTSIDE the playlist screen — it survives
    navigating away, switching apps and the lock screen, with play/pause on the
    lock screen via the Media Session API. */
-const BG = { audio: null, url: null, offsets: [], dur: 0, token: 0 };
-function bgStop() { try { if (BG.audio) BG.audio.pause(); } catch {} }
+const BG = { audio: null, url: null, offsets: [], dur: 0, token: 0, userPaused: false };
+function bgSessionState(st) { try { if (typeof navigator !== "undefined" && "mediaSession" in navigator) navigator.mediaSession.playbackState = st; } catch {} }
+// A deliberate pause/stop — remembered, so the keep-alive below never fights the user.
+function bgPause() { BG.userPaused = true; try { if (BG.audio) BG.audio.pause(); } catch {} bgSessionState("paused"); }
+function bgStop() { bgPause(); }
+function bgResume() { BG.userPaused = false; try { if (BG.audio) { const p = BG.audio.play(); if (p && p.catch) p.catch(() => {}); } } catch {} bgSessionState("playing"); }
 function bgClear() {
   bgStop();
   BG.token++;
   try { if (BG.url) URL.revokeObjectURL(BG.url); } catch {}
-  BG.url = null; BG.offsets = []; BG.dur = 0;
+  BG.url = null; BG.offsets = []; BG.dur = 0; BG.userPaused = false;
   try { if (BG.audio) { BG.audio.removeAttribute("src"); BG.audio.load(); } } catch {}
+}
+/* iOS sometimes fires a bare pause on the media element when the screen locks
+   or the app is backgrounded — not the user's doing. When that happens to a
+   track we mean to keep playing, nudge it back a few times; and if the system
+   froze the page instead, the same nudge plus the visibility handler brings
+   the track back the moment the page is allowed to run again. */
+let BG_DOC_HOOKED = false;
+function bgKeepAlive(a) {
+  if (!a || a._keepAlive) return;
+  a._keepAlive = true;
+  try { a.preload = "auto"; } catch {}
+  a.addEventListener("pause", () => {
+    if (!BG.url || BG.userPaused || a.ended) return;
+    let tries = 0;
+    const kick = () => {
+      if (!BG.url || BG.userPaused || a.ended || !a.paused) return;
+      tries++;
+      try { const p = a.play(); if (p && p.catch) p.catch(() => {}); } catch {}
+      if (tries < 6) setTimeout(kick, 800);
+    };
+    setTimeout(kick, 250);
+  });
+  if (!BG_DOC_HOOKED && typeof document !== "undefined" && document.addEventListener) {
+    BG_DOC_HOOKED = true;
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && BG.url && !BG.userPaused && BG.audio && BG.audio.paused && !BG.audio.ended) bgResume();
+    });
+  }
 }
 // Mono AudioBuffer → 16-bit PCM WAV bytes.
 function encodeWav(buf) {
@@ -4164,6 +4196,7 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
   const [mode, setMode] = useState("mine");       // mine | en
   const [loop, setLoop] = useState(true);
   const [shuf, setShuf] = useState(false);
+  const [rep, setRep] = useState("off"); // off | all (everything ×2) | ar (Masri side ×2)
   const [playing, setPlaying] = useState(false);
   const [nowItem, setNowItem] = useState(null);
   const [pos, setPos] = useState([0, 0]);
@@ -4178,6 +4211,8 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
   const playingRef = useRef(false), orderRef = useRef([]), idxRef = useRef(0), modeRef = useRef(mode), loopRef = useRef(loop), timerRef = useRef(null), audioRef = useRef(null);
   useEffect(() => { modeRef.current = mode; }, [mode]);
   useEffect(() => { loopRef.current = loop; }, [loop]);
+  const repRef = useRef(rep);
+  useEffect(() => { repRef.current = rep; }, [rep]);
   // Make sure every clip is in memory before the first tap — the iOS unlock
   // below needs the first track's URL synchronously.
   useEffect(() => { primeMyRecordings([...recIds, ...(state.recordingIdsEn || []).map((id) => "en:" + id)]); /* eslint-disable-next-line */ }, []);
@@ -4216,21 +4251,22 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
     const it = list[i];
     setNowItem(it);
     setPos([i + 1, list.length]);
-    const playRec = () => {
+    const playAr = (done) => {
       if (!playingRef.current || idxRef.current !== i) return;
       getClip(it.id).then((url) => {
         if (!playingRef.current || idxRef.current !== i) return;
         const a = audioRef.current;
-        if (!url || !a) { next(); return; }
+        if (!url || !a) { done(); return; }
         a.src = url;
-        a.onended = next;
-        a.onerror = next;
-        a.play().catch(next);
+        a.onended = done;
+        a.onerror = done;
+        a.play().catch(done);
       });
     };
     // "English + Masri": your own English recording when you've made one,
-    // otherwise the device's English voice — then your Masri recording.
-    const playEnglishThen = (done) => {
+    // otherwise the device's English voice.
+    const playEn = (done) => {
+      if (!playingRef.current || idxRef.current !== i) return;
       if (enSetRef.current && enSetRef.current.has(it.id)) {
         getClip("en:" + it.id).then((url) => {
           if (!playingRef.current || idxRef.current !== i) return;
@@ -4243,8 +4279,21 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
         });
       } else speakEnglish(it.en, done);
     };
-    if (modeRef.current === "en") playEnglishThen(playRec);
-    else playRec();
+    /* Each card is a short sequence of parts, shaped by the repeat setting:
+       ×1 → [en] ar · everything ×2 → [en] ar [en] ar · Masri ×2 → [en] ar ar. */
+    const wantEnHere = modeRef.current === "en";
+    const r = repRef.current;
+    const parts = [];
+    if (wantEnHere) parts.push(playEn);
+    parts.push(playAr);
+    if (r === "all") { if (wantEnHere) parts.push(playEn); parts.push(playAr); }
+    else if (r === "ar") parts.push(playAr);
+    const run = (k) => {
+      if (!playingRef.current || idxRef.current !== i) return;
+      if (k >= parts.length) { next(); return; }
+      parts[k](() => run(k + 1));
+    };
+    run(0);
   };
 
   const start = (startIdx = 0, plainOrder = false) => {
@@ -4310,8 +4359,8 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
     try {
       if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
       bgMediaMeta(null);
-      navigator.mediaSession.setActionHandler("play", () => { try { a.play().catch(() => {}); } catch {} });
-      navigator.mediaSession.setActionHandler("pause", () => { try { a.pause(); } catch {} });
+      navigator.mediaSession.setActionHandler("play", () => { bgResume(); });
+      navigator.mediaSession.setActionHandler("pause", () => { bgPause(); });
     } catch {}
   };
 
@@ -4343,12 +4392,18 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
   useEffect(() => { try { if (BG.audio && BG.url) BG.audio.loop = loop; } catch {} }, [loop]);
 
   const discardBg = () => { bgClear(); bgItemRef.current = null; setBgNow(null); setBgPos(0); setBgS({ s: "idle" }); };
+  // The stitched track is a real audio file — offer it as a download, for a
+  // music/files app that backgrounds more happily than any web page can.
+  const saveBgTrack = () => {
+    if (!BG.url) return;
+    try { const el = document.createElement("a"); el.href = BG.url; el.download = `masri-playlist-${todayStr()}.wav`; document.body.appendChild(el); el.click(); setTimeout(() => el.remove(), 0); } catch {}
+  };
 
   // Changing what the queue IS (filters, mode, shuffle) makes the stitched
   // track stale — discard it. Skipped on mount so a track started on an
   // earlier visit keeps playing when you come back to this screen.
   const bgFirst = useRef(true);
-  useEffect(() => { if (bgFirst.current) { bgFirst.current = false; return; } if (BG.url || bgS.s === "building") discardBg(); /* eslint-disable-next-line */ }, [selLevels, selTiers, mode, shuf]);
+  useEffect(() => { if (bgFirst.current) { bgFirst.current = false; return; } if (BG.url || bgS.s === "building") discardBg(); /* eslint-disable-next-line */ }, [selLevels, selTiers, mode, shuf, rep]);
 
   const startBackground = () => {
     if (!tracks.length || bgS.s === "building") return;
@@ -4359,6 +4414,7 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
     const myToken = BG.token;
     if (!BG.audio) { BG.audio = new Audio(); setBgGen((g) => g + 1); }
     const a = BG.audio;
+    bgKeepAlive(a);
     /* Unlock inside this tap: the stitched file only exists after async
        decoding, which lands outside iOS's activation window. Touching the
        element now (play → guarded pause) marks it user-activated, so the
@@ -4393,12 +4449,18 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
         for (const it of list) {
           if (BG.token !== myToken) { try { ctx.close && ctx.close(); } catch {} return; } // discarded mid-build
           const at0 = t, before = segs.length;
-          if (wantEn && enSetRef.current && enSetRef.current.has(it.id)) {
-            const eb = await decode("en:" + it.id);
-            if (eb) { segs.push([eb, t]); t += eb.duration + GAP_EN; }
-          }
+          let eb = null;
+          if (wantEn && enSetRef.current && enSetRef.current.has(it.id)) eb = await decode("en:" + it.id);
           const ab = await decode(it.id);
-          if (ab) { segs.push([ab, t]); t += ab.duration + GAP; }
+          // Same repeat shapes as the live player: ×1 → [en] ar ·
+          // everything ×2 → [en] ar [en] ar · Masri ×2 → [en] ar ar.
+          const r = repRef.current;
+          const partsB = [];
+          if (eb) partsB.push(eb);
+          if (ab) partsB.push(ab);
+          if (r === "all") { if (eb) partsB.push(eb); if (ab) partsB.push(ab); }
+          else if (r === "ar" && ab) partsB.push(ab);
+          partsB.forEach((buf, k) => { segs.push([buf, t]); t += buf.duration + (k === partsB.length - 1 ? GAP : GAP_EN); });
           if (segs.length > before) offsets.push({ at: at0, it });
           done++; setBgS({ s: "building", done, total: list.length });
         }
@@ -4418,8 +4480,8 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
         bgItemRef.current = null;
         setBgNow(offsets.length ? offsets[0].it : null);
         bgMediaSetup(a);
-        if (playingRef.current) { setBgS({ s: "paused" }); } // user restarted the regular player mid-build — don't talk over it
-        else { a.play().catch(() => {}); setBgS({ s: "playing" }); }
+        if (playingRef.current) { BG.userPaused = true; setBgS({ s: "paused" }); } // user restarted the regular player mid-build — don't talk over it
+        else { BG.userPaused = false; a.play().catch(() => {}); bgSessionState("playing"); setBgS({ s: "playing" }); }
       } catch (e) {
         if (BG.token === myToken) setBgS({ s: "error", msg: "Couldn't build the background track here." });
       }
@@ -4459,6 +4521,10 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
         ))}
       </div>
       <div style={{ fontSize: 10.5, color: T.textDim, lineHeight: 1.5, margin: "-4px 2px 10px" }}>English + Masri plays <b style={{ color: T.gold }}>your English recording</b> first when the card has one (EN in the track list) — the device's English voice otherwise — then your Masri.</div>
+      <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "0 2px 6px" }}>Repeat each card</div>
+      <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 6, marginBottom: 8 }}>
+        {(mode === "en" ? [["off", "× 1"], ["all", "× 2 English + Masri"], ["ar", "× 2 Masri only"]] : [["off", "× 1"], ["ar", "× 2 Masri"]]).map(([k, label]) => chip(rep === k || (mode !== "en" && k === "ar" && rep === "all"), label, () => setRep(k), "rep" + k))}
+      </div>
       <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
         {chip(loop, loop ? "✓ Loop forever" : "Loop forever", () => setLoop((v) => !v), "loop")}
         {chip(shuf, shuf ? "✓ Shuffle" : "Shuffle", () => setShuf((v) => !v), "shuf")}
@@ -4505,7 +4571,12 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
       <div style={{ background: T.panel, border: `1px solid ${T.gold}55`, borderRadius: 16, padding: "14px 15px", marginBottom: 12 }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
           <div style={{ fontSize: 13.5, fontWeight: 700, color: T.gold }}>🌙 Background mode</div>
-          {(bgS.s === "playing" || bgS.s === "paused") && <button className="tap" onClick={discardBg} style={{ border: "none", background: "transparent", color: T.textDim, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>✕ discard track</button>}
+          {(bgS.s === "playing" || bgS.s === "paused") && (
+            <span style={{ display: "inline-flex", gap: 12 }}>
+              <button className="tap" onClick={saveBgTrack} style={{ border: "none", background: "transparent", color: T.gold, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>⬇ save</button>
+              <button className="tap" onClick={discardBg} style={{ border: "none", background: "transparent", color: T.textDim, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>✕ discard track</button>
+            </span>
+          )}
         </div>
         <div style={{ fontSize: 11.5, color: T.textDim, lineHeight: 1.55, marginTop: 5 }}>
           The player above pauses when your phone locks — iOS freezes web apps between tracks. Background mode stitches the current queue into <b style={{ color: T.gold }}>one continuous track</b> that keeps playing with the screen locked or while you're in another app, with play/pause on the lock screen.{mode === "en" ? " Cards without an English recording play Masri only here — the device's English voice can't run in the background." : ""}
@@ -4530,13 +4601,13 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
             <div style={{ margin: "6px 0" }}><Bar pct={BG.dur ? Math.min(1, bgPos / BG.dur) : 0} h={5} /></div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
               {bgS.s === "playing" ? (
-                <button className="tap" onClick={() => { try { BG.audio && BG.audio.pause(); } catch {} }} style={{ padding: "10px 22px", borderRadius: 999, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 14, fontWeight: 700 }}>⏸ Pause track</button>
+                <button className="tap" onClick={() => bgPause()} style={{ padding: "10px 22px", borderRadius: 999, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 14, fontWeight: 700 }}>⏸ Pause track</button>
               ) : (
-                <button className="tap" onClick={() => { try { BG.audio && BG.audio.play().catch(() => {}); } catch {} }} style={{ padding: "10px 22px", borderRadius: 999, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 14, fontWeight: 700 }}>▶ Resume track</button>
+                <button className="tap" onClick={() => bgResume()} style={{ padding: "10px 22px", borderRadius: 999, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 14, fontWeight: 700 }}>▶ Resume track</button>
               )}
               <span style={{ fontSize: 11.5, color: T.textDim }}>{fmtClock(bgPos)} / {fmtClock(BG.dur)}{BG.audio && BG.audio.loop ? " · loops" : ""}</span>
             </div>
-            <div style={{ fontSize: 10.5, color: T.textDim, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>Lock your phone or switch apps — it keeps going. It even keeps playing if you leave this screen.</div>
+            <div style={{ fontSize: 10.5, color: T.textDim, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>Lock your phone or switch apps — it keeps going, and if iOS ever pauses it on lock it nudges itself back (or tap ▶ on the lock screen). It keeps playing even if you leave this screen.</div>
           </div>
         )}
         {bgS.s === "error" && <div style={{ fontSize: 12, color: BAD_RED, fontWeight: 600, marginTop: 8, lineHeight: 1.5 }}>⚠ {bgS.msg}</div>}

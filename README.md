@@ -220,7 +220,10 @@ home screen.
   played back to back as a continuous listening drill. Filter the queue by
   **level** and/or **mastery tier** (including not-yet-learned cards), choose
   whether each track plays as **English + Masri** or **Masri only**, and toggle
-  **loop forever** and **shuffle**. In English + Masri mode the English part is
+  **loop forever** and **shuffle**. A **Repeat each card** setting plays every
+  card **× 1**, **× 2 English + Masri** (the whole pair twice), or **× 2 Masri
+  only** (meaning twice, said twice) — in both the live player and the stitched
+  background track. In English + Masri mode the English part is
   **your own English recording** whenever the card has one (marked **EN** in the
   track list), with the device's English voice as the fallback. The player card shows the
   current word (Arabic, transliteration, Arabizi, English) with ⏮ ▶ ⏸ ⏭
@@ -235,8 +238,12 @@ home screen.
   keeps playing with the **screen locked**, in **other apps**, and even if you
   leave the playlist screen, with **play/pause and the current card's name on
   the lock screen** (Media Session). A mini-player shows the moving now-playing
-  card, position, pause/resume and a discard button; changing filters or mode
-  discards the stale track. Cards without an English recording play Masri only
+  card, position, pause/resume, a **⬇ save** button that downloads the stitched
+  track as a .wav (play it from any music or files app), and discard; changing
+  filters, mode or repeat discards the stale track. A **keep-alive** watches for
+  the bare pause iOS sometimes fires on lock and nudges playback back within a
+  second — while always respecting a pause *you* chose, on screen or from the
+  lock screen. Cards without an English recording play Masri only
   in this mode — the device's speech voice can't run in the background.
 - **Recordings now live in IndexedDB** — they used to be stored inside the same
   localStorage blob as your progress, which has a hard ~5 MB limit. Once you'd
@@ -300,7 +307,20 @@ home screen.
 
 ---
 
-*Last updated (v2.8.0 · 9/19/2026): **🌙 Background mode — the playlist keeps
+*Last updated (v2.9.0 · 9/19/2026): **Repeat each card + steadier background
+playback.** New repeat setting in the playlist — **× 1**, **× 2 English + Masri**
+(English, Masri, English, Masri) or **× 2 Masri only** (English once, Masri twice;
+in Masri-only mode simply your Masri twice) — applied identically by the live
+player and the stitched background track. Background playback is hardened for the
+lock screen: iOS sometimes fires a bare pause on the audio element when the phone
+locks, so a keep-alive now distinguishes a system pause from one you chose and
+nudges the track back within a second, with a visibility handler that resumes the
+moment the page runs again if the system froze it outright; the lock screen's
+playback state now stays in sync too. The stitched track also gained a **⬇ save**
+button — it's a real .wav, so you can drop it in a music or files app for
+bulletproof background listening. Engine suite: 37 scenarios.*
+
+*Earlier (v2.8.0 · 9/19/2026): **🌙 Background mode — the playlist keeps
 playing with the screen locked or in another app.** iOS freezes a web app's
 JavaScript on lock, which kills any playlist that advances track by track — so
 background mode decodes your recordings with WebAudio, lays the whole queue out on
