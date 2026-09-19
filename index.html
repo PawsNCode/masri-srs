@@ -31,7 +31,7 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.9.0";
+const APP_VERSION = "2.10.0";
 const APP_UPDATED = "9/19/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
@@ -445,17 +445,17 @@ function primeMyRecordings(ids) {
    through one element that lives OUTSIDE the playlist screen — it survives
    navigating away, switching apps and the lock screen, with play/pause on the
    lock screen via the Media Session API. */
-const BG = { audio: null, url: null, offsets: [], dur: 0, token: 0, userPaused: false };
+const BG = { audio: null, url: null, blob: null, offsets: [], dur: 0, token: 0, userPaused: false, wake: false };
 function bgSessionState(st) { try { if (typeof navigator !== "undefined" && "mediaSession" in navigator) navigator.mediaSession.playbackState = st; } catch {} }
 // A deliberate pause/stop — remembered, so the keep-alive below never fights the user.
-function bgPause() { BG.userPaused = true; try { if (BG.audio) BG.audio.pause(); } catch {} bgSessionState("paused"); }
+function bgPause() { BG.userPaused = true; try { if (BG.audio) BG.audio.pause(); } catch {} bgSessionState("paused"); wakeOff(); }
 function bgStop() { bgPause(); }
-function bgResume() { BG.userPaused = false; try { if (BG.audio) { const p = BG.audio.play(); if (p && p.catch) p.catch(() => {}); } } catch {} bgSessionState("playing"); }
+function bgResume() { BG.userPaused = false; bgAudioSession(); try { if (BG.audio) { const p = BG.audio.play(); if (p && p.catch) p.catch(() => {}); } } catch {} bgSessionState("playing"); if (BG.wake) wakeOn(); }
 function bgClear() {
   bgStop();
   BG.token++;
   try { if (BG.url) URL.revokeObjectURL(BG.url); } catch {}
-  BG.url = null; BG.offsets = []; BG.dur = 0; BG.userPaused = false;
+  BG.url = null; BG.blob = null; BG.offsets = []; BG.dur = 0; BG.userPaused = false;
   try { if (BG.audio) { BG.audio.removeAttribute("src"); BG.audio.load(); } } catch {}
 }
 /* iOS sometimes fires a bare pause on the media element when the screen locks
@@ -486,6 +486,31 @@ function bgKeepAlive(a) {
     });
   }
 }
+/* Tell iOS this is media playback (Audio Session API, Safari 17+): audio that
+   should keep going with the screen off and ignore the ring/silent switch. */
+function bgAudioSession() {
+  try { if (typeof navigator !== "undefined" && navigator.audioSession && "type" in navigator.audioSession) navigator.audioSession.type = "playback"; } catch {}
+}
+/* The home-screen (standalone) version of the app. iOS suspends standalone web
+   apps the moment the screen locks — script and media alike — which a Safari
+   tab is never subject to. Knowing which one we're in decides what to offer. */
+function isStandaloneApp() {
+  try {
+    if (typeof navigator !== "undefined" && navigator.standalone === true) return true;
+    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) return true;
+  } catch {}
+  return false;
+}
+/* Screen Wake Lock: the in-app way to listen for a long stretch inside the
+   home-screen version — keep the screen from locking at all while playing. */
+let WAKE = null;
+function wakeOn() {
+  try {
+    if (typeof navigator === "undefined" || !navigator.wakeLock || WAKE) return;
+    navigator.wakeLock.request("screen").then((l) => { WAKE = l; try { l.addEventListener("release", () => { if (WAKE === l) WAKE = null; }); } catch {} }).catch(() => {});
+  } catch {}
+}
+function wakeOff() { try { if (WAKE) { const l = WAKE; WAKE = null; if (l.release) l.release(); } } catch {} }
 // Mono AudioBuffer → 16-bit PCM WAV bytes.
 function encodeWav(buf) {
   const n = buf.length, rate = buf.sampleRate, data = buf.getChannelData(0);
@@ -4179,7 +4204,7 @@ function HarakatQuiz({ marks, onDone, onSet, harakat = {} }) {
    One shared <audio> element is unlocked by the Play tap and reused for every
    track — that is what keeps auto-advance working on iOS, where audio started
    outside a tap is otherwise blocked. */
-function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
+function PlaylistView({ state, allItems, onBack, onOpenDetail, prefs = {}, onPrefs }) {
   const recIds = state.recordingIds || [];
   const tracksAll = useMemo(() => allItems.filter((it) => recIds.includes(it.id)), [allItems, state.recordingIds]);
   const PL_TIERS = ["Not learned", "Learning", "Shaky", "Familiar", "Strong", "Mastered"];
@@ -4191,12 +4216,14 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
   const countByTier = {};
   tracksAll.forEach((t) => { const g = tierOf(t); countByTier[g] = (countByTier[g] || 0) + 1; });
 
-  const [selLevels, setSelLevels] = useState([]); // empty = all levels
-  const [selTiers, setSelTiers] = useState([]);   // empty = all tiers
-  const [mode, setMode] = useState("mine");       // mine | en
-  const [loop, setLoop] = useState(true);
-  const [shuf, setShuf] = useState(false);
-  const [rep, setRep] = useState("off"); // off | all (everything ×2) | ar (Masri side ×2)
+  // Restored from the saved setup so the playlist comes back the way you left it.
+  const [selLevels, setSelLevels] = useState(() => (Array.isArray(prefs.selLevels) ? prefs.selLevels : [])); // empty = all levels
+  const [selTiers, setSelTiers] = useState(() => (Array.isArray(prefs.selTiers) ? prefs.selTiers : []));   // empty = all tiers
+  const [mode, setMode] = useState(prefs.mode === "en" ? "en" : "mine");       // mine | en
+  const [loop, setLoop] = useState(prefs.loop !== false);
+  const [shuf, setShuf] = useState(!!prefs.shuf);
+  const [rep, setRep] = useState(prefs.rep === "all" || prefs.rep === "ar" ? prefs.rep : "off"); // off | all (everything ×2) | ar (Masri side ×2)
+  const [wake, setWake] = useState(!!prefs.wake); // keep the screen on while playing
   const [playing, setPlaying] = useState(false);
   const [nowItem, setNowItem] = useState(null);
   const [pos, setPos] = useState([0, 0]);
@@ -4213,6 +4240,14 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
   useEffect(() => { loopRef.current = loop; }, [loop]);
   const repRef = useRef(rep);
   useEffect(() => { repRef.current = rep; }, [rep]);
+  // Remember the setup (filters, mode, repeat, loop, shuffle, keep-awake) so it's
+  // back the way you left it — after a reload, or in a Safari tab.
+  const prefsFirst = useRef(true);
+  useEffect(() => {
+    if (prefsFirst.current) { prefsFirst.current = false; return; }
+    if (onPrefs) onPrefs({ selLevels, selTiers, mode, loop, shuf, rep, wake });
+    // eslint-disable-next-line
+  }, [selLevels, selTiers, mode, loop, shuf, rep, wake]);
   // Make sure every clip is in memory before the first tap — the iOS unlock
   // below needs the first track's URL synchronously.
   useEffect(() => { primeMyRecordings([...recIds, ...(state.recordingIdsEn || []).map((id) => "en:" + id)]); /* eslint-disable-next-line */ }, []);
@@ -4299,6 +4334,8 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
   const start = (startIdx = 0, plainOrder = false) => {
     if (!tracks.length) return;
     bgStop(); // never talk over the stitched background track
+    bgAudioSession();
+    if (wake) wakeOn();
     const list = shuf && !plainOrder ? shuffle(tracks.slice()) : tracks.slice();
     orderRef.current = list;
     try { if (CURRENT_AUDIO) CURRENT_AUDIO.pause(); } catch {}
@@ -4324,6 +4361,7 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
   const step = (d) => {
     if (!orderRef.current.length) { start(0); return; }
     bgStop();
+    if (wake) wakeOn();
     try { if (audioRef.current) audioRef.current.pause(); } catch {}
     try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch {}
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -4344,6 +4382,13 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
   const [bgNow, setBgNow] = useState(null);
   const [bgPos, setBgPos] = useState(() => (BG.audio ? BG.audio.currentTime || 0 : 0));
   const bgItemRef = useRef(null);
+  // Keep-screen-on follows playback of either player while the toggle is on;
+  // the flag is mirrored to BG so lock-screen resume/pause can honour it too.
+  useEffect(() => {
+    BG.wake = wake;
+    if (wake && (playing || bgS.s === "playing")) wakeOn(); else wakeOff();
+  }, [wake, playing, bgS.s]);
+  useEffect(() => () => { if (!(BG.url && BG.audio && !BG.audio.paused)) wakeOff(); }, []);
 
   const bgMediaMeta = (it) => {
     try {
@@ -4398,6 +4443,24 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
     if (!BG.url) return;
     try { const el = document.createElement("a"); el.href = BG.url; el.download = `masri-playlist-${todayStr()}.wav`; document.body.appendChild(el); el.click(); setTimeout(() => el.remove(), 0); } catch {}
   };
+  // Share the stitched track as a real .wav — on iPhone, "Save to Files" and then
+  // playing it from the Files app is the one route iOS never interrupts.
+  const shareBgTrack = async () => {
+    if (!BG.blob) { saveBgTrack(); return; }
+    try {
+      const file = new File([BG.blob], `masri-playlist-${todayStr()}.wav`, { type: "audio/wav" });
+      if (typeof navigator !== "undefined" && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Masri playlist" });
+        return;
+      }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    saveBgTrack();
+  };
+  const standalone = isStandaloneApp();
+  const playlistLink = () => { try { const u = new URL(window.location.href); u.search = "?view=playlist"; u.hash = ""; return u.toString(); } catch { return ""; } };
+  const openInSafari = () => { try { window.open(playlistLink(), "_blank"); } catch {} };
+  const [linkMsg, setLinkMsg] = useState("");
+  const copyLink = async () => { try { await navigator.clipboard.writeText(playlistLink()); setLinkMsg("✓ Link copied — paste it into Safari."); } catch { setLinkMsg(playlistLink()); } };
 
   // Changing what the queue IS (filters, mode, shuffle) makes the stitched
   // track stale — discard it. Skipped on mount so a track started on an
@@ -4415,6 +4478,8 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
     if (!BG.audio) { BG.audio = new Audio(); setBgGen((g) => g + 1); }
     const a = BG.audio;
     bgKeepAlive(a);
+    bgAudioSession();
+    if (wake) wakeOn();
     /* Unlock inside this tap: the stitched file only exists after async
        decoding, which lands outside iOS's activation window. Touching the
        element now (play → guarded pause) marks it user-activated, so the
@@ -4471,7 +4536,8 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
         segs.forEach(([buf, at]) => { const sn = oc.createBufferSource(); sn.buffer = buf; sn.connect(oc.destination); sn.start(at); });
         const rendered = await oc.startRendering();
         if (BG.token !== myToken) return;
-        BG.url = URL.createObjectURL(new Blob([encodeWav(rendered)], { type: "audio/wav" }));
+        BG.blob = new Blob([encodeWav(rendered)], { type: "audio/wav" });
+        BG.url = URL.createObjectURL(BG.blob);
         BG.offsets = offsets;
         BG.dur = t;
         a.loop = loopRef.current;
@@ -4528,6 +4594,7 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
       <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
         {chip(loop, loop ? "✓ Loop forever" : "Loop forever", () => setLoop((v) => !v), "loop")}
         {chip(shuf, shuf ? "✓ Shuffle" : "Shuffle", () => setShuf((v) => !v), "shuf")}
+        {chip(wake, wake ? "✓ ☀️ Keep screen on" : "☀️ Keep screen on", () => setWake((v) => !v), "wake")}
       </div>
 
       <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 6px" }}>Levels</div>
@@ -4573,7 +4640,7 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
           <div style={{ fontSize: 13.5, fontWeight: 700, color: T.gold }}>🌙 Background mode</div>
           {(bgS.s === "playing" || bgS.s === "paused") && (
             <span style={{ display: "inline-flex", gap: 12 }}>
-              <button className="tap" onClick={saveBgTrack} style={{ border: "none", background: "transparent", color: T.gold, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>⬇ save</button>
+              <button className="tap" onClick={shareBgTrack} style={{ border: "none", background: "transparent", color: T.gold, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>⬆ share / save</button>
               <button className="tap" onClick={discardBg} style={{ border: "none", background: "transparent", color: T.textDim, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>✕ discard track</button>
             </span>
           )}
@@ -4581,6 +4648,19 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
         <div style={{ fontSize: 11.5, color: T.textDim, lineHeight: 1.55, marginTop: 5 }}>
           The player above pauses when your phone locks — iOS freezes web apps between tracks. Background mode stitches the current queue into <b style={{ color: T.gold }}>one continuous track</b> that keeps playing with the screen locked or while you're in another app, with play/pause on the lock screen.{mode === "en" ? " Cards without an English recording play Masri only here — the device's English voice can't run in the background." : ""}
         </div>
+        {standalone && (
+          <div style={{ marginTop: 10, background: `${T.gold}0d`, border: `1px solid ${T.gold}55`, borderRadius: 12, padding: "10px 12px", fontSize: 11.5, color: T.text, lineHeight: 1.55 }}>
+            <b style={{ color: T.gold }}>You're in the home-screen version.</b> iPhone suspends home-screen web apps the moment the screen locks — script and audio alike — while Safari itself has no such limit. To listen with the screen off, use one of these:
+            <div style={{ marginTop: 6 }}><b>①</b> Build the track, tap <b>⬆ share / save</b> → <b>Save to Files</b>, then play it from the Files app — never interrupted.</div>
+            <div style={{ marginTop: 4 }}><b>②</b> Turn on <b>☀️ Keep screen on</b> above and play here — the screen stays awake, so nothing gets suspended.</div>
+            <div style={{ marginTop: 4 }}><b>③</b> Open this playlist in Safari. Recordings live in this app's own storage, so restore a <i>Voice only</i> backup there once — after that it's all set.</div>
+            <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap", alignItems: "center" }}>
+              <button className="tap" onClick={openInSafari} style={{ padding: "7px 12px", borderRadius: 999, border: `1px solid ${T.gold}`, background: `${T.gold}12`, color: T.gold, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>Open in Safari</button>
+              <button className="tap" onClick={copyLink} style={{ padding: "7px 12px", borderRadius: 999, border: `1px solid ${T.line}`, background: "transparent", color: T.textDim, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>Copy link</button>
+              {linkMsg && <span style={{ fontSize: 10.5, color: T.gold, wordBreak: "break-all" }}>{linkMsg}</span>}
+            </div>
+          </div>
+        )}
         {bgS.s === "idle" && (
           <button className="tap" disabled={!tracks.length} onClick={startBackground} style={{ width: "100%", marginTop: 10, padding: 12, borderRadius: 11, border: "none", background: tracks.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: "#fff", fontSize: 13.5, fontWeight: 700 }}>🌙 Build &amp; play in background ({tracks.length} track{tracks.length === 1 ? "" : "s"})</button>
         )}
@@ -4607,10 +4687,11 @@ function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
               )}
               <span style={{ fontSize: 11.5, color: T.textDim }}>{fmtClock(bgPos)} / {fmtClock(BG.dur)}{BG.audio && BG.audio.loop ? " · loops" : ""}</span>
             </div>
-            <div style={{ fontSize: 10.5, color: T.textDim, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>Lock your phone or switch apps — it keeps going, and if iOS ever pauses it on lock it nudges itself back (or tap ▶ on the lock screen). It keeps playing even if you leave this screen.</div>
+            <div style={{ fontSize: 10.5, color: T.textDim, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>Keeps playing if you leave this screen or switch apps, and nudges itself back if iOS pauses it (or tap ▶ on the lock screen). Most reliable of all on iPhone: ⬆ share → Save to Files, then play it from Files.</div>
           </div>
         )}
         {bgS.s === "error" && <div style={{ fontSize: 12, color: BAD_RED, fontWeight: 600, marginTop: 8, lineHeight: 1.5 }}>⚠ {bgS.msg}</div>}
+        <div style={{ fontSize: 10, color: T.textDim, marginTop: 8, opacity: 0.8 }}>Running as {standalone ? "home-screen app" : "browser tab"} · audio session {typeof navigator !== "undefined" && navigator.audioSession ? "playback" : "n/a"} · wake lock {typeof navigator !== "undefined" && navigator.wakeLock ? "available" : "n/a"}</div>
       </div>
 
       <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 8px" }}>Tracks · tap one to play from there</div>
@@ -5630,7 +5711,8 @@ function ReviewsHub({ dueLetters, dueWords, duePhrases, dueSentences, onLetters,
 /* ===================== APP ===================== */
 function App() {
   const [state, setState] = useState(null);
-  const [view, setView] = useState("home");
+  // ?view=playlist opens straight onto the playlist (the "Open in Safari" link).
+  const [view, setView] = useState(() => { try { return new URLSearchParams(window.location.search).get("view") === "playlist" ? "playlist" : "home"; } catch { return "home"; } });
   const [practiceItems, setPracticeItems] = useState([]);
   const [reviewRun, setReviewRun] = useState([]);
   const [scriptAuto, setScriptAuto] = useState(false);
@@ -5965,6 +6047,12 @@ function App() {
     if (items.length) { setPracticeItems(items); setView("practice"); }
   }, [allItems]);
 
+  const onPlaylistPrefs = useCallback((p) => {
+    const s = stateRef.current;
+    if (!s) return;
+    persist({ ...s, settings: { ...s.settings, playlist: { ...((s.settings && s.settings.playlist) || {}), ...p } } });
+  }, [persist]);
+
   const onQuizType = useCallback((t) => {
     const s = stateRef.current;
     persist({ ...s, settings: { ...s.settings, quizType: t } });
@@ -6077,7 +6165,7 @@ function App() {
         {view === "convlearn" && convCat && (
           <LearnSession pool={allItems.filter((it) => it.level === convCat && !state.progress[it.id])} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("conv")} autoStart={true} learnedCount={allItems.filter((it) => it.level === convCat && state.progress[it.id]).length} onQuizLearned={() => startConvQuiz(convCat)} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}
-        {view === "playlist" && <PlaylistView state={state} allItems={allItems} onBack={() => setView("lessons")} onOpenDetail={setDetailItem} />}
+        {view === "playlist" && <PlaylistView state={state} allItems={allItems} onBack={() => setView("lessons")} onOpenDetail={setDetailItem} prefs={(state.settings && state.settings.playlist) || {}} onPrefs={onPlaylistPrefs} />}
         {view === "items" && (
           <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onAddByStage={onAddItemsToCustom} audioIds={audioIds} onReorder={onReorderLevel} initialFilter={itemsFilter} onOpenDetail={setDetailItem} />
         )}

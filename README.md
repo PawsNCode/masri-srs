@@ -243,7 +243,22 @@ home screen.
   filters, mode or repeat discards the stale track. A **keep-alive** watches for
   the bare pause iOS sometimes fires on lock and nudges playback back within a
   second — while always respecting a pause *you* chose, on screen or from the
-  lock screen. Cards without an English recording play Masri only
+  lock screen. Playback also declares itself as media to iOS (Audio Session
+  API), so it's treated like a music app: kept alive with the screen off and not
+  muted by the ring/silent switch.
+- **Home-screen version — what iPhone allows, and three ways around it.** iOS
+  suspends *home-screen* web apps the moment the screen locks (script and audio
+  alike; Safari tabs are exempt). The playlist detects this and shows the routes
+  that genuinely work: **① ⬆ share / save** the stitched track → *Save to Files*
+  and play it from the Files app, which is never interrupted; **② ☀️ Keep screen
+  on** — a toggle that holds a screen wake lock while either player runs, so
+  nothing gets suspended; **③ Open in Safari** (or copy the link) — a
+  `?view=playlist` deep link that opens straight onto the playlist, where
+  background audio just works (restore a *Voice only* backup there once, since
+  the home-screen app and Safari keep separate storage). The playlist setup —
+  filters, mode, repeat, loop, shuffle, keep-awake — is now saved and restored,
+  and a small status line shows which mode you're running in and which platform
+  hooks are available. Cards without an English recording play Masri only
   in this mode — the device's speech voice can't run in the background.
 - **Recordings now live in IndexedDB** — they used to be stored inside the same
   localStorage blob as your progress, which has a hard ~5 MB limit. Once you'd
@@ -307,7 +322,21 @@ home screen.
 
 ---
 
-*Last updated (v2.9.0 · 9/19/2026): **Repeat each card + steadier background
+*Last updated (v2.10.0 · 9/19/2026): **Background playback, addressed at the root.**
+The app is installed as a *home-screen* web app, and iPhone suspends those the moment
+the screen locks — script and audio together — while Safari tabs are exempt; no
+keep-alive can run inside a suspended app, which is why the stitched track still
+stopped. This release adds the one hook iOS does honour (the Audio Session API, so
+playback is treated as media: alive with the screen off, immune to the silent switch)
+and, when running as the home-screen app, a notice with three working routes:
+**⬆ share / save** the stitched track to Files and play it from the Files app;
+**☀️ Keep screen on**, a screen-wake-lock toggle that follows either player; and
+**Open in Safari** / copy link, a `?view=playlist` deep link that lands on the
+playlist. The playlist setup is now persisted (filters, mode, repeat, loop, shuffle,
+keep-awake), and a status line reports the running mode and available hooks. Engine
+suite: 42 scenarios.*
+
+*Earlier (v2.9.0 · 9/19/2026): **Repeat each card + steadier background
 playback.** New repeat setting in the playlist — **× 1**, **× 2 English + Masri**
 (English, Masri, English, Masri) or **× 2 Masri only** (English once, Masri twice;
 in Masri-only mode simply your Masri twice) — applied identically by the live
