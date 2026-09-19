@@ -209,10 +209,35 @@ home screen.
   with any audio**. The Items browser has matching filter chips.
 - **Themes** — six color themes (Rose, Violet, Bubblegum, Mint, Dark, Midnight),
   chosen at the bottom of the Home screen.
-- **Record your own voice** — on any word's detail page, tap **🎤 Record my voice**
-  to capture your own pronunciation (15 seconds max). A **▶ My voice** button then
-  sits beside the original speaker, with re-record and delete options. Words with an
-  own-voice recording show a **🎤** in the Items list.
+- **Record your own voice — in both languages** — every card's detail page has an
+  **🎤 In my voice** panel with two recording slots (15 seconds each): **Masri**,
+  your pronunciation of the Arabic, which is what the 🔊 buttons play app-wide when
+  the card is set to "My voice"; and **English**, your own reading of the meaning,
+  which the 🎧 playlist plays before your Masri in "English + Masri" mode. Each slot
+  has play / re-record / delete. Cards with a Masri recording show a **🎤** in the
+  Items list.
+- **🎧 My Voice Playlist** (Lessons → Listening) — every card you've recorded,
+  played back to back as a continuous listening drill. Filter the queue by
+  **level** and/or **mastery tier** (including not-yet-learned cards), choose
+  whether each track plays as **English + Masri** or **Masri only**, and toggle
+  **loop forever** and **shuffle**. In English + Masri mode the English part is
+  **your own English recording** whenever the card has one (marked **EN** in the
+  track list), with the device's English voice as the fallback. The player card shows the
+  current word (Arabic, transliteration, Arabizi, English) with ⏮ ▶ ⏸ ⏭
+  controls, and a tappable track list jumps anywhere in the queue. One shared
+  audio element is unlocked by the Play tap and reused for every track, so
+  auto-advance keeps working on iOS.
+- **🌙 Background mode (lock-screen playback)** — the regular player stops when
+  the phone locks, because iOS freezes a web app's JavaScript between tracks. Tap
+  **Build & play in background** and the current queue (same filters, mode,
+  shuffle and loop) is stitched into **one continuous audio track** — English
+  recording (in English + Masri mode), then Masri, with natural gaps — which
+  keeps playing with the **screen locked**, in **other apps**, and even if you
+  leave the playlist screen, with **play/pause and the current card's name on
+  the lock screen** (Media Session). A mini-player shows the moving now-playing
+  card, position, pause/resume and a discard button; changing filters or mode
+  discards the stale track. Cards without an English recording play Masri only
+  in this mode — the device's speech voice can't run in the background.
 - **Recordings now live in IndexedDB** — they used to be stored inside the same
   localStorage blob as your progress, which has a hard ~5 MB limit. Once you'd
   recorded enough to cross it, **every save failed silently** and later changes
@@ -275,7 +300,48 @@ home screen.
 
 ---
 
-*Last updated (v2.5.2 · 7/30/2026): **Own-voice fix for manually added cards.** The
+*Last updated (v2.8.0 · 9/19/2026): **🌙 Background mode — the playlist keeps
+playing with the screen locked or in another app.** iOS freezes a web app's
+JavaScript on lock, which kills any playlist that advances track by track — so
+background mode decodes your recordings with WebAudio, lays the whole queue out on
+one timeline (English recording where the mode wants one, then Masri, with natural
+gaps), renders it to a single WAV, and plays that through one continuous audio
+element that media playback rules keep alive. It survives locking, app-switching
+and leaving the playlist screen, loops if Loop is on, and puts play/pause plus the
+current card's Arabic + English on the lock screen via the Media Session API. The
+playlist screen gets a stitching progress bar and a mini-player whose now-playing
+card follows the timeline. The engine suite grew to 29 scenarios, covering the
+stitch layout, offsets, English inclusion, lock-screen metadata, mutual exclusion
+with the regular player, and stale-track invalidation.*
+
+*Earlier (v2.7.0 · 9/19/2026): **Record the English side too.** Every card's
+🎤 In my voice panel now has two slots — **Masri** (drives the 🔊 buttons when a card
+is set to "My voice", exactly as before) and **English** (your own reading of the
+meaning). The 🎧 playlist's modes are now **English + Masri** — your English
+recording first when the card has one (EN badge in the track list), the device's
+English voice otherwise, then your Masri — and **Masri only**. Level and mastery
+filters apply to both modes. English clips are stored in IndexedDB under their own
+keys, ride along in full and voice-only backups, are pre-loaded for instant
+playback, and existing recordings and backups are untouched (old backups restore
+cleanly; new backups carry both voices). The playlist engine test suite grew to 17
+scenarios, covering English-clip playback, TTS fallback, mode isolation, and the
+badge.*
+
+*Earlier (v2.6.0 · 9/19/2026): **🎧 My Voice Playlist** — a new Listening
+section in Lessons that plays your own recordings back to back, all the time if you
+want: loop-forever and shuffle toggles, filters by **level** and/or **mastery tier**
+(with a "Not learned" tier for recorded-but-unlearned cards), and a per-track mode
+choice of **English meaning + my voice** (the device says the English, then you say
+the Masri) or **my voice only**. The player shows the current card in full — Arabic,
+transliteration, Arabizi, English, tap to open the card — with prev/play/pause/next
+controls and a track list you can tap into anywhere. Auto-advance is engineered for
+iOS: one audio element is unlocked on the Play tap and reused for the whole session.
+The whole engine was driven end to end in a test harness (14 scenarios: sequencing,
+loop wrap-around, pause, English-then-voice chaining, and both filters), which also
+caught and fixed a queue-staleness bug where changing filters while paused would
+have resumed the old unfiltered queue.*
+
+*Earlier (v2.5.2 · 7/30/2026): **Own-voice fix for manually added cards.** The
 speaker buttons find a card's recording by looking its Arabic spelling up in a
 spelling→id map — but custom cards only entered that map if they had a
 transliteration, so a card added without one (stored as "—") was invisible to the

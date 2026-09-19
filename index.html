@@ -31,8 +31,8 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const STORE_KEY = "masri-wk-v1";
 
 /* ---- App version + build stamp (bump these on each release) ---- */
-const APP_VERSION = "2.5.2";
-const APP_UPDATED = "7/30/2026";
+const APP_VERSION = "2.8.0";
+const APP_UPDATED = "9/19/2026";
 
 // Force-fetch the freshest copy of the app from the web (busts the cache that
 // makes the home-screen shortcut go stale). Progress lives in localStorage,
@@ -435,6 +435,39 @@ const MY_REC = {};
 function primeMyRecordings(ids) {
   (ids || []).forEach((id) => { if (!(id in MY_REC)) recGet(id).then((v) => { if (v) MY_REC[id] = playableRec(v); }); });
 }
+/* ===== BACKGROUND PLAYLIST (stitched) ==========================
+   iOS freezes a web app's JavaScript when the screen locks or you switch
+   apps, which kills any playlist that advances by timers and events — but a
+   single, already-playing <audio> element is *media*, and media keeps going.
+   So background mode decodes the queue's clips, lays them out on one timeline
+   with WebAudio (English recording, when the mode wants one, then Masri, with
+   natural gaps), renders the whole thing to a single WAV, and plays that
+   through one element that lives OUTSIDE the playlist screen — it survives
+   navigating away, switching apps and the lock screen, with play/pause on the
+   lock screen via the Media Session API. */
+const BG = { audio: null, url: null, offsets: [], dur: 0, token: 0 };
+function bgStop() { try { if (BG.audio) BG.audio.pause(); } catch {} }
+function bgClear() {
+  bgStop();
+  BG.token++;
+  try { if (BG.url) URL.revokeObjectURL(BG.url); } catch {}
+  BG.url = null; BG.offsets = []; BG.dur = 0;
+  try { if (BG.audio) { BG.audio.removeAttribute("src"); BG.audio.load(); } } catch {}
+}
+// Mono AudioBuffer → 16-bit PCM WAV bytes.
+function encodeWav(buf) {
+  const n = buf.length, rate = buf.sampleRate, data = buf.getChannelData(0);
+  const out = new DataView(new ArrayBuffer(44 + n * 2));
+  const wstr = (o, str) => { for (let i = 0; i < str.length; i++) out.setUint8(o + i, str.charCodeAt(i)); };
+  wstr(0, "RIFF"); out.setUint32(4, 36 + n * 2, true); wstr(8, "WAVE"); wstr(12, "fmt ");
+  out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, 1, true);
+  out.setUint32(24, rate, true); out.setUint32(28, rate * 2, true); out.setUint16(32, 2, true); out.setUint16(34, 16, true);
+  wstr(36, "data"); out.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++) { const s = Math.max(-1, Math.min(1, data[i] || 0)); out.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true); }
+  return out.buffer;
+}
+const fmtClock = (s) => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+
 function speak(text) {
   let id = AUDIO_ID_BY_AR[text];
   const wantsMine = (x) => !!x && REC_API && REC_API.pref(x) === "mine" && !!MY_REC[x];
@@ -456,6 +489,29 @@ function speak(text) {
   }
   if (SPEECH_PREFS.recorded && id) playRecorded(id, () => speakTTS(text));
   else speakTTS(text);
+}
+
+/* English TTS for the playlist's "English + my voice" mode: says the card's
+   meaning with the device's English voice, then hands off to the recording.
+   The safety timer covers engines that occasionally drop the onend event —
+   without it a single silent utterance would stall the whole playlist. */
+function speakEnglish(text, done) {
+  let finished = false;
+  const fin = () => { if (!finished) { finished = true; done(); } };
+  try {
+    if (!window.speechSynthesis || !text) { fin(); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const vs = window.speechSynthesis.getVoices() || [];
+    const v = vs.find((x) => x.lang && x.lang.toLowerCase().startsWith("en"));
+    if (v) u.voice = v;
+    u.lang = v ? v.lang : "en-US";
+    u.rate = 0.95;
+    u.onend = fin;
+    u.onerror = fin;
+    window.speechSynthesis.speak(u);
+    setTimeout(fin, Math.min(12000, 1800 + text.length * 90));
+  } catch { fin(); }
 }
 
 function Speaker({ text, size = 18, color = "#c02e80" }) {
@@ -2953,21 +3009,32 @@ async function saveState(state){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); SAVE_ERR = null; return true; }
   catch(e){ SAVE_ERR = (e && e.name === "QuotaExceededError") ? "Storage is full — recent changes may not have been saved. Download a backup, then use Reset." : "Couldn't save to this browser's storage."; return false; }
 }
+/* Recording keys carry both voices: a bare item id is your Masri recording,
+   "en:" + id is your English one. This splits a raw key list back into the two
+   id lists the app state tracks. */
+function splitRecKeys(keys) {
+  const ar = [], en = [];
+  (keys || []).forEach((k) => { const x = String(k); if (x.slice(0, 3) === "en:") en.push(x.slice(3)); else ar.push(x); });
+  return { ar, en };
+}
 // A backup carries everything — progress, corrections, custom cards, settings and
 // your recordings — except the GitHub token. Recordings live in IndexedDB, so this
 // has to be async: it reads them back out and inlines them in the file.
 async function exportState(state, withVoice = true){
   const c = JSON.parse(JSON.stringify(state));
   if (c.settings) delete c.settings.ghToken;
-  c.recordings = withVoice ? await recDump(state.recordingIds || await recKeys()) : {};
-  c.recordingIds = state.recordingIds || Object.keys(c.recordings);
+  c.recordings = withVoice ? await recDump() : {}; // every stored clip — Masri and English
+  const sk = splitRecKeys(Object.keys(c.recordings));
+  c.recordingIds = state.recordingIds || sk.ar;
+  c.recordingIdsEn = state.recordingIdsEn || sk.en;
   c.appVersion = APP_VERSION;
   c.exportedAt = new Date().toISOString();
   return c;
 }
 
 const DEFAULT_STATE = {
-  recordingIds: [],   // which items have a voice recording (audio itself is in IndexedDB)
+  recordingIds: [],   // which items have a Masri voice recording (audio itself is in IndexedDB)
+  recordingIdsEn: [], // which items also have an English recording (stored under "en:" + id)
   recordings: {},     // legacy home for recordings — migrated to IndexedDB on load
   voicePref: {},
   itemEdits: {},
@@ -3270,7 +3337,7 @@ function TypedQuiz({ items, mode, onGrade, onAnswer, onExit, title, quizType = "
 }
 
 /* ===================== LEARN SESSION (teach N, then quiz them) ===================== */
-function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, onConv, onVerbs, autoStart = false, quizType = "inapp", onQuizType, autoPlay = true }) {
+function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learnedCount = 0, onQuizLearned, customCount = 0, onCustom, onGotoItems, onConv, onVerbs, onPlaylist, autoStart = false, quizType = "inapp", onQuizType, autoPlay = true }) {
   const [queue] = useState(() => pool.slice(0, batch));
   const [phase, setPhase] = useState(() => (autoStart && pool.length ? "teach" : "menu"));
   const [i, setI] = useState(0);
@@ -3317,6 +3384,15 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
           <button className="tap" onClick={onVerbs} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 10, textAlign: "left", border: `1px solid ${T.gold}55`, background: `${T.gold}0d`, color: T.gold }}>
             <div style={{ fontSize: 14, fontWeight: 700 }}>⚡ Verb lessons →</div>
             <div style={{ fontSize: 11.5, marginTop: 2, color: T.textDim }}>Core Egyptian verbs, each with three sentences that put it to work</div>
+          </button>
+        )}
+
+        {/* My voice playlist */}
+        {onPlaylist && <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "14px 2px 8px" }}>Listening</div>}
+        {onPlaylist && (
+          <button className="tap" onClick={onPlaylist} style={{ width: "100%", padding: 14, borderRadius: 13, marginBottom: 10, textAlign: "left", border: `1px solid ${T.gold}55`, background: `${T.gold}0d`, color: T.gold }}>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>🎧 My voice playlist →</div>
+            <div style={{ fontSize: 11.5, marginTop: 2, color: T.textDim }}>Play your own recordings back to back — filter by level and mastery, loop forever</div>
           </button>
         )}
 
@@ -3404,11 +3480,14 @@ function LearnSession({ pool, batch, onLearn, onGrade, onAnswer, onExit, learned
 // the user's own recordings without threading props everywhere. Set by App each render.
 let REC_API = null;
 
-// Record-your-own-pronunciation widget: mic capture → base64 in app state, so it
-// persists locally and rides along in backup export/import automatically.
-function VoiceRecorder({ itemId }) {
+// Record-your-own-pronunciation widget. Every card now has TWO recording slots:
+// the Masri one (stored under the item id — it's what the 🔊 buttons play when a
+// card is set to "My voice") and an English one (stored under "en:" + id — the
+// 🎧 playlist plays it before your Masri in "English + Masri" mode, falling back
+// to the device's English voice for cards without one). Both live in IndexedDB
+// and ride along in backups.
+function RecorderRow({ storeKey, label, sayHint, onHave }) {
   const [rec, setRec] = useState(null);
-  const [prefV, setPrefV] = useState(() => (REC_API ? REC_API.pref(itemId) : "original"));
   const [phase, setPhase] = useState("idle"); // idle | recording | denied
   const mrRef = useRef(null);
   const chunksRef = useRef([]);
@@ -3418,10 +3497,10 @@ function VoiceRecorder({ itemId }) {
   useEffect(() => {
     let alive = true;
     setRec(null);
-    setPrefV(REC_API ? REC_API.pref(itemId) : "original");
-    recGet(itemId).then((v) => { if (alive) setRec(v || null); });
+    recGet(storeKey).then((v) => { if (alive) { setRec(v || null); if (onHave) onHave(!!v); } });
     return () => { alive = false; };
-  }, [itemId]);
+    // eslint-disable-next-line
+  }, [storeKey]);
 
   useEffect(() => () => { // cleanup if closed mid-recording
     if (mrRef.current && mrRef.current.state === "recording") { try { mrRef.current.stop(); } catch {} }
@@ -3442,8 +3521,9 @@ function VoiceRecorder({ itemId }) {
         const fr = new FileReader();
         fr.onload = () => {
           const url = fr.result;
-          if (REC_API) REC_API.save(itemId, url);
+          if (REC_API) REC_API.save(storeKey, url);
           setRec(url);
+          if (onHave) onHave(true);
           setPhase("idle");
         };
         fr.readAsDataURL(blob);
@@ -3457,40 +3537,55 @@ function VoiceRecorder({ itemId }) {
   };
   const stop = () => { if (timerRef.current) clearTimeout(timerRef.current); if (mrRef.current && mrRef.current.state === "recording") mrRef.current.stop(); };
   // Play through the converted object URL — iOS won't play the raw data: URL.
-  const play = () => playDataURL(MY_REC[itemId] || (MY_REC[itemId] = playableRec(rec)));
-  const remove = () => { if (REC_API) { REC_API.del(itemId); REC_API.setPref(itemId, "original"); } setRec(null); setPrefV("original"); };
-  const btn = (label, onClick, solid) => (
-    <button className="tap" onClick={onClick} style={{ padding: "8px 13px", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${T.gold}`, background: solid ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : `${T.gold}12`, color: solid ? "#fff" : T.gold }}>{label}</button>
+  const play = () => playDataURL(MY_REC[storeKey] || (MY_REC[storeKey] = playableRec(rec)));
+  const remove = () => { if (REC_API) REC_API.del(storeKey); setRec(null); if (onHave) onHave(false); };
+  const btn = (bl, onClick, solid) => (
+    <button className="tap" onClick={onClick} style={{ padding: "7px 12px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${T.gold}`, background: solid ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : `${T.gold}12`, color: solid ? "#fff" : T.gold }}>{bl}</button>
   );
 
   return (
-    <div style={{ marginTop: 12 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+    <div style={{ marginTop: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 11.5, fontWeight: 700, color: T.goldSoft, minWidth: 50, textAlign: "right" }}>{label}</span>
         {phase === "recording" ? (
           <>
-            <span className="fade" style={{ fontSize: 12.5, color: BAD_RED, fontWeight: 700 }}>● recording…</span>
+            <span className="fade" style={{ fontSize: 12, color: BAD_RED, fontWeight: 700 }}>● recording…</span>
             {btn("■ Stop & save", stop, true)}
           </>
         ) : rec ? (
           <>
-            {btn("▶ My voice", play, true)}
+            {btn("▶ Play", play, true)}
             {btn("● Re-record", start)}
             {btn("🗑", remove)}
           </>
         ) : (
-          btn("🎤 Record my voice", start)
+          btn("🎤 Record", start)
         )}
       </div>
-      {rec && phase !== "recording" && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 9, fontSize: 11.5 }}>
+      {phase === "denied" && <div style={{ fontSize: 10.5, color: BAD_RED, textAlign: "center", marginTop: 4 }}>Microphone blocked — allow mic access for this site in your browser settings.</div>}
+      {phase === "recording" && <div style={{ fontSize: 10.5, color: T.textDim, textAlign: "center", marginTop: 4 }}>{sayHint}</div>}
+    </div>
+  );
+}
+
+function VoiceRecorder({ itemId }) {
+  const [prefV, setPrefV] = useState(() => (REC_API ? REC_API.pref(itemId) : "original"));
+  const [hasAr, setHasAr] = useState(false);
+  useEffect(() => { setPrefV(REC_API ? REC_API.pref(itemId) : "original"); }, [itemId]);
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, textAlign: "center" }}>🎤 In my voice</div>
+      <RecorderRow storeKey={itemId} label="Masri" sayHint="Say it in Arabic, then tap stop (15s max)." onHave={setHasAr} />
+      <RecorderRow storeKey={"en:" + itemId} label="English" sayHint="Say the English meaning, then tap stop (15s max)." />
+      {hasAr && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 10, fontSize: 11.5 }}>
           <span style={{ color: T.textDim }}>Plays in app:</span>
-          {[["original", "Original"], ["mine", "My voice"]].map(([v, label]) => (
-            <button key={v} className="tap" onClick={() => { if (REC_API) REC_API.setPref(itemId, v); setPrefV(v); }} style={{ padding: "5px 11px", borderRadius: 999, fontSize: 11.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${prefV === v ? T.gold : T.line}`, background: prefV === v ? `${T.gold}1a` : "transparent", color: prefV === v ? T.gold : T.textDim }}>{prefV === v ? "✓ " : ""}{label}</button>
+          {[["original", "Original"], ["mine", "My voice"]].map(([v, vl]) => (
+            <button key={v} className="tap" onClick={() => { if (REC_API) REC_API.setPref(itemId, v); setPrefV(v); }} style={{ padding: "5px 11px", borderRadius: 999, fontSize: 11.5, fontWeight: 700, cursor: "pointer", border: `1.5px solid ${prefV === v ? T.gold : T.line}`, background: prefV === v ? `${T.gold}1a` : "transparent", color: prefV === v ? T.gold : T.textDim }}>{prefV === v ? "✓ " : ""}{vl}</button>
           ))}
         </div>
       )}
-      {phase === "denied" && <div style={{ fontSize: 11, color: BAD_RED, textAlign: "center", marginTop: 6 }}>Microphone blocked — allow mic access for this site in your browser settings.</div>}
-      {phase === "recording" && <div style={{ fontSize: 11, color: T.textDim, textAlign: "center", marginTop: 6 }}>Say the word, then tap stop (15s max).</div>}
+      <div style={{ fontSize: 10.5, color: T.textDim, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>Masri is what the 🔊 buttons play when set to "My voice". English is used by the 🎧 playlist's "English + Masri" mode.</div>
     </div>
   );
 }
@@ -4045,6 +4140,433 @@ function HarakatQuiz({ marks, onDone, onSet, harakat = {} }) {
 /* The Verbs tab. Each verb owns three example sentences that live in the
    Conversations set, so learning a verb and learning it *in use* are the same
    flow — and every sentence you take on joins the normal review queue. */
+/* ===================== MY VOICE PLAYLIST =====================
+   A listening drill built from your own recordings: every card you've recorded,
+   played back to back. Filter the queue by level and mastery, choose whether
+   each track is introduced by its English meaning, and let it loop.
+   One shared <audio> element is unlocked by the Play tap and reused for every
+   track — that is what keeps auto-advance working on iOS, where audio started
+   outside a tap is otherwise blocked. */
+function PlaylistView({ state, allItems, onBack, onOpenDetail }) {
+  const recIds = state.recordingIds || [];
+  const tracksAll = useMemo(() => allItems.filter((it) => recIds.includes(it.id)), [allItems, state.recordingIds]);
+  const PL_TIERS = ["Not learned", "Learning", "Shaky", "Familiar", "Strong", "Mastered"];
+  const tierOf = (it) => { const p = state.progress[it.id]; return p ? masteryTier(masteryPct(p)).label : "Not learned"; };
+  const tierColor = (label) => { const t = MASTERY_TIERS.find((x) => x.label === label); return t ? t.color : T.textDim; };
+  const levels = useMemo(() => Array.from(new Set(tracksAll.map((t) => t.level))).sort((a, b) => a - b), [tracksAll]);
+  const countByLevel = {};
+  tracksAll.forEach((t) => { countByLevel[t.level] = (countByLevel[t.level] || 0) + 1; });
+  const countByTier = {};
+  tracksAll.forEach((t) => { const g = tierOf(t); countByTier[g] = (countByTier[g] || 0) + 1; });
+
+  const [selLevels, setSelLevels] = useState([]); // empty = all levels
+  const [selTiers, setSelTiers] = useState([]);   // empty = all tiers
+  const [mode, setMode] = useState("mine");       // mine | en
+  const [loop, setLoop] = useState(true);
+  const [shuf, setShuf] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [nowItem, setNowItem] = useState(null);
+  const [pos, setPos] = useState([0, 0]);
+
+  const tracks = useMemo(() => {
+    const lv = selLevels.length ? new Set(selLevels) : null;
+    const tr = selTiers.length ? new Set(selTiers) : null;
+    return tracksAll.filter((it) => (!lv || lv.has(it.level)) && (!tr || tr.has(tierOf(it))));
+    // eslint-disable-next-line
+  }, [tracksAll, selLevels, selTiers, state.progress]);
+
+  const playingRef = useRef(false), orderRef = useRef([]), idxRef = useRef(0), modeRef = useRef(mode), loopRef = useRef(loop), timerRef = useRef(null), audioRef = useRef(null);
+  useEffect(() => { modeRef.current = mode; }, [mode]);
+  useEffect(() => { loopRef.current = loop; }, [loop]);
+  // Make sure every clip is in memory before the first tap — the iOS unlock
+  // below needs the first track's URL synchronously.
+  useEffect(() => { primeMyRecordings([...recIds, ...(state.recordingIdsEn || []).map((id) => "en:" + id)]); /* eslint-disable-next-line */ }, []);
+  // Which cards also have an English recording — refreshed every render, read via ref
+  // from inside the playback chain so stale closures can't miss a new recording.
+  const enSetRef = useRef(null);
+  enSetRef.current = new Set(state.recordingIdsEn || []);
+
+  const stopAll = useCallback(() => {
+    playingRef.current = false;
+    setPlaying(false);
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+    try { if (audioRef.current) audioRef.current.pause(); } catch {}
+    try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch {}
+  }, []);
+  useEffect(() => () => stopAll(), [stopAll]);
+  // A filter change invalidates the queue — even while paused, so resuming
+  // can't replay a stale, unfiltered order. The next ▶ rebuilds from the
+  // filtered tracks.
+  useEffect(() => { if (playingRef.current) stopAll(); orderRef.current = []; idxRef.current = 0; setNowItem(null); setPos([0, 0]); /* eslint-disable-next-line */ }, [selLevels, selTiers]);
+
+  const getClip = (id) => (MY_REC[id] ? Promise.resolve(MY_REC[id]) : recGet(id).then((v) => { if (v) MY_REC[id] = playableRec(v); return MY_REC[id] || null; }));
+
+  const next = () => {
+    if (!playingRef.current) return;
+    timerRef.current = setTimeout(() => { if (playingRef.current) playTrack(idxRef.current + 1); }, 800);
+  };
+  const playTrack = (i) => {
+    const list = orderRef.current;
+    if (!list.length) { stopAll(); return; }
+    if (i >= list.length) {
+      if (loopRef.current) i = 0;
+      else { stopAll(); setNowItem(null); setPos([0, 0]); return; }
+    }
+    idxRef.current = i;
+    const it = list[i];
+    setNowItem(it);
+    setPos([i + 1, list.length]);
+    const playRec = () => {
+      if (!playingRef.current || idxRef.current !== i) return;
+      getClip(it.id).then((url) => {
+        if (!playingRef.current || idxRef.current !== i) return;
+        const a = audioRef.current;
+        if (!url || !a) { next(); return; }
+        a.src = url;
+        a.onended = next;
+        a.onerror = next;
+        a.play().catch(next);
+      });
+    };
+    // "English + Masri": your own English recording when you've made one,
+    // otherwise the device's English voice — then your Masri recording.
+    const playEnglishThen = (done) => {
+      if (enSetRef.current && enSetRef.current.has(it.id)) {
+        getClip("en:" + it.id).then((url) => {
+          if (!playingRef.current || idxRef.current !== i) return;
+          const a = audioRef.current;
+          if (!url || !a) { speakEnglish(it.en, done); return; }
+          a.src = url;
+          a.onended = done;
+          a.onerror = () => speakEnglish(it.en, done);
+          a.play().catch(() => speakEnglish(it.en, done));
+        });
+      } else speakEnglish(it.en, done);
+    };
+    if (modeRef.current === "en") playEnglishThen(playRec);
+    else playRec();
+  };
+
+  const start = (startIdx = 0, plainOrder = false) => {
+    if (!tracks.length) return;
+    bgStop(); // never talk over the stitched background track
+    const list = shuf && !plainOrder ? shuffle(tracks.slice()) : tracks.slice();
+    orderRef.current = list;
+    try { if (CURRENT_AUDIO) CURRENT_AUDIO.pause(); } catch {}
+    try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch {}
+    if (!audioRef.current) audioRef.current = new Audio();
+    /* iOS unlock: in English-first mode the recording starts seconds after the
+       tap (once the TTS finishes), which iOS blocks on a fresh element. A
+       play-then-pause inside this tap marks the element user-activated, and a
+       reused activated element can then be driven from timers and ended events
+       for the rest of the session. */
+    if (mode === "en") {
+      const first = list[startIdx];
+      const opensWithClip = first && enSetRef.current && enSetRef.current.has(first.id) && MY_REC["en:" + first.id];
+      const url = first && MY_REC[first.id];
+      if (!opensWithClip && url) { const a = audioRef.current; try { a.src = url; const p = a.play(); if (p && p.then) p.then(() => { if (a.src === url) { a.pause(); a.currentTime = 0; } }).catch(() => {}); } catch {} }
+    }
+    playingRef.current = true;
+    setPlaying(true);
+    playTrack(startIdx);
+  };
+
+  // Prev / next / resume — every call happens inside a tap, so playback is allowed.
+  const step = (d) => {
+    if (!orderRef.current.length) { start(0); return; }
+    bgStop();
+    try { if (audioRef.current) audioRef.current.pause(); } catch {}
+    try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch {}
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (!playingRef.current) { playingRef.current = true; setPlaying(true); }
+    let n = idxRef.current + d;
+    if (n < 0) n = orderRef.current.length - 1;
+    if (n >= orderRef.current.length) n = 0;
+    playTrack(n);
+  };
+
+  const lvName = (l) => {
+    const t = (LEVEL_TITLES[l] || "").replace(/^Conversations: /, "").replace(/^Verbs — /, "");
+    return l < CONV_START ? "Lv " + l : (t || "Lv " + l);
+  };
+  /* ---- Background (lock-screen) mode ---- */
+  const [bgGen, setBgGen] = useState(0); // bumps when the shared element is created
+  const [bgS, setBgS] = useState(() => (BG.url ? (BG.audio && !BG.audio.paused ? { s: "playing" } : { s: "paused" }) : { s: "idle" }));
+  const [bgNow, setBgNow] = useState(null);
+  const [bgPos, setBgPos] = useState(() => (BG.audio ? BG.audio.currentTime || 0 : 0));
+  const bgItemRef = useRef(null);
+
+  const bgMediaMeta = (it) => {
+    try {
+      if (typeof navigator === "undefined" || !("mediaSession" in navigator) || !window.MediaMetadata) return;
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: it ? it.ar + " — " + it.en : "My Voice Playlist",
+        artist: "Masri SRS · my voice",
+        album: "🎧 My Voice Playlist",
+      });
+    } catch {}
+  };
+  const bgMediaSetup = (a) => {
+    try {
+      if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+      bgMediaMeta(null);
+      navigator.mediaSession.setActionHandler("play", () => { try { a.play().catch(() => {}); } catch {} });
+      navigator.mediaSession.setActionHandler("pause", () => { try { a.pause(); } catch {} });
+    } catch {}
+  };
+
+  // Mirror the shared element's state while this screen is open. Listeners only —
+  // the element itself is never torn down here, so leaving the screen (or the
+  // whole app) doesn't stop it.
+  useEffect(() => {
+    const a = BG.audio;
+    if (!a || !a.addEventListener) return;
+    const onTime = () => {
+      const t = a.currentTime || 0;
+      setBgPos(t);
+      let cur = null;
+      for (let k = 0; k < BG.offsets.length; k++) { if (t >= BG.offsets[k].at) cur = BG.offsets[k].it; else break; }
+      if (cur && (!bgItemRef.current || bgItemRef.current.id !== cur.id)) { bgItemRef.current = cur; setBgNow(cur); bgMediaMeta(cur); }
+    };
+    const onPlay = () => setBgS((v) => (v.s === "building" ? v : { s: "playing" }));
+    const onPause = () => setBgS((v) => (v.s === "playing" ? { s: "paused" } : v));
+    const onEnd = () => { setBgS({ s: "paused" }); try { a.currentTime = 0; } catch {} };
+    a.addEventListener("timeupdate", onTime);
+    a.addEventListener("play", onPlay);
+    a.addEventListener("pause", onPause);
+    a.addEventListener("ended", onEnd);
+    return () => { a.removeEventListener("timeupdate", onTime); a.removeEventListener("play", onPlay); a.removeEventListener("pause", onPause); a.removeEventListener("ended", onEnd); };
+    // eslint-disable-next-line
+  }, [bgGen]);
+
+  // The loop toggle applies live to a stitched track that's already playing.
+  useEffect(() => { try { if (BG.audio && BG.url) BG.audio.loop = loop; } catch {} }, [loop]);
+
+  const discardBg = () => { bgClear(); bgItemRef.current = null; setBgNow(null); setBgPos(0); setBgS({ s: "idle" }); };
+
+  // Changing what the queue IS (filters, mode, shuffle) makes the stitched
+  // track stale — discard it. Skipped on mount so a track started on an
+  // earlier visit keeps playing when you come back to this screen.
+  const bgFirst = useRef(true);
+  useEffect(() => { if (bgFirst.current) { bgFirst.current = false; return; } if (BG.url || bgS.s === "building") discardBg(); /* eslint-disable-next-line */ }, [selLevels, selTiers, mode, shuf]);
+
+  const startBackground = () => {
+    if (!tracks.length || bgS.s === "building") return;
+    stopAll(); // the chained player and the stitched one never run together
+    bgClear();
+    const list = shuf ? shuffle(tracks.slice()) : tracks.slice();
+    const wantEn = mode === "en";
+    const myToken = BG.token;
+    if (!BG.audio) { BG.audio = new Audio(); setBgGen((g) => g + 1); }
+    const a = BG.audio;
+    /* Unlock inside this tap: the stitched file only exists after async
+       decoding, which lands outside iOS's activation window. Touching the
+       element now (play → guarded pause) marks it user-activated, so the
+       delayed a.play() on the finished WAV is allowed. */
+    const firstUrl = MY_REC[list[0].id] || (wantEn && MY_REC["en:" + list[0].id]) || null;
+    if (firstUrl) { try { a.src = firstUrl; const p = a.play(); if (p && p.then) p.then(() => { if (a.src === firstUrl) { a.pause(); a.currentTime = 0; } }).catch(() => {}); } catch {} }
+    setBgS({ s: "building", done: 0, total: list.length });
+    (async () => {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        if (!AC || !OAC) { setBgS({ s: "error", msg: "This browser can't stitch audio for background play." }); return; }
+        const ctx = new AC();
+        const decode = async (key) => {
+          const raw = await recGet(key); // raw base64 from IndexedDB, not the object URL
+          if (!raw || typeof raw !== "string") return null;
+          try {
+            const comma = raw.indexOf(",");
+            const bin = atob(raw.slice(comma + 1));
+            const bytes = new Uint8Array(bin.length);
+            for (let k = 0; k < bin.length; k++) bytes[k] = bin.charCodeAt(k);
+            return await new Promise((resolve) => {
+              let settled = false;
+              const fin = (b) => { if (!settled) { settled = true; resolve(b || null); } };
+              try { const p = ctx.decodeAudioData(bytes.buffer, fin, () => fin(null)); if (p && p.then) p.then(fin, () => fin(null)); } catch { fin(null); }
+            });
+          } catch { return null; }
+        };
+        const RATE = 22050, GAP = 0.9, GAP_EN = 0.35;
+        const segs = [], offsets = [];
+        let t = 0, done = 0;
+        for (const it of list) {
+          if (BG.token !== myToken) { try { ctx.close && ctx.close(); } catch {} return; } // discarded mid-build
+          const at0 = t, before = segs.length;
+          if (wantEn && enSetRef.current && enSetRef.current.has(it.id)) {
+            const eb = await decode("en:" + it.id);
+            if (eb) { segs.push([eb, t]); t += eb.duration + GAP_EN; }
+          }
+          const ab = await decode(it.id);
+          if (ab) { segs.push([ab, t]); t += ab.duration + GAP; }
+          if (segs.length > before) offsets.push({ at: at0, it });
+          done++; setBgS({ s: "building", done, total: list.length });
+        }
+        try { ctx.close && ctx.close(); } catch {}
+        if (BG.token !== myToken) return;
+        if (!segs.length) { setBgS({ s: "error", msg: "Couldn't decode any of these recordings on this device." }); return; }
+        const oc = new OAC(1, Math.max(1, Math.ceil(t * RATE)), RATE);
+        segs.forEach(([buf, at]) => { const sn = oc.createBufferSource(); sn.buffer = buf; sn.connect(oc.destination); sn.start(at); });
+        const rendered = await oc.startRendering();
+        if (BG.token !== myToken) return;
+        BG.url = URL.createObjectURL(new Blob([encodeWav(rendered)], { type: "audio/wav" }));
+        BG.offsets = offsets;
+        BG.dur = t;
+        a.loop = loopRef.current;
+        a.onended = null; a.onerror = null;
+        a.src = BG.url;
+        bgItemRef.current = null;
+        setBgNow(offsets.length ? offsets[0].it : null);
+        bgMediaSetup(a);
+        if (playingRef.current) { setBgS({ s: "paused" }); } // user restarted the regular player mid-build — don't talk over it
+        else { a.play().catch(() => {}); setBgS({ s: "playing" }); }
+      } catch (e) {
+        if (BG.token === myToken) setBgS({ s: "error", msg: "Couldn't build the background track here." });
+      }
+    })();
+  };
+
+  const chip = (on, label, onTap, key) => (
+    <button key={key || label} className="tap" onClick={onTap} style={{ whiteSpace: "nowrap", border: `1px solid ${on ? T.gold : T.line}`, background: on ? `${T.gold}18` : "transparent", color: on ? T.gold : T.textDim, borderRadius: 20, padding: "6px 12px", fontSize: 12, fontWeight: 600 }}>{label}</button>
+  );
+
+  if (!tracksAll.length) {
+    return (
+      <div className="fade">
+        <button className="tap" onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "8px 14px", borderRadius: 999, border: `1px solid ${T.line}`, background: T.panel, color: T.gold, fontSize: 13, fontWeight: 700 }}>‹ Lessons</button>
+        <div style={{ fontFamily: displayFont, fontSize: 24, marginBottom: 2 }}>🎧 My Voice Playlist</div>
+        <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 18, padding: "26px 20px", textAlign: "center", marginTop: 12 }}>
+          <div style={{ fontSize: 34, marginBottom: 8 }}>🎤</div>
+          <div style={{ fontSize: 14.5, fontWeight: 700 }}>No recordings yet</div>
+          <div style={{ fontSize: 12.5, color: T.textDim, marginTop: 8, lineHeight: 1.6 }}>Open any card and tap <b style={{ color: T.gold }}>🎤 Record my voice</b> — every card you record shows up here as a playable track.</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fade">
+      <button className="tap" onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "8px 14px", borderRadius: 999, border: `1px solid ${T.line}`, background: T.panel, color: T.gold, fontSize: 13, fontWeight: 700 }}>‹ Lessons</button>
+      <div style={{ fontFamily: displayFont, fontSize: 24, marginBottom: 2 }}>🎧 My Voice Playlist</div>
+      <div style={{ fontSize: 12.5, color: T.textDim, marginBottom: 14, lineHeight: 1.5 }}>
+        Every card you've recorded, played back to back — your own voice as a listening drill. Filter it, set it looping, and let it run.
+      </div>
+
+      <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 6px" }}>Each track plays</div>
+      <div style={{ display: "flex", gap: 5, background: T.panelHi, border: `1px solid ${T.line}`, padding: 4, borderRadius: 12, marginBottom: 10 }}>
+        {[["mine", "🎤 Masri only"], ["en", "🔊 English + Masri"]].map(([k, label]) => (
+          <button key={k} className="tap" onClick={() => setMode(k)} style={{ flex: 1, border: "none", borderRadius: 8, padding: "9px 2px", fontSize: 12.5, fontWeight: 600, color: mode === k ? "#fff" : T.textDim, background: mode === k ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : "transparent" }}>{label}</button>
+        ))}
+      </div>
+      <div style={{ fontSize: 10.5, color: T.textDim, lineHeight: 1.5, margin: "-4px 2px 10px" }}>English + Masri plays <b style={{ color: T.gold }}>your English recording</b> first when the card has one (EN in the track list) — the device's English voice otherwise — then your Masri.</div>
+      <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+        {chip(loop, loop ? "✓ Loop forever" : "Loop forever", () => setLoop((v) => !v), "loop")}
+        {chip(shuf, shuf ? "✓ Shuffle" : "Shuffle", () => setShuf((v) => !v), "shuf")}
+      </div>
+
+      <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 6px" }}>Levels</div>
+      <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 6, marginBottom: 4 }}>
+        {chip(selLevels.length === 0, `All (${tracksAll.length})`, () => setSelLevels([]), "alllv")}
+        {levels.map((l) => chip(selLevels.includes(l), `${lvName(l)} (${countByLevel[l] || 0})`, () => setSelLevels((s) => (s.includes(l) ? s.filter((x) => x !== l) : [...s, l])), "lv" + l))}
+      </div>
+      <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 6px" }}>Mastery</div>
+      <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8, marginBottom: 8 }}>
+        {chip(selTiers.length === 0, "All", () => setSelTiers([]), "alltier")}
+        {PL_TIERS.map((g) => chip(selTiers.includes(g), `${g} (${countByTier[g] || 0})`, () => setSelTiers((s) => (s.includes(g) ? s.filter((x) => x !== g) : [...s, g])), "t" + g))}
+      </div>
+
+      <div style={{ background: `linear-gradient(160deg, ${T.panelHi}, ${T.panel})`, border: `1px solid ${T.line}`, borderRadius: 20, padding: "18px 16px", textAlign: "center", marginBottom: 12, boxShadow: "0 12px 30px rgba(128,29,92,.08)" }}>
+        {nowItem ? (
+          <>
+            <div style={{ fontSize: 11, color: T.goldSoft, fontWeight: 700 }}>{pos[0]} / {pos[1]}{shuf ? " · shuffled" : ""}</div>
+            <div style={{ fontFamily: arFont, fontSize: nowItem.type === "sentence" ? 26 : 36, color: T.text, direction: "rtl", margin: "8px 0 2px", lineHeight: 1.4 }}>{nowItem.ar}</div>
+            <div style={{ color: T.goldSoft, fontStyle: "italic", fontSize: 13.5 }}>{nowItem.tr}</div>
+            {nowItem.az && <div style={{ fontSize: 12.5, color: T.gold, fontWeight: 700, marginTop: 2 }}>{nowItem.az}</div>}
+            <div style={{ fontFamily: displayFont, fontSize: 16, marginTop: 3 }}>{nowItem.en}</div>
+            {onOpenDetail && <button className="tap" onClick={() => onOpenDetail(nowItem)} style={{ marginTop: 6, background: "transparent", border: "none", color: T.gold, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>open card ›</button>}
+          </>
+        ) : (
+          <div style={{ fontSize: 13.5, color: T.textDim, lineHeight: 1.6 }}>
+            {tracks.length ? `${tracks.length} recording${tracks.length === 1 ? "" : "s"} ready — tap play` : "Nothing matches these filters"}
+          </div>
+        )}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginTop: 12 }}>
+          <button className="tap" onClick={() => step(-1)} disabled={!tracks.length} style={{ width: 46, height: 46, borderRadius: 999, border: `1px solid ${T.line}`, background: T.panelHi, color: tracks.length ? T.gold : T.line, fontSize: 17, lineHeight: 1, cursor: "pointer" }}>⏮</button>
+          {playing ? (
+            <button className="tap" onClick={stopAll} style={{ width: 62, height: 62, borderRadius: 999, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 23, lineHeight: 1, cursor: "pointer", boxShadow: "0 8px 20px rgba(128,29,92,.25)" }}>⏸</button>
+          ) : (
+            <button className="tap" onClick={() => (nowItem && orderRef.current.length ? step(0) : start(0))} disabled={!tracks.length} style={{ width: 62, height: 62, borderRadius: 999, border: "none", background: tracks.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: "#fff", fontSize: 23, lineHeight: 1, cursor: "pointer", boxShadow: tracks.length ? "0 8px 20px rgba(128,29,92,.25)" : "none" }}>▶</button>
+          )}
+          <button className="tap" onClick={() => step(1)} disabled={!tracks.length} style={{ width: 46, height: 46, borderRadius: 999, border: `1px solid ${T.line}`, background: T.panelHi, color: tracks.length ? T.gold : T.line, fontSize: 17, lineHeight: 1, cursor: "pointer" }}>⏭</button>
+        </div>
+      </div>
+
+      {/* background / lock-screen mode */}
+      <div style={{ background: T.panel, border: `1px solid ${T.gold}55`, borderRadius: 16, padding: "14px 15px", marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: T.gold }}>🌙 Background mode</div>
+          {(bgS.s === "playing" || bgS.s === "paused") && <button className="tap" onClick={discardBg} style={{ border: "none", background: "transparent", color: T.textDim, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>✕ discard track</button>}
+        </div>
+        <div style={{ fontSize: 11.5, color: T.textDim, lineHeight: 1.55, marginTop: 5 }}>
+          The player above pauses when your phone locks — iOS freezes web apps between tracks. Background mode stitches the current queue into <b style={{ color: T.gold }}>one continuous track</b> that keeps playing with the screen locked or while you're in another app, with play/pause on the lock screen.{mode === "en" ? " Cards without an English recording play Masri only here — the device's English voice can't run in the background." : ""}
+        </div>
+        {bgS.s === "idle" && (
+          <button className="tap" disabled={!tracks.length} onClick={startBackground} style={{ width: "100%", marginTop: 10, padding: 12, borderRadius: 11, border: "none", background: tracks.length ? `linear-gradient(135deg, ${T.gold}, ${T.terra})` : T.line, color: "#fff", fontSize: 13.5, fontWeight: 700 }}>🌙 Build &amp; play in background ({tracks.length} track{tracks.length === 1 ? "" : "s"})</button>
+        )}
+        {bgS.s === "building" && (
+          <div style={{ marginTop: 10 }}>
+            <div style={{ fontSize: 12, color: T.gold, fontWeight: 700, marginBottom: 6 }}>Stitching your recordings… {bgS.done}/{bgS.total}</div>
+            <Bar pct={bgS.total ? bgS.done / bgS.total : 0} h={6} />
+          </div>
+        )}
+        {(bgS.s === "playing" || bgS.s === "paused") && (
+          <div style={{ marginTop: 10 }}>
+            {bgNow && (
+              <div style={{ fontSize: 12.5, color: T.text, marginBottom: 4, textAlign: "center" }}>
+                <span style={{ fontFamily: arFont, fontSize: 17, direction: "rtl" }}>{bgNow.ar}</span>
+                <span style={{ color: T.textDim }}> — {bgNow.en}</span>
+              </div>
+            )}
+            <div style={{ margin: "6px 0" }}><Bar pct={BG.dur ? Math.min(1, bgPos / BG.dur) : 0} h={5} /></div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+              {bgS.s === "playing" ? (
+                <button className="tap" onClick={() => { try { BG.audio && BG.audio.pause(); } catch {} }} style={{ padding: "10px 22px", borderRadius: 999, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 14, fontWeight: 700 }}>⏸ Pause track</button>
+              ) : (
+                <button className="tap" onClick={() => { try { BG.audio && BG.audio.play().catch(() => {}); } catch {} }} style={{ padding: "10px 22px", borderRadius: 999, border: "none", background: `linear-gradient(135deg, ${T.gold}, ${T.terra})`, color: "#fff", fontSize: 14, fontWeight: 700 }}>▶ Resume track</button>
+              )}
+              <span style={{ fontSize: 11.5, color: T.textDim }}>{fmtClock(bgPos)} / {fmtClock(BG.dur)}{BG.audio && BG.audio.loop ? " · loops" : ""}</span>
+            </div>
+            <div style={{ fontSize: 10.5, color: T.textDim, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>Lock your phone or switch apps — it keeps going. It even keeps playing if you leave this screen.</div>
+          </div>
+        )}
+        {bgS.s === "error" && <div style={{ fontSize: 12, color: BAD_RED, fontWeight: 600, marginTop: 8, lineHeight: 1.5 }}>⚠ {bgS.msg}</div>}
+      </div>
+
+      <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: 1, color: T.goldSoft, margin: "4px 2px 8px" }}>Tracks · tap one to play from there</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 7, maxHeight: 340, overflowY: "auto" }}>
+        {tracks.map((it, i) => {
+          const cur = nowItem && nowItem.id === it.id;
+          const g = tierOf(it);
+          return (
+            <button key={it.id} className="tap" onClick={() => start(i, true)} style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 10, background: cur ? `${T.gold}12` : T.panel, border: `1px solid ${cur ? T.gold : T.line}`, borderRadius: 12, padding: "10px 12px", cursor: "pointer" }}>
+              <span style={{ fontSize: 13, width: 18, textAlign: "center", flexShrink: 0 }}>{cur && playing ? "🔊" : "🎤"}</span>
+              <span style={{ fontFamily: arFont, fontSize: 19, direction: "rtl", color: T.text, minWidth: 56, textAlign: "right", flexShrink: 0 }}>{it.ar}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: "block", fontSize: 12.5, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{it.en}</span>
+                <span style={{ display: "block", fontSize: 10.5, color: T.goldSoft, fontStyle: "italic" }}>{it.tr}</span>
+              </span>
+              {enSetRef.current && enSetRef.current.has(it.id) && <span style={{ fontSize: 9, fontWeight: 800, color: T.gold, border: `1px solid ${T.gold}66`, borderRadius: 5, padding: "1px 4px", flexShrink: 0 }}>EN</span>}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9.5, color: T.textDim, whiteSpace: "nowrap", flexShrink: 0 }}>
+                <span style={{ width: 8, height: 8, borderRadius: 3, background: tierColor(g) }} />{g}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function VerbHub({ state, allItems, onBack, onLearn, onQuiz, onOpenDetail, onItems }) {
   const verbs = allItems.filter((it) => isVerbLevel(it.level));
   const learnedVerbs = verbs.filter((it) => state.progress[it.id]);
@@ -4247,7 +4769,8 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
       await recLoad(obj.recordings);
       const ids = await recKeys();
       primeMyRecordings(ids);
-      onImport({ ...state, recordingIds: ids, voicePref: { ...(state.voicePref || {}), ...(obj.voicePref || {}) } });
+      const sk = splitRecKeys(ids);
+      onImport({ ...state, recordingIds: sk.ar, recordingIdsEn: sk.en, voicePref: { ...(state.voicePref || {}), ...(obj.voicePref || {}) } });
       setMsg(`✓ Restored ${n} voice recording${n === 1 ? "" : "s"}. Your progress was left as it is.`);
       setImportText(""); setBusy(false); setRecCount(ids.length);
       return;
@@ -4256,7 +4779,8 @@ function HomeView({ state, level, levelPct, lessons, reviews, leeches, stageCoun
     if (obj.recordings && Object.keys(obj.recordings).length) await recLoad(obj.recordings);
     const ids = await recKeys();
     primeMyRecordings(ids);
-    if (onImport({ ...obj, recordings: {}, recordingIds: ids })) {
+    const sk = splitRecKeys(ids);
+    if (onImport({ ...obj, recordings: {}, recordingIds: sk.ar, recordingIdsEn: sk.en })) {
       setMsg(`✓ Restored — progress, corrections${ids.length ? ` and ${ids.length} voice recording${ids.length === 1 ? "" : "s"}` : ""}.`);
       setImportText("");
       setRecCount(ids.length);
@@ -5062,7 +5586,8 @@ function App() {
       const legacy = s.recordings && Object.keys(s.recordings).length ? s.recordings : null;
       if (legacy) { await recLoad(legacy); }
       const ids = await recKeys();
-      s = { ...s, recordings: {}, recordingIds: ids };
+      const sk = splitRecKeys(ids);
+      s = { ...s, recordings: {}, recordingIds: sk.ar, recordingIdsEn: sk.en };
       primeMyRecordings(ids);
       if (legacy) await saveState(s); // reclaim the space immediately
 
@@ -5140,19 +5665,29 @@ function App() {
     prog: (id) => (stateRef.current && stateRef.current.progress ? stateRef.current.progress[id] || null : null),
     learn: (id) => commitLearn(id),
     // The clip itself is in IndexedDB; state only remembers which ids have one.
-    save: (id, url) => {
-      MY_REC[id] = playableRec(url);   // playable immediately; IndexedDB keeps the raw base64
-      recPut(id, url).then(() => {
+    save: (key, url) => {
+      MY_REC[key] = playableRec(url);   // playable immediately; IndexedDB keeps the raw base64
+      recPut(key, url).then(() => {
         const s = stateRef.current;
-        const ids = Array.from(new Set([...(s.recordingIds || []), id]));
-        persist({ ...s, recordingIds: ids });
+        if (String(key).slice(0, 3) === "en:") {
+          const id = String(key).slice(3);
+          persist({ ...s, recordingIdsEn: Array.from(new Set([...(s.recordingIdsEn || []), id])) });
+        } else {
+          persist({ ...s, recordingIds: Array.from(new Set([...(s.recordingIds || []), key])) });
+        }
       });
     },
-    del: (id) => {
-      delete MY_REC[id];
-      recDel(id).then(() => {
+    del: (key) => {
+      delete MY_REC[key];
+      recDel(key).then(() => {
         const s = stateRef.current;
-        persist({ ...s, recordingIds: (s.recordingIds || []).filter((x) => x !== id) });
+        if (String(key).slice(0, 3) === "en:") {
+          const id = String(key).slice(3);
+          persist({ ...s, recordingIdsEn: (s.recordingIdsEn || []).filter((x) => x !== id) });
+        } else {
+          // Deleting the Masri clip also resets that card's playback back to Original.
+          persist({ ...s, recordingIds: (s.recordingIds || []).filter((x) => x !== key), voicePref: { ...(s.voicePref || {}), [key]: "original" } });
+        }
       });
     },
   };
@@ -5446,7 +5981,7 @@ function App() {
           />
         )}
         {view === "lessons" && (
-          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} onConv={() => setView("conv")} onVerbs={() => setView("verbs")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
+          <LearnSession pool={derived.pool} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("home")} learnedCount={allItems.filter((it) => state.progress[it.id]).length} onQuizLearned={startLearnedQuiz} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} onConv={() => setView("conv")} onVerbs={() => setView("verbs")} onPlaylist={() => setView("playlist")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}
         {view === "reviews" && (
           <ReviewsHub
@@ -5471,6 +6006,7 @@ function App() {
         {view === "convlearn" && convCat && (
           <LearnSession pool={allItems.filter((it) => it.level === convCat && !state.progress[it.id])} batch={state.settings.lessonBatch} onLearn={commitLearn} onGrade={grade} onAnswer={bumpItemRun} onExit={() => setView("conv")} autoStart={true} learnedCount={allItems.filter((it) => it.level === convCat && state.progress[it.id]).length} onQuizLearned={() => startConvQuiz(convCat)} customCount={(state.customItems || []).length} onCustom={startCustomItems} onGotoItems={() => setView("items")} quizType={state.settings.quizType || "inapp"} onQuizType={onQuizType} autoPlay={state.settings.autoPlay !== false} />
         )}
+        {view === "playlist" && <PlaylistView state={state} allItems={allItems} onBack={() => setView("lessons")} onOpenDetail={setDetailItem} />}
         {view === "items" && (
           <ItemsView allItems={allItems} state={state} level={state.currentLevel} leeches={derived.leechList.length} onAdd={(c) => persist({ ...state, custom: [...state.custom, c] })} onStartPractice={startPractice} customItems={state.customItems || []} onToggleCustom={onToggleCustom} onStartCustom={startCustomItems} onClearCustom={onClearCustom} onAddByStage={onAddItemsToCustom} audioIds={audioIds} onReorder={onReorderLevel} initialFilter={itemsFilter} onOpenDetail={setDetailItem} />
         )}
